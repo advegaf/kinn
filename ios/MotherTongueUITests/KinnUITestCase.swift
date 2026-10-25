@@ -52,6 +52,19 @@ class KinnUITestCase: XCTestCase {
         shot.lifetime = .keepAlways
         add(shot)
 
+        // Frame checks cannot see text cut off by its container or truncated to "...".
+        var issues: [String] = []
+        do {
+            try app.performAccessibilityAudit(for: [.textClipped, .dynamicType]) { issue in
+                let id = issue.element.map { $0.identifier.isEmpty ? $0.label : $0.identifier } ?? "?"
+                issues.append("\(id): \(issue.compactDescription)")
+                return true
+            }
+        } catch {
+            issues.append("accessibility audit did not run: \(error)")
+        }
+        XCTAssertTrue(issues.isEmpty, "\(name): " + issues.joined(separator: "; "))
+
         let window = app.windows.firstMatch.frame
         let insets = safeInsets(window)
         for button in app.buttons.allElementsBoundByIndex where button.exists && button.isHittable {
@@ -66,16 +79,6 @@ class KinnUITestCase: XCTestCase {
             let f = text.frame
             XCTAssertGreaterThanOrEqual(f.minX, window.minX - 1, "\(name): \"\(text.label)\" runs off the left edge")
             XCTAssertLessThanOrEqual(f.maxX, window.maxX + 1, "\(name): \"\(text.label)\" runs off the right edge")
-        }
-        // The frame checks above cannot see text cut off by its container or truncated to "...".
-        do {
-            try app.performAccessibilityAudit(for: [.textClipped, .dynamicType]) { issue in
-                let id = issue.element.map { $0.identifier.isEmpty ? $0.label : $0.identifier } ?? "?"
-                XCTFail("\(name): \(id): \(issue.compactDescription)")
-                return true
-            }
-        } catch {
-            XCTFail("\(name): accessibility audit did not run: \(error)")
         }
     }
 
