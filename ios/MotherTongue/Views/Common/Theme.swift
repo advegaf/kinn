@@ -91,6 +91,11 @@ extension AnyTransition {
     static var fade: AnyTransition {
         .asymmetric(insertion: .opacity.animation(.enter), removal: .opacity.animation(.exit))
     }
+
+    /// For Reduce Motion: fade in, and leave at once, so the view does not overlap a layout that jumps.
+    static var fadeIn: AnyTransition {
+        .asymmetric(insertion: .opacity.animation(.enter), removal: .identity)
+    }
 }
 
 @MainActor
@@ -212,19 +217,92 @@ struct SlabButtonStyle: ButtonStyle {
 }
 
 struct RecordDisc: View {
-    var live: Bool
+    enum Mark { case record, stop, send }
+    var mark: Mark
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         Circle()
             .fill(Color.ink)
             .overlay(Circle().strokeBorder(.black.opacity(0.4), lineWidth: 2).blur(radius: 2).offset(y: -1).mask(Circle()))
             .overlay {
-                Circle().fill(Color.rec)
-                    .frame(width: live ? 26 : 22, height: live ? 26 : 22)
-                    .overlay(Circle().stroke(Color(hex: 0xFFDCC8, opacity: 0.25), lineWidth: 1).offset(y: 0.5).mask(Circle()))
+                if mark == .send {
+                    Arrow()
+                        .stroke(Color.cream, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+                        .frame(width: 18, height: 18)
+                } else {
+                    let stop = mark == .stop
+                    let dot = RoundedRectangle(cornerRadius: stop ? 4 : 11)
+                    dot.fill(Color.rec)
+                        .frame(width: stop ? 20 : 22, height: stop ? 20 : 22)
+                        .overlay(dot.stroke(Color(hex: 0xFFDCC8, opacity: 0.25), lineWidth: 1).offset(y: 0.5).mask(dot))
+                }
             }
             .frame(width: 72, height: 72)
             .shadow(color: Color(hex: 0x1E140A, opacity: 0.45), radius: 9, y: 10)
-            .animation(.enter, value: live)
+            .animation(reduceMotion ? nil : .enter, value: mark)
+    }
+}
+
+/// The up and right arrow: the send mark, and the sent mark in a list. Turned 180 degrees, it marks a note received.
+struct Arrow: Shape {
+    func path(in r: CGRect) -> Path {
+        Path { p in
+            p.move(to: CGPoint(x: r.minX, y: r.maxY))
+            p.addLine(to: CGPoint(x: r.maxX, y: r.minY))
+            p.move(to: CGPoint(x: r.minX, y: r.minY))
+            p.addLine(to: CGPoint(x: r.maxX, y: r.minY))
+            p.addLine(to: CGPoint(x: r.maxX, y: r.maxY))
+        }
+    }
+}
+
+/// A ruled box that takes an ink tick, in place of the system switch. VoiceOver still gets a standard switch.
+struct TickToggleStyle: ToggleStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        Button { configuration.isOn.toggle() } label: {
+            HStack(spacing: 12) {
+                configuration.label
+                Spacer(minLength: 0)
+                TickBox(on: configuration.isOn)
+            }
+            .tapTarget()
+        }
+        .buttonStyle(PressStyle())
+        .accessibilityRepresentation {
+            Toggle(isOn: configuration.$isOn) { configuration.label }
+        }
+    }
+}
+
+private struct TickBox: View {
+    var on: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @ScaledMetric(relativeTo: .body) private var side: CGFloat = 24
+
+    var body: some View {
+        let box = RoundedRectangle(cornerRadius: 4)
+        box.fill(on ? Color.ink : Color.clear)
+            .overlay(box.strokeBorder(Color.ink, lineWidth: 1.5))
+            .overlay {
+                Tick()
+                    .trim(from: 0, to: on || reduceMotion ? 1 : 0)
+                    .stroke(Color.cream, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+                    .padding(side * 0.25)
+                    .opacity(on ? 1 : 0)
+            }
+            .frame(width: side, height: side)
+            .animation(.push, value: on)
+    }
+}
+
+private struct Tick: Shape {
+    func path(in r: CGRect) -> Path {
+        Path { p in
+            p.move(to: CGPoint(x: r.minX, y: r.minY + r.height * 0.55))
+            p.addLine(to: CGPoint(x: r.minX + r.width * 0.38, y: r.minY + r.height * 0.9))
+            p.addLine(to: CGPoint(x: r.maxX, y: r.minY + r.height * 0.12))
+        }
     }
 }
 

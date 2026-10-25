@@ -118,7 +118,7 @@ struct VoiceEnrollView: View {
             Spacer(minLength: 16)
             Button(action: tapped) {
                 ZStack {
-                    RecordDisc(live: live)
+                    RecordDisc(mark: live ? .stop : .record)
                     if phase == .uploading { ProgressView().tint(.cream) }
                 }
             }

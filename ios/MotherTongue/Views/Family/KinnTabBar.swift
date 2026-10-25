@@ -6,22 +6,30 @@ struct KinnTabBar: View {
     var compose: () -> Void
     var settings: () -> Void
 
+    @State private var bottomInset: CGFloat = 0
+    /// Instrument Serif's descender is 0.04 em deeper than the space over its cap height, so the ink sits centered with 0.04 em more on top.
+    @ScaledMetric(relativeTo: .body) private var nudge: CGFloat = 0.76
+
     var body: some View {
-        VStack(spacing: 0) {
-            Hairline()
-            HStack(spacing: 0) {
-                item("Home", id: "tabBar.home", selected: true, action: home)
-                item("Archive", id: "tabBar.archive", action: archive)
-                item("New note", id: "tabBar.compose", action: compose)
-                item("Settings", id: "tabBar.settings", action: settings)
-            }
-            .padding(.horizontal, 30)
-            .padding(.top, 6)
+        HStack(spacing: 0) {
+            Spacer(minLength: 0)
+            item("Home", id: "tabBar.home", selected: true, action: home)
+            Spacer(minLength: 0)
+            item("Archive", id: "tabBar.archive", action: archive)
+            Spacer(minLength: 0)
+            item("New note", id: "tabBar.compose", action: compose)
+            Spacer(minLength: 0)
+            item("Settings", id: "tabBar.settings", action: settings)
+            Spacer(minLength: 0)
         }
+        .padding(.horizontal, 8)
+        .overlay(alignment: .top) { Hairline() }
         .background { Color.paper.ignoresSafeArea(edges: .bottom) }
+        .onGeometryChange(for: CGFloat.self) { $0.safeAreaInsets.bottom } action: { bottomInset = $0 }
     }
 
     /// The bar only shows on the week, so Home is always the selected item.
+    /// The text sits on the top of the safe area, so the space over it equals the space under it down to the screen edge.
     private func item(_ label: String, id: String, selected: Bool = false, action: @escaping () -> Void) -> some View {
         Button {
             Haptics.tap()
@@ -32,7 +40,10 @@ struct KinnTabBar: View {
                 .foregroundStyle(selected ? Color.ink : Color.soft)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
-                .frame(maxWidth: .infinity, minHeight: 44)
+                .padding(.horizontal, 8)
+                .padding(.top, max(bottomInset, 20) + nudge)
+                .padding(.bottom, max(20 - bottomInset, 0))
+                .frame(minHeight: 44)
                 .contentShape(.rect)
         }
         .buttonStyle(PressStyle())

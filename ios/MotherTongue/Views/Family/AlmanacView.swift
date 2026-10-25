@@ -18,7 +18,9 @@ struct AlmanacView: View {
         let now = Date.now
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                head
+                Text("Kinn")
+                    .font(.serif(28, relativeTo: .title))
+                    .foregroundStyle(Color.ink)
                 Text(Almanac.month(now))
                     .font(.serif(66, relativeTo: .largeTitle))
                     .tracking(-1.65)
@@ -43,18 +45,6 @@ struct AlmanacView: View {
         .scrollClipDisabled()
         .mask { Rectangle().ignoresSafeArea(edges: .bottom) }
         .scrollIndicators(.hidden)
-    }
-
-    private var head: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text("Kinn")
-                .font(.serif(28, relativeTo: .title))
-                .foregroundStyle(Color.ink)
-            Text("To \(session.partnerName)\(session.isDemo ? ", Monterrey" : "")")
-                .font(.serif(17))
-                .foregroundStyle(Color.soft)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func weekRow(_ now: Date) -> some View {
@@ -95,25 +85,16 @@ struct AlmanacView: View {
         let making = m.isMakingFilm(at: now)
         return VStack(alignment: .leading, spacing: 0) {
             Button { open(m.id) } label: {
-                VStack(alignment: .leading, spacing: -2) {
-                    Text(Almanac.titleEn(m))
-                        .font(.serif(34, relativeTo: .title))
-                        .tracking(-0.5)
-                        .foregroundStyle(Color.ink)
-                        .multilineTextAlignment(.leading)
-                    Text(Almanac.titleEs(m))
-                        .font(.serif(17))
-                        .foregroundStyle(Color.sub)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .contentShape(.rect)
+                Text(Almanac.titleEn(m))
+                    .font(.serif(34, relativeTo: .title))
+                    .tracking(-0.5)
+                    .foregroundStyle(Color.ink)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(.rect)
             }
             .buttonStyle(PressStyle())
             .accessibilityIdentifier("almanac.featured")
-            Text("\(Almanac.day(m.date)) at \(Almanac.time(m.date))")
-                .font(.serif(17))
-                .foregroundStyle(Color.soft)
-                .padding(.top, 6)
             if making {
                 Breathing {
                     Text("Making the film")
@@ -175,44 +156,53 @@ struct AlmanacView: View {
         }
     }
 
-    private func index(_ rows: [Message]) -> some View {
-        VStack(spacing: 0) {
-            ForEach(Array(rows.enumerated()), id: \.element.id) { i, m in
-                let sameDay = i > 0 && Almanac.calendar.isDate(rows[i - 1].date, inSameDayAs: m.date)
-                let mine = session.isMine(m)
-                Button { open(m.id) } label: {
-                    HStack(alignment: .firstTextBaseline, spacing: 0) {
-                        Text(sameDay ? "" : "\(Almanac.dayNumber(m.date))")
-                            .font(.serif(22))
-                            .monospacedDigit()
-                            .foregroundStyle(mine ? Color.later : Color.sub)
-                            .frame(width: 44, alignment: .leading)
-                        VStack(alignment: .leading, spacing: 2) {
+    @ViewBuilder private func index(_ rows: [Message]) -> some View {
+        if !rows.isEmpty {
+            Disclosure(title: "Earlier this week", id: "almanac.earlier") {
+                ForEach(Array(rows.enumerated()), id: \.element.id) { i, m in
+                    let sameDay = i > 0 && Almanac.calendar.isDate(rows[i - 1].date, inSameDayAs: m.date)
+                    let mine = session.isMine(m)
+                    Button { open(m.id) } label: {
+                        HStack(alignment: .firstTextBaseline, spacing: 0) {
+                            Text(sameDay ? "" : "\(Almanac.dayNumber(m.date))")
+                                .font(.serif(22))
+                                .monospacedDigit()
+                                .foregroundStyle(mine ? Color.later : Color.sub)
+                                .frame(width: 44, alignment: .leading)
+                            DirectionMark(sent: mine)
+                                .padding(.trailing, 12)
                             Text(Almanac.titleEn(m))
                                 .font(.serif(19))
                                 .foregroundStyle(Color.ink)
-                            Text(Almanac.titleEs(m))
-                                .font(.serif(15))
-                                .foregroundStyle(Color.sub)
-                            if mine {
-                                Text("You sent this")
-                                    .font(.serif(15))
-                                    .foregroundStyle(Color.soft)
-                            }
+                                .multilineTextAlignment(.leading)
+                            Spacer(minLength: 0)
                         }
-                        .multilineTextAlignment(.leading)
-                        Spacer(minLength: 0)
+                        .padding(.top, 10)
+                        .padding(.bottom, 9)
+                        .contentShape(.rect)
                     }
-                    .padding(.top, 10)
-                    .padding(.bottom, 9)
-                    .contentShape(.rect)
+                    .buttonStyle(PressStyle())
+                    .accessibilityValue(mine ? "Sent" : "Received")
+                    .accessibilityIdentifier("almanac.row")
+                    .overlay(alignment: .bottom) { Hairline() }
                 }
-                .buttonStyle(PressStyle())
-                .accessibilityIdentifier("almanac.row")
-                .overlay(alignment: .bottom) { Hairline() }
             }
         }
-        .overlay(alignment: .top) { if !rows.isEmpty { Hairline() } }
+    }
+}
+
+/// Up and right for a note you sent, down and left for one you received, as in a call log.
+private struct DirectionMark: View {
+    var sent: Bool
+    @ScaledMetric(relativeTo: .body) private var side: CGFloat = 10
+
+    var body: some View {
+        Arrow()
+            .stroke(Color.soft, style: StrokeStyle(lineWidth: 1.25, lineCap: .round, lineJoin: .round))
+            .frame(width: side, height: side)
+            .rotationEffect(.degrees(sent ? 0 : 180))
+            .alignmentGuide(.firstTextBaseline) { $0[.bottom] }
+            .accessibilityHidden(true)
     }
 }
 

@@ -7,6 +7,7 @@ final class AlmanacTests: KinnUITestCase {
         element("tabBar.settings")
         element("almanac.featured")
         element("almanac.listen")
+        element("almanac.earlier").tap()
         XCTAssertGreaterThan(app.buttons.matching(identifier: "almanac.row").count, 0, "the index has no older stories")
         checkScreen("week")
     }
@@ -31,6 +32,7 @@ final class AlmanacTests: KinnUITestCase {
 
     func testOpenOlderStoryFromIndex() {
         launch()
+        element("almanac.earlier").tap()
         app.buttons.matching(identifier: "almanac.row").firstMatch.tap()
         element("entry.back")
         checkScreen("entry from index")
@@ -54,8 +56,9 @@ final class AlmanacTests: KinnUITestCase {
         element("writeBack.back").tap()
         waitGone("writeBack.back")
         element("entry.writeBack").tap()
-        // A hold records while held, and letting go sends.
+        // A hold records while held. Letting go shows send.
         element("writeBack.record").press(forDuration: 2.5)
+        element("writeBack.send").tap()
         checkNoteSends()
     }
 
@@ -65,11 +68,12 @@ final class AlmanacTests: KinnUITestCase {
         element("writeBack.back")
         XCTAssertGreaterThan(app.buttons.matching(identifier: "writeBack.prompt").count, 0, "a new note has no prompts")
         checkScreen("new note")
-        // A tap starts the recording and the next tap sends it.
+        // A tap starts the recording and the next tap stops it. Then send.
         let record = element("writeBack.record")
         record.tap()
         Thread.sleep(forTimeInterval: 1.5)
         record.tap()
+        element("writeBack.send").tap()
         checkNoteSends()
     }
 
