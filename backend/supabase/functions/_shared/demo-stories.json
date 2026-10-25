@@ -1,0 +1,392 @@
+{
+  "elder": {
+    "name": "Margaret",
+    "place": "Monterrey"
+  },
+  "family": {
+    "name": "Angel"
+  },
+  "stories": [
+    {
+      "id": "s1",
+      "days_ago": 0,
+      "title_es": "Los tamales de mamá",
+      "title": "Mama's tamales",
+      "transcript": "Mi mamá nos despertaba a las cinco cada Navidad, sin falta. Todavía estaba oscuro y la cocina olía a leña. Prendía el foco amarillo de la mesa y nos decía: ándale, que la masa no espera. Desde la noche antes dejaba todo listo. Los chiles anchos remojando, el ajo pelado, el comino en un platito. Mi hermana Lupe y yo nos sentábamos en el piso con las hojas en las piernas, todavía mojadas y tibias. Nos enseñó a untar la masa con el revés de la cuchara, delgadita, nunca gorda. Si te salía gorda, te la quitaba y la volvía a hacer sin decir nada. Luego nos daba un jarrito de champurrado para calentar los dedos. Mientras trabajábamos, ella cantaba. Muy bajito, casi nada, para que mi papá siguiera durmiendo. Él trabajaba en la Fundidora y llegaba rendido. A las siete le llevábamos su café a la cama y él hacía como que no sabía nada. Todavía tengo su tetera, la de las flores amarillas. Nomás está en la repisa. Cuando hago tamales a las cinco, sola en la cocina, me sorprendo cantando igual de bajito. Y ya no hay nadie a quien despertar, mijo.",
+      "translation": "My mother woke us at five every Christmas, without fail. It was still dark and the kitchen smelled like firewood. She'd switch on the yellow bulb over the table and say: come on, the masa doesn't wait. She'd left everything ready the night before. Ancho chiles soaking, garlic peeled, cumin in a little dish. My sister Lupe and I sat on the floor with the corn husks in our laps, still damp and warm. She taught us to spread the masa with the back of a spoon, thin, never thick. If yours came out thick, she'd take it and redo it without a word. Then she'd hand us a cup of champurrado to warm our fingers. While we worked, she sang. Very low, almost nothing, so my father would keep sleeping. He worked at the Fundidora and came home worn out. At seven we took him coffee in bed, and he pretended he knew nothing about the tamales. I still have her teapot, the one with yellow flowers. It just sits on the shelf now. When I make tamales at five, alone in the kitchen, I catch myself singing that low. *And there's no one left to wake*, mijo.",
+      "ask_about": [
+        "What song did your mother sing while you worked?",
+        "Did your father ever catch you making the tamales?",
+        "Can you teach me to spread the masa this Christmas?"
+      ],
+      "scenes": [
+        {
+          "image": "s1-1",
+          "text_es": "Mi mamá nos despertaba a las cinco cada Navidad, sin falta. Todavía estaba oscuro y la cocina olía a leña. Prendía el foco amarillo de la mesa y nos decía: ándale, que la masa no espera.",
+          "text_en": "My mother woke us at five every Christmas, without fail. It was still dark and the kitchen smelled like firewood. She'd switch on the yellow bulb over the table and say: come on, the masa doesn't wait.",
+          "prompt": "a worn wooden kitchen table at dawn, a single yellow bulb hanging from a wire, blue light at the window, wood stove glowing, a small family kitchen in Monterrey, Mexico, Christmas morning in the 1950s, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.0, 0.185],
+          "t_es": [0.0, 0.1874]
+        },
+        {
+          "image": "s1-2",
+          "text_es": "Desde la noche antes dejaba todo listo. Los chiles anchos remojando, el ajo pelado, el comino en un platito. Mi hermana Lupe y yo nos sentábamos en el piso con las hojas en las piernas, todavía mojadas y tibias.",
+          "text_en": "She'd left everything ready the night before. Ancho chiles soaking, garlic peeled, cumin in a little dish. My sister Lupe and I sat on the floor with the corn husks in our laps, still damp and warm.",
+          "prompt": "dried ancho chiles, peeled garlic, cumin in a clay dish and a pile of corn husks on a scarred cutting board, two small girls seen from behind sitting on a tiled floor, a small family kitchen in Monterrey, Mexico, Christmas morning in the 1950s, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.185, 0.388],
+          "t_es": [0.1874, 0.3874]
+        },
+        {
+          "image": "s1-3",
+          "text_es": "Nos enseñó a untar la masa con el revés de la cuchara, delgadita, nunca gorda. Si te salía gorda, te la quitaba y la volvía a hacer sin decir nada. Luego nos daba un jarrito de champurrado para calentar los dedos.",
+          "text_en": "She taught us to spread the masa with the back of a spoon, thin, never thick. If yours came out thick, she'd take it and redo it without a word. Then she'd hand us a cup of champurrado to warm our fingers.",
+          "prompt": "a mother's hand passing a small clay cup of steaming champurrado to a child's hand, masa on a spoon, husks in an apron lap, a small family kitchen in Monterrey, Mexico, Christmas morning in the 1950s, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.388, 0.573],
+          "t_es": [0.3874, 0.5816]
+        },
+        {
+          "image": "s1-4",
+          "text_es": "Mientras trabajábamos, ella cantaba. Muy bajito, casi nada, para que mi papá siguiera durmiendo. Él trabajaba en la Fundidora y llegaba rendido. A las siete le llevábamos su café a la cama y él hacía como que no sabía nada.",
+          "text_en": "While we worked, she sang. Very low, almost nothing, so my father would keep sleeping. He worked at the Fundidora and came home worn out. At seven we took him coffee in bed, and he pretended he knew nothing about the tamales.",
+          "prompt": "a steaming cup of coffee on a white chenille bedspread, morning light through a lace curtain, a sleeping figure's shoulder in soft focus, a small family kitchen in Monterrey, Mexico, Christmas morning in the 1950s, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.573, 0.7958],
+          "t_es": [0.5816, 0.8054]
+        },
+        {
+          "image": "s1-5",
+          "text_es": "Todavía tengo su tetera, la de las flores amarillas. Nomás está en la repisa. Cuando hago tamales a las cinco, sola en la cocina, me sorprendo cantando igual de bajito. Y ya no hay nadie a quien despertar, mijo.",
+          "text_en": "I still have her teapot, the one with yellow flowers. It just sits on the shelf now. When I make tamales at five, alone in the kitchen, I catch myself singing that low. *And there's no one left to wake*, mijo.",
+          "prompt": "an old enamel teapot painted with yellow flowers on a kitchen shelf, early light, a pot of tamales steaming below, a small family kitchen in Monterrey, Mexico, Christmas morning in the 1950s, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.7958, 1.0],
+          "t_es": [0.8054, 1.0]
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "days_ago": 1,
+      "title_es": "La bicicleta verde",
+      "title": "The green bicycle",
+      "transcript": "Cuando tenía nueve años, mi papá llegó empujando una bicicleta verde. Era usada, con la pintura descarapelada y el asiento parchado con un pedazo de cámara de llanta. La recargó en nuestra puerta azul y no dijo nada. Nomás esperó a que yo la viera. Nuestra calle en la colonia Independencia era larga y bajaba hacia el río. Los domingos temprano no pasaban camiones, nomás el señor del pan y unos perros. Ahí me enseñó, con el Cerro de la Silla mirándonos. Él caminaba atrás de mí, agarrando el asiento, con sus zapatos de trabajo, diciendo ya te tengo, ya te tengo. Yo pedaleaba y pedaleaba. Cuando volteé, él estaba lejos, parado en medio de la calle, con las manos en las bolsas. Me dio tanto coraje que casi lloro. Y luego me di cuenta de que seguía andando. Anduve hasta que el sol se metió detrás de los árboles del río, y llegué a la casa con las rodillas raspadas y la cara ardiendo. Ese verano fui a todos lados en ella, hasta más allá de las últimas casas, donde el campo se ponía dorado. Ahí me paraba nomás a respirar. Nadie me podía alcanzar. Yo creo que él sabía que eso era lo que me estaba regalando.",
+      "translation": "When I was nine, my father came home pushing a green bicycle. It was used, the paint chipped, the seat patched with a piece of inner tube. He leaned it against our blue door and didn't say a word. He just waited for me to see it. Our street in Colonia Independencia was long and ran downhill toward the river. Early on Sundays there were no trucks, just the bread man and a few dogs. That's where he taught me, with the Cerro de la Silla watching us. He walked behind me holding the seat, in his work shoes, saying I've got you, I've got you. I pedaled and pedaled. When I turned around he was far back, standing in the middle of the street with his hands in his pockets. I was so mad I almost cried. And then I realized I was still going. I rode until the sun went down behind the trees by the river, and I came home with scraped knees and my whole face burning. That summer I rode it everywhere, out past the last houses, where the fields turned gold. I'd stop there just to breathe. *Nobody could catch me.* I think he knew that was what he was giving me.",
+      "ask_about": [
+        "Where did your father find the green bicycle?",
+        "Did you ever forgive him for letting go?",
+        "Where did you ride when you went past the last houses?"
+      ],
+      "scenes": [
+        {
+          "image": "s2-1",
+          "text_es": "Cuando tenía nueve años, mi papá llegó empujando una bicicleta verde. Era usada, con la pintura descarapelada y el asiento parchado con un pedazo de cámara de llanta. La recargó en nuestra puerta azul y no dijo nada. Nomás esperó a que yo la viera.",
+          "text_en": "When I was nine, my father came home pushing a green bicycle. It was used, the paint chipped, the seat patched with a piece of inner tube. He leaned it against our blue door and didn't say a word. He just waited for me to see it.",
+          "prompt": "a chipped green bicycle leaning against a weathered blue wooden door, sunlit adobe wall, patched seat, Colonia Independencia in Monterrey, Mexico, a Sunday in 1957, Cerro de la Silla on the horizon, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.0, 0.2053],
+          "t_es": [0.0, 0.2194]
+        },
+        {
+          "image": "s2-2",
+          "text_es": "Nuestra calle en la colonia Independencia era larga y bajaba hacia el río. Los domingos temprano no pasaban camiones, nomás el señor del pan y unos perros. Ahí me enseñó, con el Cerro de la Silla mirándonos.",
+          "text_en": "Our street in Colonia Independencia was long and ran downhill toward the river. Early on Sundays there were no trucks, just the bread man and a few dogs. That's where he taught me, with the Cerro de la Silla watching us.",
+          "prompt": "a long empty hillside street of low painted houses running down toward a river, the saddle shaped mountain Cerro de la Silla in morning haze, Colonia Independencia in Monterrey, Mexico, a Sunday in 1957, Cerro de la Silla on the horizon, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.2053, 0.4264],
+          "t_es": [0.2194, 0.4099]
+        },
+        {
+          "image": "s2-3",
+          "text_es": "Él caminaba atrás de mí, agarrando el asiento, con sus zapatos de trabajo, diciendo ya te tengo, ya te tengo. Yo pedaleaba y pedaleaba. Cuando volteé, él estaba lejos, parado en medio de la calle, con las manos en las bolsas.",
+          "text_en": "He walked behind me holding the seat, in his work shoes, saying I've got you, I've got you. I pedaled and pedaled. When I turned around he was far back, standing in the middle of the street with his hands in his pockets.",
+          "prompt": "a man in work clothes seen from behind, standing alone in the middle of a dusty road, hands in pockets, a small cyclist far ahead, Colonia Independencia in Monterrey, Mexico, a Sunday in 1957, Cerro de la Silla on the horizon, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.4264, 0.6295],
+          "t_es": [0.4099, 0.6156]
+        },
+        {
+          "image": "s2-4",
+          "text_es": "Me dio tanto coraje que casi lloro. Y luego me di cuenta de que seguía andando. Anduve hasta que el sol se metió detrás de los árboles del río, y llegué a la casa con las rodillas raspadas y la cara ardiendo.",
+          "text_en": "I was so mad I almost cried. And then I realized I was still going. I rode until the sun went down behind the trees by the river, and I came home with scraped knees and my whole face burning.",
+          "prompt": "sunset behind a line of tall riverside trees, long shadows across a dirt road, orange and rose sky, Colonia Independencia in Monterrey, Mexico, a Sunday in 1957, Cerro de la Silla on the horizon, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.6295, 0.8185],
+          "t_es": [0.6156, 0.7988]
+        },
+        {
+          "image": "s2-5",
+          "text_es": "Ese verano fui a todos lados en ella, hasta más allá de las últimas casas, donde el campo se ponía dorado. Ahí me paraba nomás a respirar. Nadie me podía alcanzar. Yo creo que él sabía que eso era lo que me estaba regalando.",
+          "text_en": "That summer I rode it everywhere, out past the last houses, where the fields turned gold. I'd stop there just to breathe. *Nobody could catch me.* I think he knew that was what he was giving me.",
+          "prompt": "a young girl seen from behind standing beside a green bicycle in a wide golden field at the edge of town, late summer light, Colonia Independencia in Monterrey, Mexico, a Sunday in 1957, Cerro de la Silla on the horizon, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.8185, 1.0],
+          "t_es": [0.7988, 1.0]
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "days_ago": 2,
+      "title_es": "Té de la tarde",
+      "title": "Afternoon tea",
+      "transcript": "Mi abuela Chela vivía en Cadereyta, en una casa de paredes tan gruesas que adentro siempre estaba fresco. Todas las tardes a las cinco, cuando por fin bajaba el calor, ponía el agua. Té de hojas de naranjo, de su propio árbol del patio. Lo endulzaba con miel de don Ramiro, un señor que tenía abejas allá por las huertas. La miel venía en un frasco viejo de café. Ella la dejaba caer de la cuchara muy despacito, como si estuviera contando. Si mi tío había bajado de la sierra, también había moras, en una taza blanca. Nos las comíamos una por una para que duraran. Nos quedaban los dedos morados y ella hacía como que nos regañaba. Siempre decía que el té no es para tomar, es para platicar. Y tenía razón. Sobre esa taza humeando me enteré de todo: quién andaba con quién, quién debía dinero, cómo mi abuelo le pidió matrimonio dos veces. Sobre su barda colgaba una bugambilia morada que nos tiraba flores en las tazas. Yo todavía hago té a las cinco. Todavía espero a que alguien se siente. A lo mejor un día te sientas tú conmigo, y te cuento todo.",
+      "translation": "My grandmother Chela lived in Cadereyta, in a house with walls so thick it stayed cool inside. Every afternoon at five, when the heat finally broke, she put the water on. Orange leaf tea, from her own tree in the patio. She sweetened it with honey from don Ramiro, a man who kept bees out by the orange groves. The honey came in an old coffee jar. She let it drip from the spoon very slowly, like she was counting. If my uncle had come down from the sierra, there were berries too, in a white cup. We ate them one by one so they would last. Our fingers turned purple and she pretended to scold us. She always said tea isn't for drinking, it's for talking. And she was right. Over that steaming cup I learned everything: who was courting who, who owed money, how my grandfather asked her to marry him twice. A purple bougainvillea hung over her wall and dropped flowers into our cups. I still make tea at five. *I still wait for someone to sit down.* Maybe one day you'll sit with me, and I'll tell you everything.",
+      "ask_about": [
+        "What did your grandmother Chela tell you about grandpa's two proposals?",
+        "Is the orange tree in her patio still there?",
+        "What would you want to tell me over tea?"
+      ],
+      "scenes": [
+        {
+          "image": "s3-1",
+          "text_es": "Mi abuela Chela vivía en Cadereyta, en una casa de paredes tan gruesas que adentro siempre estaba fresco. Todas las tardes a las cinco, cuando por fin bajaba el calor, ponía el agua. Té de hojas de naranjo, de su propio árbol del patio.",
+          "text_en": "My grandmother Chela lived in Cadereyta, in a house with walls so thick it stayed cool inside. Every afternoon at five, when the heat finally broke, she put the water on. Orange leaf tea, from her own tree in the patio.",
+          "prompt": "a clay teapot and a jar of fresh orange blossoms on a table in a shaded room with thick whitewashed walls, afternoon light from a patio door, an old thick walled house in Cadereyta, Nuevo León, Mexico, summer afternoons in the 1950s, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.0, 0.2188],
+          "t_es": [0.0, 0.2418]
+        },
+        {
+          "image": "s3-2",
+          "text_es": "Lo endulzaba con miel de don Ramiro, un señor que tenía abejas allá por las huertas. La miel venía en un frasco viejo de café. Ella la dejaba caer de la cuchara muy despacito, como si estuviera contando.",
+          "text_en": "She sweetened it with honey from don Ramiro, a man who kept bees out by the orange groves. The honey came in an old coffee jar. She let it drip from the spoon very slowly, like she was counting.",
+          "prompt": "golden honey dripping slowly from a spoon into a cup of amber tea, an old glass coffee jar beside it, warm side light, an old thick walled house in Cadereyta, Nuevo León, Mexico, summer afternoons in the 1950s, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.2188, 0.4105],
+          "t_es": [0.2418, 0.4328]
+        },
+        {
+          "image": "s3-3",
+          "text_es": "Si mi tío había bajado de la sierra, también había moras, en una taza blanca. Nos las comíamos una por una para que duraran. Nos quedaban los dedos morados y ella hacía como que nos regañaba.",
+          "text_en": "If my uncle had come down from the sierra, there were berries too, in a white cup. We ate them one by one so they would last. Our fingers turned purple and she pretended to scold us.",
+          "prompt": "a white enamel cup full of fresh red berries on a wooden table, children's hands reaching in from the edge of frame, an old thick walled house in Cadereyta, Nuevo León, Mexico, summer afternoons in the 1950s, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.4105, 0.5883],
+          "t_es": [0.4328, 0.6065]
+        },
+        {
+          "image": "s3-4",
+          "text_es": "Siempre decía que el té no es para tomar, es para platicar. Y tenía razón. Sobre esa taza humeando me enteré de todo: quién andaba con quién, quién debía dinero, cómo mi abuelo le pidió matrimonio dos veces.",
+          "text_en": "She always said tea isn't for drinking, it's for talking. And she was right. Over that steaming cup I learned everything: who was courting who, who owed money, how my grandfather asked her to marry him twice.",
+          "prompt": "a single cup of tea steaming in slanted afternoon light, two chairs pulled close at a small table, a patio beyond, an old thick walled house in Cadereyta, Nuevo León, Mexico, summer afternoons in the 1950s, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.5883, 0.8053],
+          "t_es": [0.6065, 0.8083]
+        },
+        {
+          "image": "s3-5",
+          "text_es": "Sobre su barda colgaba una bugambilia morada que nos tiraba flores en las tazas. Yo todavía hago té a las cinco. Todavía espero a que alguien se siente. A lo mejor un día te sientas tú conmigo, y te cuento todo.",
+          "text_en": "A purple bougainvillea hung over her wall and dropped flowers into our cups. I still make tea at five. *I still wait for someone to sit down.* Maybe one day you'll sit with me, and I'll tell you everything.",
+          "prompt": "purple bougainvillea spilling over an old adobe wall, petals scattered on a table below, golden hour, an old thick walled house in Cadereyta, Nuevo León, Mexico, summer afternoons in the 1950s, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.8053, 1.0],
+          "t_es": [0.8083, 1.0]
+        }
+      ]
+    },
+    {
+      "id": "s4",
+      "days_ago": 3,
+      "title_es": "La banca frente al mar",
+      "title": "The bench facing the sea",
+      "transcript": "Tu abuelo Ernesto y yo nos fuimos a Tampico de luna de miel, en el sesenta y ocho. Ocho horas en camión desde Monterrey. En Playa Miramar había una banca frente al mar, y ahí nos sentábamos cada tarde, como dos viejitos. Yo nunca había visto el mar. Pensaba que iba a ser azul como en los calendarios, y era verde y gris, y olía a sal y a diésel del puerto. No me importó. Yo le agarraba el brazo y no podía dejar de mirar. Una mañana un pescador nos subió a su lancha, una de madera, vieja, pintada y repintada. Ernesto se mareó y se puso del color de un limón. El pescador se rió tanto que casi suelta la red. En las tardes el sol se metía detrás de las palmas y los árboles de la laguna, todo anaranjado. Él hablaba de la casa que íbamos a tener, de los hijos, de un patio con limonero. Él hablaba, y yo oía su voz. El último día me trajo un lirio blanco de la Laguna del Carpintero. Quién sabe cómo lo sacó. Lo puse a secar dentro de mi misal. Ahí sigue, aplastado y café, y no dejo que nadie lo tire.",
+      "translation": "Your grandfather Ernesto and I went to Tampico for our honeymoon, in sixty eight. Eight hours on the bus from Monterrey. At Playa Miramar there was a bench facing the sea, and we sat there every evening like two little old people. I had never seen the sea. I thought it would be blue like in the calendars, and it was green and gray, and it smelled like salt and diesel from the port. I didn't care. I held on to his arm and couldn't stop looking. One morning a fisherman took us out in his boat, an old wooden one, painted and repainted. Ernesto got seasick and turned the color of a lime. The fisherman laughed so hard he nearly dropped his net. In the evenings the sun went down behind the palms and the trees by the lagoon, everything orange. He talked about the house we would have, the children, a patio with a lemon tree. He talked, and I listened to his voice. On the last day he brought me a white water lily from the Laguna del Carpintero. Who knows how he got it. I pressed it inside my missal. *It's still there*, flat and brown, and I won't let anyone throw it away.",
+      "ask_about": [
+        "What was grandpa like when you first met him?",
+        "Did you ever go back to that bench in Tampico?",
+        "Can I see the lily in your missal?"
+      ],
+      "scenes": [
+        {
+          "image": "s4-1",
+          "text_es": "Tu abuelo Ernesto y yo nos fuimos a Tampico de luna de miel, en el sesenta y ocho. Ocho horas en camión desde Monterrey. En Playa Miramar había una banca frente al mar, y ahí nos sentábamos cada tarde, como dos viejitos.",
+          "text_en": "Your grandfather Ernesto and I went to Tampico for our honeymoon, in sixty eight. Eight hours on the bus from Monterrey. At Playa Miramar there was a bench facing the sea, and we sat there every evening like two little old people.",
+          "prompt": "a young couple seen from behind on a weathered wooden bench facing a wide gray green sea, late 1960s clothes, evening light, Playa Miramar and the lagoons of Tampico, Tamaulipas, Mexico, on a honeymoon in 1968, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.0, 0.2096],
+          "t_es": [0.0, 0.2033]
+        },
+        {
+          "image": "s4-2",
+          "text_es": "Yo nunca había visto el mar. Pensaba que iba a ser azul como en los calendarios, y era verde y gris, y olía a sal y a diésel del puerto. No me importó. Yo le agarraba el brazo y no podía dejar de mirar.",
+          "text_en": "I had never seen the sea. I thought it would be blue like in the calendars, and it was green and gray, and it smelled like salt and diesel from the port. I didn't care. I held on to his arm and couldn't stop looking.",
+          "prompt": "the sea glimpsed beyond a dense coastal forest of palms and mangroves, hazy horizon, a port crane far away, Playa Miramar and the lagoons of Tampico, Tamaulipas, Mexico, on a honeymoon in 1968, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.2096, 0.3994],
+          "t_es": [0.2033, 0.4009]
+        },
+        {
+          "image": "s4-3",
+          "text_es": "Una mañana un pescador nos subió a su lancha, una de madera, vieja, pintada y repintada. Ernesto se mareó y se puso del color de un limón. El pescador se rió tanto que casi suelta la red.",
+          "text_en": "One morning a fisherman took us out in his boat, an old wooden one, painted and repainted. Ernesto got seasick and turned the color of a lime. The fisherman laughed so hard he nearly dropped his net.",
+          "prompt": "an old wooden fishing boat with layers of chipped paint resting on calm water, nets piled in the bow, morning sun, Playa Miramar and the lagoons of Tampico, Tamaulipas, Mexico, on a honeymoon in 1968, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.3994, 0.5954],
+          "t_es": [0.4009, 0.5964]
+        },
+        {
+          "image": "s4-4",
+          "text_es": "En las tardes el sol se metía detrás de las palmas y los árboles de la laguna, todo anaranjado. Él hablaba de la casa que íbamos a tener, de los hijos, de un patio con limonero. Él hablaba, y yo oía su voz.",
+          "text_en": "In the evenings the sun went down behind the palms and the trees by the lagoon, everything orange. He talked about the house we would have, the children, a patio with a lemon tree. He talked, and I listened to his voice.",
+          "prompt": "an orange sunset behind silhouetted palms and lagoon trees, still water reflecting the sky, Playa Miramar and the lagoons of Tampico, Tamaulipas, Mexico, on a honeymoon in 1968, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.5954, 0.8041],
+          "t_es": [0.5964, 0.8104]
+        },
+        {
+          "image": "s4-5",
+          "text_es": "El último día me trajo un lirio blanco de la Laguna del Carpintero. Quién sabe cómo lo sacó. Lo puse a secar dentro de mi misal. Ahí sigue, aplastado y café, y no dejo que nadie lo tire.",
+          "text_en": "On the last day he brought me a white water lily from the Laguna del Carpintero. Who knows how he got it. I pressed it inside my missal. *It's still there*, flat and brown, and I won't let anyone throw it away.",
+          "prompt": "a single white water lily floating open on a dark lagoon, soft reflections, quiet dusk, Playa Miramar and the lagoons of Tampico, Tamaulipas, Mexico, on a honeymoon in 1968, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
+          "t_en": [0.8041, 1.0],
+          "t_es": [0.8104, 1.0]
+        }
+      ]
+    },
+    {
+      "id": "s5",
+      "days_ago": 4,
+      "title_es": "Aquel verano en el campo",
+      "title": "That summer in the fields",
+      "transcript": "El verano que cumplí trece, me mandaron al rancho de mi tío Chuy, por Cadereyta. Tenía el pelo tan largo que me sentaba en él. Me metía al sorgo, ya dorado, y me llegaba a los hombros. Las mañanas allá eran de neblina, con la sierra azul y lejos. Mi primo Beto caminaba adelante con un palo al hombro, buscando una chiva que se había perdido. Lo seguí horas, y nunca la encontramos. Por la orilla de la acequia había margaritas silvestres, cientos. Yo hacía coronas para mí, para mi tía, para el perro. Mi tía se puso la suya todo el día mientras hacía tortillas, muy seria, como una reina. Atrás del pozo había moras, y nos las comíamos calientitas del sol, directo de la mata. Me mancharon mi único vestido blanco. Mi mamá nunca le pudo sacar la mancha, y yo nunca le dije lo feliz que fui ese día. Al atardecer nos sentábamos bajo los nogales a oír cómo se callaban las chicharras, una por una. Yo no quería regresar a la ciudad. Quería que ese verano no se acabara nunca. Algunas noches cierro los ojos y todavía estoy ahí.",
+      "translation": "The summer I turned thirteen, they sent me to my uncle Chuy's ranch outside Cadereyta. My hair was so long I could sit on it. I'd walk out into the sorghum, already gold, and it came up to my shoulders. Mornings there were hazy, with the sierra blue and far away. My cousin Beto walked ahead with a stick on his shoulder, looking for a goat that had wandered off. I followed him for hours, and we never found it. Along the irrigation ditch there were wild daisies, hundreds. I made crowns for me, for my aunt, for the dog. My aunt wore hers all day while she made tortillas, very serious, like a queen. Behind the well there were berries, and we ate them warm from the sun, right off the bush. They stained my only white dress. My mother never got it out, and I never told her how happy I was that day. At sunset we sat under the pecan trees and listened to the cicadas go quiet, one by one. I didn't want to go back to the city. *I wanted that summer to never end.* Some nights I close my eyes and I'm still there.",
+      "ask_about": [
+        "Did you and Beto ever find the lost goat?",
+        "What was your uncle Chuy's ranch like?",
+        "What did you miss most when you went back to the city?"
+      ],
+      "scenes": [
+        {
+          "image": "s5-1",
+          "text_es": "El verano que cumplí trece, me mandaron al rancho de mi tío Chuy, por Cadereyta. Tenía el pelo tan largo que me sentaba en él. Me metía al sorgo, ya dorado, y me llegaba a los hombros.",
+          "text_en": "The summer I turned thirteen, they sent me to my uncle Chuy's ranch outside Cadereyta. My hair was so long I could sit on it. I'd walk out into the sorghum, already gold, and it came up to my shoulders.",
+          "prompt": "a girl with very long dark hair seen from behind, wading into a shoulder high golden sorghum field, bright summer sky, a sorghum and pecan ranch outside Cadereyta, Nuevo León, Mexico, the summer of 1961, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up"
+        },
+        {
+          "image": "s5-2",
+          "text_es": "Las mañanas allá eran de neblina, con la sierra azul y lejos. Mi primo Beto caminaba adelante con un palo al hombro, buscando una chiva que se había perdido. Lo seguí horas, y nunca la encontramos.",
+          "text_en": "Mornings there were hazy, with the sierra blue and far away. My cousin Beto walked ahead with a stick on his shoulder, looking for a goat that had wandered off. I followed him for hours, and we never found it.",
+          "prompt": "a boy with a stick over his shoulder walking away through a hazy valley, blue mountains of the Sierra Madre fading behind, a sorghum and pecan ranch outside Cadereyta, Nuevo León, Mexico, the summer of 1961, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up"
+        },
+        {
+          "image": "s5-3",
+          "text_es": "Por la orilla de la acequia había margaritas silvestres, cientos. Yo hacía coronas para mí, para mi tía, para el perro. Mi tía se puso la suya todo el día mientras hacía tortillas, muy seria, como una reina.",
+          "text_en": "Along the irrigation ditch there were wild daisies, hundreds. I made crowns for me, for my aunt, for the dog. My aunt wore hers all day while she made tortillas, very serious, like a queen.",
+          "prompt": "wild white daisies crowding the bank of an irrigation ditch, a half finished daisy crown resting in the grass, a sorghum and pecan ranch outside Cadereyta, Nuevo León, Mexico, the summer of 1961, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up"
+        },
+        {
+          "image": "s5-4",
+          "text_es": "Atrás del pozo había moras, y nos las comíamos calientitas del sol, directo de la mata. Me mancharon mi único vestido blanco. Mi mamá nunca le pudo sacar la mancha, y yo nunca le dije lo feliz que fui ese día.",
+          "text_en": "Behind the well there were berries, and we ate them warm from the sun, right off the bush. They stained my only white dress. My mother never got it out, and I never told her how happy I was that day.",
+          "prompt": "ripe red berries on a sunlit bush beside an old stone well, a white cotton dress hem at the edge of frame, a sorghum and pecan ranch outside Cadereyta, Nuevo León, Mexico, the summer of 1961, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up"
+        },
+        {
+          "image": "s5-5",
+          "text_es": "Al atardecer nos sentábamos bajo los nogales a oír cómo se callaban las chicharras, una por una. Yo no quería regresar a la ciudad. Quería que ese verano no se acabara nunca. Algunas noches cierro los ojos y todavía estoy ahí.",
+          "text_en": "At sunset we sat under the pecan trees and listened to the cicadas go quiet, one by one. I didn't want to go back to the city. *I wanted that summer to never end.* Some nights I close my eyes and I'm still there.",
+          "prompt": "sunset glowing through a grove of old pecan trees, long shadows on dry grass, dust in the light, a sorghum and pecan ranch outside Cadereyta, Nuevo León, Mexico, the summer of 1961, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up"
+        }
+      ]
+    },
+    {
+      "id": "s6",
+      "days_ago": 5,
+      "title_es": "El pueblo junto al canal",
+      "title": "The town by the canal",
+      "transcript": "En Cadereyta las casas junto al canal estaban pintadas de todos colores: margaret, azul, amarillo mostaza. Las señoras lavaban ropa en las piedras en la mañana. Mi tía decía que se sabía quién estaba peleado por quién dejaba de dar los buenos días. En enero del sesenta y siete, nevó. Imagínate, nieve en Nuevo León. Me desperté y los techos estaban blancos, todos, y el pueblo entero salió en suéter y cobijas, riéndose como niños. Hasta la calle del mercado se llenó. Gente que nunca se hablaba se aventaba bolas de nieve. El señor de los elotes los regaló porque tenía las manos tan frías que no podía contar el cambio. Nadie fue a trabajar. La puerta de mi tía era vieja y azul, con la pintura pelándose, y siempre estaba ahí recargada la bicicleta de mi primo. Ese día la bicicleta amaneció llena de nieve, como un pastel. La dejamos ahí nomás para verla. Junto al canal había una lancha vieja de madera que ya nadie usaba. Se llenó de nieve y luego de agua, y en la tarde ya no quedaba nada. Como si nunca hubiera pasado. Pero yo estuve ahí, y ahora tú también lo sabes.",
+      "translation": "In Cadereyta the houses along the canal were painted every color: pink, blue, mustard yellow. The women washed clothes on the stones in the morning. My aunt said you could tell who was fighting by who stopped saying good morning. In January of sixty seven, it snowed. Imagine that, snow in Nuevo León. I woke up and the roofs were white, every one of them, and the whole town came out in sweaters and blankets, laughing like children. Even the market street filled up. People who never spoke to each other threw snowballs. The corn man gave his elotes away because his hands were too cold to count change. Nobody went to work. My aunt's door was old and blue, the paint peeling, and my cousin's bicycle always leaned against it. That day the bicycle woke up covered in snow, like a cake. We left it there just to look at it. By the canal there was an old wooden boat that nobody used anymore. It filled with snow and then with water, and by afternoon there was nothing left. *Like it never happened.* But I was there, and now you know too.",
+      "ask_about": [
+        "Did it ever snow like that again?",
+        "What happened to your aunt's blue door?",
+        "Who washed clothes at the canal with your aunt?"
+      ],
+      "scenes": [
+        {
+          "image": "s6-1",
+          "text_es": "En Cadereyta las casas junto al canal estaban pintadas de todos colores: margaret, azul, amarillo mostaza. Las señoras lavaban ropa en las piedras en la mañana. Mi tía decía que se sabía quién estaba peleado por quién dejaba de dar los buenos días.",
+          "text_en": "In Cadereyta the houses along the canal were painted every color: pink, blue, mustard yellow. The women washed clothes on the stones in the morning. My aunt said you could tell who was fighting by who stopped saying good morning.",
+          "prompt": "a row of pink, blue and mustard yellow houses along a stone lined canal, laundry drying, women washing at the water's edge seen from afar, the town of Cadereyta, Nuevo León, Mexico, along an old canal, January 1967, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up"
+        },
+        {
+          "image": "s6-2",
+          "text_es": "En enero del sesenta y siete, nevó. Imagínate, nieve en Nuevo León. Me desperté y los techos estaban blancos, todos, y el pueblo entero salió en suéter y cobijas, riéndose como niños.",
+          "text_en": "In January of sixty seven, it snowed. Imagine that, snow in Nuevo León. I woke up and the roofs were white, every one of them, and the whole town came out in sweaters and blankets, laughing like children.",
+          "prompt": "flat rooftops of a small Mexican town covered in fresh snow, church bell tower, pale winter morning sky, the town of Cadereyta, Nuevo León, Mexico, along an old canal, January 1967, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up"
+        },
+        {
+          "image": "s6-3",
+          "text_es": "Hasta la calle del mercado se llenó. Gente que nunca se hablaba se aventaba bolas de nieve. El señor de los elotes los regaló porque tenía las manos tan frías que no podía contar el cambio. Nadie fue a trabajar.",
+          "text_en": "Even the market street filled up. People who never spoke to each other threw snowballs. The corn man gave his elotes away because his hands were too cold to count change. Nobody went to work.",
+          "prompt": "a crowded market street in light snow, people in wool blankets and sweaters, a steaming corn cart, figures seen at a distance, the town of Cadereyta, Nuevo León, Mexico, along an old canal, January 1967, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up"
+        },
+        {
+          "image": "s6-4",
+          "text_es": "La puerta de mi tía era vieja y azul, con la pintura pelándose, y siempre estaba ahí recargada la bicicleta de mi primo. Ese día la bicicleta amaneció llena de nieve, como un pastel. La dejamos ahí nomás para verla.",
+          "text_en": "My aunt's door was old and blue, the paint peeling, and my cousin's bicycle always leaned against it. That day the bicycle woke up covered in snow, like a cake. We left it there just to look at it.",
+          "prompt": "a bicycle dusted with snow leaning against a weathered peeling blue door, quiet morning, the town of Cadereyta, Nuevo León, Mexico, along an old canal, January 1967, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up"
+        },
+        {
+          "image": "s6-5",
+          "text_es": "Junto al canal había una lancha vieja de madera que ya nadie usaba. Se llenó de nieve y luego de agua, y en la tarde ya no quedaba nada. Como si nunca hubiera pasado. Pero yo estuve ahí, y ahora tú también lo sabes.",
+          "text_en": "By the canal there was an old wooden boat that nobody used anymore. It filled with snow and then with water, and by afternoon there was nothing left. *Like it never happened.* But I was there, and now you know too.",
+          "prompt": "an old abandoned wooden boat moored at the edge of a canal, melting snow pooling inside it, afternoon thaw light, the town of Cadereyta, Nuevo León, Mexico, along an old canal, January 1967, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up"
+        }
+      ]
+    }
+  ],
+  "replies": [
+    {
+      "after_story": "s1",
+      "minutes_after": 30,
+      "title_es": "¿Me enseñas?",
+      "title": "Will you teach me?",
+      "translation_es": "Abuela, lo escuché dos veces. No sabía que tú y mi tía Lupe hacían los tamales sentadas en el piso. ¿Me enseñas esta Navidad, a las cinco de la mañana? ¿Qué canción cantaba ella?",
+      "text_en": "Abuela, I listened twice. I didn't know you and Tía Lupe made the tamales sitting on the floor. Will you teach me this Christmas, at five in the morning? What song was she singing?",
+      "scenes": [
+        {
+          "image": "s1-5",
+          "text_es": "Abuela, lo escuché dos veces.",
+          "text_en": "Abuela, I listened twice.",
+          "t_en": [0.0, 0.2013],
+          "t_es": [0.0, 0.1901]
+        },
+        {
+          "image": "s1-3",
+          "text_es": "No sabía que tú y mi tía Lupe hacían los tamales sentadas en el piso.",
+          "text_en": "I didn't know you and Tía Lupe made the tamales sitting on the floor.",
+          "t_en": [0.2013, 0.5265],
+          "t_es": [0.1901, 0.5829]
+        },
+        {
+          "image": "s1-1",
+          "text_es": "¿Me enseñas esta Navidad, a las cinco de la mañana?",
+          "text_en": "Will you teach me this Christmas, at five in the morning?",
+          "t_en": [0.5265, 0.8473],
+          "t_es": [0.5829, 0.8523]
+        },
+        {
+          "image": "s1-4",
+          "text_es": "¿Qué canción cantaba ella?",
+          "text_en": "What song was she singing?",
+          "t_en": [0.8473, 1.0],
+          "t_es": [0.8523, 1.0]
+        }
+      ]
+    },
+    {
+      "after_story": "s2",
+      "minutes_after": 45,
+      "title_es": "¿Qué pasó con la bici?",
+      "title": "What happened to the bike?",
+      "translation_es": "Puedo ver a tu papá parado en la calle con las manos en las bolsas. Yo aprendí igual, con mi papá, y también me enojé. ¿Te acuerdas qué pasó con la bicicleta verde?",
+      "text_en": "I can see your dad standing in the street with his hands in his pockets. I learned the same way, with my dad, and I got mad too. Do you remember what happened to the green bicycle?",
+      "scenes": [
+        {
+          "image": "s2-3",
+          "text_es": "Puedo ver a tu papá parado en la calle con las manos en las bolsas.",
+          "text_en": "I can see your dad standing in the street with his hands in his pockets.",
+          "t_en": [0.0, 0.33],
+          "t_es": [0.0, 0.3321]
+        },
+        {
+          "image": "s2-4",
+          "text_es": "Yo aprendí igual, con mi papá, y también me enojé.",
+          "text_en": "I learned the same way, with my dad, and I got mad too.",
+          "t_en": [0.33, 0.7799],
+          "t_es": [0.3321, 0.7547]
+        },
+        {
+          "image": "s2-1",
+          "text_es": "¿Te acuerdas qué pasó con la bicicleta verde?",
+          "text_en": "Do you remember what happened to the green bicycle?",
+          "t_en": [0.7799, 1.0],
+          "t_es": [0.7547, 1.0]
+        }
+      ]
+    }
+  ]
+}
