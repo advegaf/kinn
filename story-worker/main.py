@@ -103,7 +103,7 @@ ELDER_READY = [
 
 
 def find_work():
-    fresh = rest("GET", ELDER_READY + [("story", "is.null")])
+    fresh = rest("GET", ELDER_READY + [("story", "is.null")]) + rest("GET", ELDER_READY + [("story->>status", "eq.pending")])
     stale_before = (datetime.now(timezone.utc) - timedelta(minutes=STALE_MINUTES)).isoformat()
     stale = rest(
         "GET",
@@ -126,6 +126,8 @@ def claim(msg, force=False):
     if not force:
         if story is None:
             params.append(("story", "is.null"))
+        elif story.get("status") == "pending":
+            params.append(("story->>status", "eq.pending"))
         else:
             params.append(("story->>claimed_at", "eq." + str(story.get("claimed_at"))))
     marker = {"status": "generating", "claimed_at": now_iso(), "worker": WORKER_ID}

@@ -19,7 +19,7 @@ ${
 The translation will be read aloud by text to speech, so do not add brackets, notes or stage directions inside it.
 Respond with only a JSON object in this exact shape:
 {"translation": "...", "title_en": "...", "title_es": "...", "cultural_notes": [{"term": "...", "note": "..."}], "ask_about": ["Ask her about ...", "Ask her about ...", "Ask her about ..."]}
-title_en and title_es summarize the message in English and in Spanish, at most 6 words each.`;
+title_en and title_es summarize the message in English and in Spanish, at most 6 words each, in sentence case (only the first word and names capitalized), no final period.`;
 }
 
 type Row = { id: string; sender_id: string; transcript: string | null };
@@ -29,8 +29,8 @@ function demoFields(msg: Msg, role: string, heard: string, existing: Row[]): Rec
   const tag = `[process-message ${msg.id}] demo heard "${heard.slice(0, 80)}"`;
   if (role === "elder") {
     const story = pickStory(heard, existing);
-    console.log(`${tag} -> ${story.id}`);
-    return elderFields(story);
+    console.log(`${tag} -> ${story?.id ?? "free"}`);
+    return story ? elderFields(story) : null;
   }
   const { index, score, heard: words } = pickReply(heard, existing);
   console.log(`${tag} score ${score}/${words} -> index ${index}`);
@@ -149,7 +149,7 @@ async function translate(job: Job, transcript: string, history: Hist[]): Promise
     ...(msg.story ?? {}),
     title: String(out.title_en ?? "").trim() || null,
     title_es: String(out.title_es ?? "").trim() || null,
-    status: "ready",
+    status: job.role === "elder" ? "pending" : "ready",
   };
   job.t.step("llm");
   return {
