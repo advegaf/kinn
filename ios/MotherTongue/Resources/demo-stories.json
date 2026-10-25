@@ -22,6 +22,8 @@
       "scenes": [
         {
           "image": "s1-1",
+          "video_path": "videos/demo/s1-1.mp4",
+          "thumb_path": "videos/demo/s1-1.jpg",
           "text_es": "Mi mamá nos despertaba a las cinco cada Navidad, sin falta. Todavía estaba oscuro y la cocina olía a leña. Prendía el foco amarillo de la mesa y nos decía: ándale, que la masa no espera.",
           "text_en": "My mother woke us at five every Christmas, without fail. It was still dark and the kitchen smelled like firewood. She'd switch on the yellow bulb over the table and say: come on, the masa doesn't wait.",
           "prompt": "a worn wooden kitchen table at dawn, a single yellow bulb hanging from a wire, blue light at the window, wood stove glowing, a small family kitchen in Monterrey, Mexico, Christmas morning in the 1950s, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
@@ -30,6 +32,8 @@
         },
         {
           "image": "s1-2",
+          "video_path": "videos/demo/s1-2.mp4",
+          "thumb_path": "videos/demo/s1-2.jpg",
           "text_es": "Desde la noche antes dejaba todo listo. Los chiles anchos remojando, el ajo pelado, el comino en un platito. Mi hermana Lupe y yo nos sentábamos en el piso con las hojas en las piernas, todavía mojadas y tibias.",
           "text_en": "She'd left everything ready the night before. Ancho chiles soaking, garlic peeled, cumin in a little dish. My sister Lupe and I sat on the floor with the corn husks in our laps, still damp and warm.",
           "prompt": "dried ancho chiles, peeled garlic, cumin in a clay dish and a pile of corn husks on a scarred cutting board, two small girls seen from behind sitting on a tiled floor, a small family kitchen in Monterrey, Mexico, Christmas morning in the 1950s, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
@@ -38,6 +42,8 @@
         },
         {
           "image": "s1-3",
+          "video_path": "videos/demo/s1-3.mp4",
+          "thumb_path": "videos/demo/s1-3.jpg",
           "text_es": "Nos enseñó a untar la masa con el revés de la cuchara, delgadita, nunca gorda. Si te salía gorda, te la quitaba y la volvía a hacer sin decir nada. Luego nos daba un jarrito de champurrado para calentar los dedos.",
           "text_en": "She taught us to spread the masa with the back of a spoon, thin, never thick. If yours came out thick, she'd take it and redo it without a word. Then she'd hand us a cup of champurrado to warm our fingers.",
           "prompt": "a mother's hand passing a small clay cup of steaming champurrado to a child's hand, masa on a spoon, husks in an apron lap, a small family kitchen in Monterrey, Mexico, Christmas morning in the 1950s, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
@@ -46,6 +52,8 @@
         },
         {
           "image": "s1-4",
+          "video_path": "videos/demo/s1-4.mp4",
+          "thumb_path": "videos/demo/s1-4.jpg",
           "text_es": "Mientras trabajábamos, ella cantaba. Muy bajito, casi nada, para que mi papá siguiera durmiendo. Él trabajaba en la Fundidora y llegaba rendido. A las siete le llevábamos su café a la cama y él hacía como que no sabía nada.",
           "text_en": "While we worked, she sang. Very low, almost nothing, so my father would keep sleeping. He worked at the Fundidora and came home worn out. At seven we took him coffee in bed, and he pretended he knew nothing about the tamales.",
           "prompt": "a steaming cup of coffee on a white chenille bedspread, morning light through a lace curtain, a sleeping figure's shoulder in soft focus, a small family kitchen in Monterrey, Mexico, Christmas morning in the 1950s, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
@@ -54,6 +62,8 @@
         },
         {
           "image": "s1-5",
+          "video_path": "videos/demo/s1-5.mp4",
+          "thumb_path": "videos/demo/s1-5.jpg",
           "text_es": "Todavía tengo su tetera, la de las flores amarillas. Nomás está en la repisa. Cuando hago tamales a las cinco, sola en la cocina, me sorprendo cantando igual de bajito. Y ya no hay nadie a quien despertar, mijo.",
           "text_en": "I still have her teapot, the one with yellow flowers. It just sits on the shelf now. When I make tamales at five, alone in the kitchen, I catch myself singing that low. *And there's no one left to wake*, mijo.",
           "prompt": "an old enamel teapot painted with yellow flowers on a kitchen shelf, early light, a pot of tamales steaming below, a small family kitchen in Monterrey, Mexico, Christmas morning in the 1950s, 21:9 cinematic wide frame, painterly, warm nostalgic light, soft film grain, no text, no faces in close up",
@@ -329,6 +339,8 @@
       "scenes": [
         {
           "image": "s1-5",
+          "video_path": "videos/demo/r1-1.mp4",
+          "thumb_path": "videos/demo/r1-1.jpg",
           "text_es": "Abuela, lo escuché dos veces.",
           "text_en": "Abuela, I listened twice.",
           "t_en": [0.0, 0.2013],
@@ -336,6 +348,8 @@
         },
         {
           "image": "s1-3",
+          "video_path": "videos/demo/r1-2.mp4",
+          "thumb_path": "videos/demo/r1-2.jpg",
           "text_es": "No sabía que tú y mi tía Lupe hacían los tamales sentadas en el piso.",
           "text_en": "I didn't know you and Tía Lupe made the tamales sitting on the floor.",
           "t_en": [0.2013, 0.5265],
@@ -343,6 +357,8 @@
         },
         {
           "image": "s1-1",
+          "video_path": "videos/demo/r1-3.mp4",
+          "thumb_path": "videos/demo/r1-3.jpg",
           "text_es": "¿Me enseñas esta Navidad, a las cinco de la mañana?",
           "text_en": "Will you teach me this Christmas, at five in the morning?",
           "t_en": [0.5265, 0.8473],
@@ -350,6 +366,8 @@
         },
         {
           "image": "s1-4",
+          "video_path": "videos/demo/r1-4.mp4",
+          "thumb_path": "videos/demo/r1-4.jpg",
           "text_es": "¿Qué canción cantaba ella?",
           "text_en": "What song was she singing?",
           "t_en": [0.8473, 1.0],
