@@ -10,6 +10,7 @@
   <meta name="theme-color" content="#000000">
   <title>Hearth</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="toast.css">
   <link rel="stylesheet" href="calibrate.css">
   <!-- Fallback only: the bundled fonts in fonts/ come first in the stack. Non-blocking so an offline Hearth still renders. -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&display=swap" media="print" onload="this.media='all'">
@@ -28,6 +29,7 @@
         <b class="day-num" id="day-num"></b>
         <div class="day-wd"><span id="day-wd"></span><em id="day-mo"></em><span class="en" id="day-en"></span></div>
         <div class="clk"><span id="clock-h">0</span><span class="colon" id="clock-colon">:</span><span id="clock-m">00</span></div>
+        <p class="hint">toca para contar una historia<span class="en">tap to tell a story</span></p>
         <p class="family-code"><span id="fam-code-es"></span><span class="family-code-en" id="fam-code-en"></span></p>
       </div>
 
@@ -37,6 +39,7 @@
         <p class="en" id="waiting-line-en"></p>
         <p class="sub" id="waiting-sub"></p>
         <p class="en" id="waiting-sub-en"></p>
+        <p class="hint">toca para escucharla<span class="en">tap to listen</span></p>
       </div>
 
       <div class="layer rec" id="rec">
@@ -50,6 +53,7 @@
           <span class="rec-label">REC</span>
           <span class="counter" aria-hidden="true"><i id="c0">0</i><i id="c1">0</i><s>:</s><i id="c2">0</i><i id="c3">0</i></span>
         </div>
+        <p class="hint">toca otra vez para enviar<span class="en">tap again to send</span></p>
       </div>
 
       <div class="layer col send" id="send">
@@ -61,7 +65,7 @@
 
       <div class="layer col saved" id="saved">
         <i class="ribbon" aria-hidden="true"></i>
-        <h1 class="headline italic">tu historia está guardada</h1>
+        <h1 class="headline">tu historia está guardada</h1>
         <p class="en">your story is saved</p>
         <p class="sub" id="saved-sub"></p>
         <p class="en" id="saved-sub-en"></p>
@@ -74,6 +78,7 @@
         <span class="label">un momento<span class="en"> · one moment</span></span>
         <h1 class="headline" id="err-line"></h1>
         <p class="en" id="err-line-en"></p>
+        <p class="hint">toca para intentar otra vez<span class="en">tap to try again</span></p>
       </div>
 
       <div id="toast" class="toast" aria-live="polite">

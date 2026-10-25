@@ -1,0 +1,23 @@
+/* Arrival note at the top of the strip, over every layer. */
+.toast {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 calc(30 * var(--u));
+  background: var(--night);
+  font-family: var(--serif);
+  color: var(--cream);
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
+  pointer-events: none;
+}
+.toast.on { opacity: 1; transform: translateY(0); transition-duration: 300ms; pointer-events: auto; }
+.toast p:empty, .toast-en { display: none; }
+[data-subs="en"] .toast-en:not(:empty) { display: block; }
+.toast-line { font-size: calc(16 * var(--u)); line-height: 1.05; }
+.toast-sum { margin-top: calc(3 * var(--u)); font-size: calc(9 * var(--u)); line-height: 1.2; color: var(--fog); }
+.toast-en { margin-top: calc(1 * var(--u)); font-size: calc(8 * var(--u)); color: rgba(142, 138, 132, 0.85); }

@@ -88,8 +88,8 @@ function renderText() {
     setText('waiting-line', `${name} te escribi\u00f3`);
     setText('waiting-line-en', `${name} wrote to you`);
     const [es, en] = titles(latest);
-    setText('waiting-sub', es ? `sobre \u00ab${es}\u00bb` : 'presiona el bot\u00f3n para escucharla');
-    setText('waiting-sub-en', en ? `about \u00ab${en}\u00bb` : 'press to listen');
+    setText('waiting-sub', es ? `sobre \u00ab${es}\u00bb` : '');
+    setText('waiting-sub-en', en ? `about \u00ab${en}\u00bb` : '');
   }
   const [prompt, promptEn] = recPrompt(name);
   setText('rec-prompt', prompt);
@@ -161,8 +161,9 @@ function press(source) {
       if (age < DOUBLE_MS) return; // bounce guard, and keeps a double press from stopping its own replay
       return stopPlayback();
     case S.ERROR:
-    case S.SAVED:
       clearTimeout(errorTimer);
+      return startRecording();
+    case S.SAVED:
       clearTimeout(savedTimer);
       return setState(idleState());
     default:
@@ -295,19 +296,30 @@ function showError(text, en, hold = false) {
   if (!hold) errorTimer = setTimeout(() => state === S.ERROR && setState(idleState()), ERROR_MS);
 }
 
+const busy = () => state === S.RECORDING || state === S.SENDING;
+
 // The first fetch only records what is already there; later arrivals get a toast.
+// During playback the newest arrival waits and shows once the story ends.
+let queuedToast = null;
 function toastNew() {
   const fresh = messages.filter((m) => !isMine(m) && m.status === 'ready' && !toasted.has(m.id));
   for (const m of fresh) toasted.add(m.id);
-  const busy = () => state === S.RECORDING || state === S.SENDING;
-  if (primed && fresh.length && !busy()) {
-    const id = fresh.at(-1).id;
-    showToast(partnerName(), titles(fresh.at(-1)), () => {
-      const msg = messages.find((m) => m.id === id);
-      if (msg && !busy()) play(msg);
-    });
+  if (primed && fresh.length) {
+    queuedToast = fresh.at(-1).id;
+    if (state !== S.PLAYING) flushToast();
   }
   primed = true;
+}
+
+function flushToast() {
+  const id = queuedToast;
+  queuedToast = null;
+  const msg = messages.find((m) => m.id === id);
+  if (!msg || heardLocal.has(id) || busy()) return;
+  showToast(partnerName(), titles(msg), () => {
+    const now = messages.find((m) => m.id === id);
+    if (now && !busy()) play(now);
+  });
 }
 
 // Her story is in. The title shows when the story worker has already named it.
@@ -396,6 +408,7 @@ function stopPlayback() {
   playingId = null;
   stopAll();
   setState(idleState());
+  flushToast();
   // Let the strip fade before tearing the media down.
   cleanupTimer = setTimeout(() => {
     if (state !== S.PLAYING) teardown();
