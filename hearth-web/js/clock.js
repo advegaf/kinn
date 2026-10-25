@@ -6,8 +6,12 @@ const fmtWd = new Intl.DateTimeFormat('es', { weekday: 'long' });
 const fmtMo = new Intl.DateTimeFormat('es', { month: 'long' });
 const fmtWdEn = new Intl.DateTimeFormat('en', { weekday: 'long' });
 const fmtMoEn = new Intl.DateTimeFormat('en', { month: 'long' });
-export const hm = (d) => `${d.getHours() % 12 || 12}:${String(d.getMinutes()).padStart(2, '0')}`;
+const hm = (d) => `${d.getHours() % 12 || 12}:${String(d.getMinutes()).padStart(2, '0')}`;
 export const dayLabel = (d) => `${fmtWd.format(d)} ${d.getDate()}`;
+export const sentAt = (d) => [
+  `el ${dayLabel(d)} ${d.getHours() % 12 === 1 ? 'a la' : 'a las'} ${hm(d)}`,
+  `on ${fmtWdEn.format(d)} ${d.getDate()} at ${hm(d)}`,
+];
 
 let colonOn = true;
 export function tickClock() {

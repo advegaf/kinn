@@ -167,13 +167,6 @@ img { -webkit-user-drag: none; }
 [data-state="saved"] .saved,
 [data-state="error"] .err { opacity: 1; transition-duration: var(--enter); }
 
-.label {
-  font: 400 calc(6 * var(--u))/1 var(--sans);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--fog);
-  white-space: nowrap;
-}
 .headline {
   margin: 0;
   font: 400 calc(28 * var(--u))/1 var(--serif);
@@ -200,7 +193,6 @@ img { -webkit-user-drag: none; }
   text-wrap: balance;
 }
 [data-subs="en"] .en:empty { display: none; }
-[data-subs="en"] .label .en { display: inline; margin: 0; font: inherit; letter-spacing: inherit; color: rgba(142, 138, 132, 0.7); }
 
 /* Left aligned column, vertically centered: waiting, sending, saved, error. */
 .col {

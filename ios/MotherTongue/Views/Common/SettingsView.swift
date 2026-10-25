@@ -12,15 +12,13 @@ struct SettingsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text("Kinn").tinyCaps()
-                    Spacer()
-                    Button("Done") { dismiss() }
-                        .font(.serif(19))
-                        .foregroundStyle(Color.ink)
-                        .buttonStyle(PressStyle())
-                }
+                Button("Done") { dismiss() }
+                    .font(.serif(19))
+                    .foregroundStyle(Color.ink)
+                    .buttonStyle(PressStyle())
+                    .frame(maxWidth: .infinity, alignment: .trailing)
                 OnbHeadline(title: "Settings", note: "The back of the book")
+                    .padding(.top, 22)
 
                 section("Profile") {
                     row("Name", session.profile?.name ?? "")
@@ -71,7 +69,9 @@ struct SettingsView: View {
 
     private func section<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text(title).tinyCaps()
+            Text(title)
+                .font(.serif(26, relativeTo: .title3))
+                .foregroundStyle(Color.ink)
                 .padding(.bottom, 10)
                 .accessibilityAddTraits(.isHeader)
             Hairline()
