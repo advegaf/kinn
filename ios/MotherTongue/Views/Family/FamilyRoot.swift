@@ -12,6 +12,8 @@ struct FamilyRoot: View {
     @Environment(AppSession.self) private var session
     /// Pages opened on top of the week, oldest first. Back drops the last one.
     @State private var history: [Route] = []
+    /// True after Back, so an entry shown again does not start its story again.
+    @State private var cameBack = false
     @State private var showSettings = false
     #if DEBUG
     @State private var debugApplied = false
@@ -21,12 +23,12 @@ struct FamilyRoot: View {
         ZStack {
             switch route {
             case .week:
-                AlmanacView(open: { history.append(.entry($0)) })
-                    .kinnTabBar(home: { history = [] }, compose: { history.append(.compose) }, settings: { showSettings = true })
+                AlmanacView(open: { push(.entry($0)) })
+                    .kinnTabBar(home: { history = [] }, compose: { push(.compose) }, settings: { showSettings = true })
                     .transition(.fade)
             case .entry(let id):
                 if let m = message(id) {
-                    EntryView(message: m, back: back, writeBack: { history.append(.write(id)) })
+                    EntryView(message: m, autoplay: !cameBack, back: back, writeBack: { push(.write(id)) })
                         .transition(.fade)
                 }
             case .write(let id):
@@ -52,7 +54,13 @@ struct FamilyRoot: View {
     private func back() {
         session.player.stop()
         session.recorder.cancel()
+        cameBack = true
         history.popLast()
+    }
+
+    private func push(_ next: Route) {
+        cameBack = false
+        history.append(next)
     }
 
     private var isEntry: Bool {

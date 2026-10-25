@@ -10,6 +10,8 @@ struct PairView: View {
     @State private var openThreads: [OpenThread] = []
     @State private var busy = false
     @State private var error: String?
+    /// Cancelled when the page goes away, so a late reply cannot move the flow after Back.
+    @State private var pending: Task<Void, Never>?
 
     private var isElder: Bool { session.profile?.role == .elder }
 
@@ -18,6 +20,7 @@ struct PairView: View {
             if isElder { elderPage } else { familyPage }
         }
         .task { if isElder { await load() } }
+        .onDisappear { pending?.cancel() }
     }
 
     // MARK: Family: type the code her Hearth shows
@@ -142,13 +145,15 @@ struct PairView: View {
     private func run(joinedByCode: Bool = false, _ work: @escaping () async throws -> Void) {
         busy = true
         error = nil
-        Task {
+        pending = Task {
             defer { busy = false }
             do {
                 try await work()
+                guard !Task.isCancelled else { return }
                 Haptics.arrival()
                 onDone(joinedByCode)
             } catch {
+                guard !Task.isCancelled else { return }
                 Haptics.error()
                 self.error = error.localizedDescription
             }
