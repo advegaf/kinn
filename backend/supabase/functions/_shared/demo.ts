@@ -1,7 +1,16 @@
 import DEMO from "./demo-stories.json" with { type: "json" };
 
 // t_en, t_es: measured [start, end] of the beat as fractions of the English and Spanish narration mp3.
-export type DemoScene = { image: string; text_es: string; text_en: string; prompt?: string; t_en?: number[]; t_es?: number[] };
+export type DemoScene = {
+  image: string;
+  text_es: string;
+  text_en: string;
+  prompt?: string;
+  t_en?: number[];
+  t_es?: number[];
+  video_path?: string;
+  thumb_path?: string;
+};
 export type DemoStory = {
   id: string;
   days_ago: number;
@@ -75,6 +84,7 @@ function spans(scenes: DemoScene[], key: "t_en" | "t_es", full: string, beats: s
 
 // The phone times English by t_en. The Hearth times the Spanish by t_es.
 const measured = (sc: DemoScene) => ({ ...(sc.t_en ? { t_en: sc.t_en } : {}), ...(sc.t_es ? { t_es: sc.t_es } : {}) });
+const clip = (sc: DemoScene) => (sc.video_path ? { video_path: sc.video_path, thumb_path: sc.thumb_path } : {});
 
 // start and end follow the English mp3, which is what the family hears.
 export function elderFields(s: DemoStory) {
@@ -82,6 +92,7 @@ export function elderFields(s: DemoStory) {
   const scenes = s.scenes.map((sc, i) => ({
     ...times[i],
     ...measured(sc),
+    ...clip(sc),
     text_es: sc.text_es,
     text_en: sc.text_en,
     image_path: `demo/${sc.image}.jpg`,
@@ -110,6 +121,7 @@ export function replyFields(r: DemoReply, i: number) {
   const scenes = r.scenes.map((sc, k) => ({
     ...times[k],
     ...measured(sc),
+    ...clip(sc),
     text_es: sc.text_es,
     text_en: sc.text_en,
     image_path: `demo/${sc.image}.jpg`,
