@@ -3,6 +3,8 @@
 
 const SUPABASE_ESM = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
 const POLL_MS = 3000;
+// Demo mode has no Supabase config, so the pre-made stage clips (videos/demo/...) load from public storage.
+const DEMO_CLIPS = 'https://gxyeoawqjzgxubfvayjs.supabase.co/storage/v1/object/public/';
 
 function uuid() {
   if (crypto.randomUUID) return crypto.randomUUID();
@@ -175,6 +177,7 @@ export class DemoBackend {
         title: r.title, title_es: r.title_es,
         ...(r.scenes?.length ? { scenes: r.scenes.map((sc) => ({
           text_es: sc.text_es, text_en: sc.text_en, t_es: sc.t_es, t_en: sc.t_en, image_path: `demo/scenes/${sc.image}.jpg`,
+          ...(sc.video_path ? { video_path: sc.video_path } : {}),
         })) } : {}),
       },
     }));
@@ -226,7 +229,7 @@ export class DemoBackend {
   audioUrl(message) { return message.translated_path || ''; }
   originalUrl(message) { return message.original_path || ''; }
   media(story) {
-    const scenes = (story?.scenes || []).map((sc) => ({ ...sc, image: sc.image_path || sc.thumb_path || '', video: sc.video_path || '' }));
+    const scenes = (story?.scenes || []).map((sc) => ({ ...sc, image: sc.image_path || sc.thumb_path || '', video: sc.video_path ? DEMO_CLIPS + sc.video_path : '' }));
     return { video: story?.video_path || '', images: story?.image_paths || [], scenes };
   }
 }

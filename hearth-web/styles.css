@@ -120,6 +120,34 @@ img { -webkit-user-drag: none; }
 [data-state="error"] .spot > .glow,
 [data-state="saved"] .spot > .glow { opacity: 0.12; transition-duration: var(--enter); }
 
+/* Hold to record: the ring sits in the middle of the strip, fills over the 3 s hold (input.js HOLD_MS) and snaps back on release. */
+.ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(60 * var(--u));
+  height: calc(60 * var(--u));
+  margin: calc(-30 * var(--u)) 0 0 calc(-30 * var(--u));
+  z-index: 45;
+  pointer-events: none;
+  transform: rotate(-90deg);
+  opacity: 0;
+  transition: opacity 200ms var(--ease-out);
+}
+.ring circle {
+  fill: none;
+  stroke: var(--lamp);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset 200ms var(--ease-out);
+}
+[data-hold] .ring { opacity: 1; transition-duration: 120ms; }
+[data-hold] .ring circle { stroke-dashoffset: 0; transition: stroke-dashoffset 3s linear; }
+.hint-reply, [data-reply] .hint-story { display: none; }
+[data-reply] .hint-reply { display: block; }
+
 /* Visible strip, sized to the shell window. */
 .strip {
   --u: calc(var(--sh) * 1vh / 100);
@@ -443,6 +471,8 @@ img { -webkit-user-drag: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .glow-breathe > .glow { animation: none; opacity: 0.7; }
+  .ring circle, [data-hold] .ring circle { stroke-dashoffset: 0; transition: none; }
+  [data-hold] .ring { transition: opacity 3s linear; }
   [data-state="sending"] .send .headline { animation: none; }
   .kb img, .kb img.on, [data-state="playing"] .warm { transform: none; }
 }

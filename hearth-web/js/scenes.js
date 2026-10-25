@@ -21,6 +21,11 @@ let videoSwap = 0;
 // row says so (demo reply_to), otherwise the newest real story in the thread.
 export const hasStory = (st) => Boolean(st && (st.scenes?.length || st.video_path || st.image_paths?.length));
 
+// A note whose film the worker is still making. After FILM_WAIT_MS it plays over the stills anyway.
+const FILM_WAIT_MS = 3 * 60 * 1000;
+export const filmPending = (msg) => ['pending', 'generating'].includes(msg.story?.status)
+  && !hasStory(msg.story) && Date.now() - Date.parse(msg.created_at) < FILM_WAIT_MS;
+
 export function storyFor(msg, messages) {
   if (hasStory(msg.story)) return msg.story;
   const related = msg.reply_to && messages.find((m) => m.id === msg.reply_to);
