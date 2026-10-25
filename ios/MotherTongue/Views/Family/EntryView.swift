@@ -10,6 +10,7 @@ struct EntryView: View {
 
     @Environment(AppSession.self) private var session
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.isTopPage) private var isTopPage
     @State private var now = Date.now
 
     init(message: Message, back: @escaping () -> Void, writeBack: @escaping () -> Void) {
@@ -133,7 +134,7 @@ struct EntryView: View {
         }
         .task(id: message.id) { session.markHeard(message.id) }
         .task(id: making) {
-            guard Self.simulated == nil, !making else { return }
+            guard Self.simulated == nil, !making, isTopPage else { return }
             if let src = primarySource { session.player.play(src, key: primaryKey) }
         }
         .task(id: message.filmDeadline) {
