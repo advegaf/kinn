@@ -82,6 +82,8 @@ extension Animation {
     static let enter = Animation.timingCurve(0.23, 1, 0.32, 1, duration: 0.6)
     static let exit = Animation.timingCurve(0.23, 1, 0.32, 1, duration: 0.3)
     static let press = Animation.timingCurve(0.23, 1, 0.32, 1, duration: 0.16)
+    static let push = Animation.timingCurve(0.23, 1, 0.32, 1, duration: 0.3)
+    static let pop = Animation.timingCurve(0.23, 1, 0.32, 1, duration: 0.24)
     static let gentle = enter
 }
 
@@ -93,7 +95,7 @@ extension AnyTransition {
 
 @MainActor
 enum PaperGrain {
-    static let image: UIImage = {
+    static let image: UIImage? = {
         let side = 240
         var rng = SeededRandom(seed: 1987)
         var pixels = [UInt8](repeating: 0, count: side * side)
@@ -105,7 +107,7 @@ enum PaperGrain {
               let cg = CGImage(width: side, height: side, bitsPerComponent: 8, bitsPerPixel: 8, bytesPerRow: side,
                                space: CGColorSpaceCreateDeviceGray(), bitmapInfo: CGBitmapInfo(rawValue: 0),
                                provider: provider, decode: nil, shouldInterpolate: false, intent: .defaultIntent)
-        else { return UIImage() }
+        else { return nil }
         return UIImage(cgImage: cg, scale: 2, orientation: .up)
     }()
 }
@@ -113,12 +115,14 @@ enum PaperGrain {
 struct GrainOverlay: View {
     var opacity: Double = 0.5
     var body: some View {
-        Image(uiImage: PaperGrain.image)
-            .resizable(resizingMode: .tile)
-            .blendMode(.overlay)
-            .opacity(opacity)
-            .allowsHitTesting(false)
-            .accessibilityHidden(true)
+        if let image = PaperGrain.image {
+            Image(uiImage: image)
+                .resizable(resizingMode: .tile)
+                .blendMode(.overlay)
+                .opacity(opacity)
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+        }
     }
 }
 
@@ -151,10 +155,12 @@ struct NightCanvas: View {
     var body: some View {
         Color.night
             .overlay {
-                Image(uiImage: PaperGrain.image)
-                    .resizable(resizingMode: .tile)
-                    .blendMode(.screen)
-                    .opacity(0.06)
+                if let image = PaperGrain.image {
+                    Image(uiImage: image)
+                        .resizable(resizingMode: .tile)
+                        .blendMode(.screen)
+                        .opacity(0.06)
+                }
             }
             .ignoresSafeArea()
             .allowsHitTesting(false)

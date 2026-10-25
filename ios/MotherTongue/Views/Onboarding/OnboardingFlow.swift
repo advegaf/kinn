@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct OnboardingFlow: View {
-    enum Step { case welcome, pair, voice }
+    enum Step { case pair, voice }
 
     @Environment(AppSession.self) private var session
     @AppStorage(StorageKeys.onboarded) private var onboarded = false
@@ -9,7 +9,7 @@ struct OnboardingFlow: View {
     @AppStorage(StorageKeys.role) private var role: Role = .family
     @AppStorage(StorageKeys.lang) private var lang = "en"
     @AppStorage(StorageKeys.demoMode) private var demoMode = false
-    @State private var step: Step = .welcome
+    @State private var path: [Step] = []
     @State private var busy = false
     @State private var error: String?
     /// Kept here so the code typed on the pair page is still there after a step back.
@@ -22,16 +22,14 @@ struct OnboardingFlow: View {
     private func languageLabel(_ code: String) -> String { isElder ? endonym(code) : languageName(code) }
 
     var body: some View {
-        ZStack {
+        PageStack(path: path, pop: { path.removeLast() }) {
+            welcome
+        } page: { step in
             switch step {
-            case .welcome: welcome.transition(.fade)
-            case .pair:
-                PairView(code: $code, onBack: { advance(to: .welcome) }) { joined in joined ? finish() : advance(to: .voice) }
-                    .transition(.fade)
-            case .voice: VoiceEnrollView(onBack: { advance(to: .pair) }, onDone: finish).transition(.fade)
+            case .pair: PairView(code: $code, onBack: back) { joined in joined ? finish() : advance(to: .voice) }
+            case .voice: VoiceEnrollView(onBack: back, onDone: finish)
             }
         }
-        .animation(.enter, value: step)
         #if DEBUG
         .task { await jumpForScreenshot() }
         #endif
@@ -41,7 +39,7 @@ struct OnboardingFlow: View {
     /// Debug screenshots only: `-onboardingStep pair|voice` skips ahead, and with `-pairCode XXXXXX`
     /// the family phone joins that thread by code, as typing it on the pair page would.
     private func jumpForScreenshot() async {
-        guard let target = UserDefaults.standard.string(forKey: "onboardingStep"), step == .welcome else { return }
+        guard let target = UserDefaults.standard.string(forKey: "onboardingStep"), path.isEmpty else { return }
         session.configureBackend()
         try? await session.createProfile(name: name.isEmpty ? "Angel" : name, role: role, lang: role == .family ? "en" : lang)
         if let code = UserDefaults.standard.string(forKey: "pairCode"), role == .family {
@@ -54,7 +52,7 @@ struct OnboardingFlow: View {
             return
         }
         if target != "voice", role == .family, session.thread == nil { try? await session.createThread() }
-        step = target == "voice" ? .voice : .pair
+        path = target == "voice" ? [.pair, .voice] : [.pair]
     }
     #endif
 
@@ -157,7 +155,12 @@ struct OnboardingFlow: View {
     }
 
     private func advance(to next: Step) {
-        withAnimation(.enter) { step = next }
+        guard path.last != next else { return }
+        withAnimation(.push) { path.append(next) }
+    }
+
+    private func back() {
+        withAnimation(.pop) { _ = path.popLast() }
     }
 
     private func finish() {
@@ -191,7 +194,6 @@ struct OnbPage<Content: View, Footer: View>: View {
             .screenshotAnchor()
         }
         .background { PaperCanvas() }
-        .backSwipe(back?.action)
     }
 }
 
