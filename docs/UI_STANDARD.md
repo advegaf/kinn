@@ -121,8 +121,9 @@ tiny caps labels. K1 and K2 replace those parts of DESIGN.md.
 
 ## 5. Color and contrast
 
-- [ ] C1. Text contrast is at least 4.5:1. Large text (24 px, or 18.7 px
-  bold) is at least 3:1. [W-1.4.3]
+- [ ] C1. Text contrast is at least 4.5:1. Large text is at least 3:1.
+  Large text on the web is 24 px, or 18.7 px bold [W-1.4.3]. Large text
+  on iOS is 18 pt and up, or bold at any size [HIG-ACC].
 - [ ] C2. Icons, control edges, and focus rings are at least 3:1 against
   their background. [W-1.4.11]
 - [ ] C3. Text over a photo or video has a scrim, so C1 holds on the
@@ -137,8 +138,8 @@ Measured token contrast (WCAG formula):
 | Token pair | Ratio | Result |
 | --- | --- | --- |
 | ink on paper | 14.27 | pass |
-| soft #6F6B65 on paper | 4.34 | fails body text |
-| sub #77726B on paper | 3.91 | fails body text |
+| soft #6F6B65 on paper | 4.34 | iOS: fails under 18 pt, passes at 18 pt and up |
+| sub #77726B on paper | 3.91 | iOS: fails under 18 pt, passes at 18 pt and up |
 | fog #8E8A84 on paper | 2.82 | fails |
 | muted #A39D94 on paper | 2.21 | fails |
 | later #BDB7AE on paper | 1.63 | fails |
@@ -207,7 +208,7 @@ Measured token contrast (WCAG formula):
 ## 10. Writing in the UI
 
 - [ ] W1. Use the words of the person, not of the system ("Sending to
-  Sofia", not "Uploading"). [NNG-ERR] [AG]
+  Angel", not "Uploading"). [NNG-ERR] [AG]
 - [ ] W2. Button labels are verbs ("Write back", "Listen"). [NNG-ERR]
 - [ ] W3. Short sentences. One idea per line. [AG]
 - [ ] W4. Text names a control that exists. Do not say "press the
@@ -215,7 +216,7 @@ Measured token contrast (WCAG formula):
 
 ## 11. The Hearth (older user, kitchen tablet, 1340x800)
 
-Context: Rosa is older and reads Spanish. The Hearth hangs in a kitchen
+Context: Margaret is older and reads Spanish. The Hearth hangs in a kitchen
 frame. She sees it from across the room and touches it with one finger,
 maybe with wet or floury hands. Only the strip (default 1340x400 in the
 middle of the screen) is visible.
@@ -238,7 +239,7 @@ middle of the screen) is visible.
 - [ ] H8. One main element per state. At most 3 elements on the strip.
   [AMZ-MM]
 - [ ] H9. Clear feedback after each action: recording shows REC and the
-  time, sending shows a calm line, sent shows "sent to Sofia". [NNG-SEN]
+  time, sending shows a calm line, sent shows "sent to Angel". [NNG-SEN]
 - [ ] H10. Errors stay on screen until she can read them twice, and say
   what to do next. [W-2.2.1] [NNG-ERR]
 - [ ] H11. All words are in her language (Spanish), in sentence case.
@@ -269,8 +270,10 @@ Found on 2026-10-25. Hearth web: run in demo mode at 1340x800 with
 agent-browser, a screenshot of each state, and a read of the code. iOS: a
 read of the current code, checked against the screenshots in docs/screens
 (ios-v4c-week.png for the Almanac, ios-v2-hearth.png for the elder
-Hearth). New simulator screenshots are still to do, because the simulator
-service on the build Mac is down.
+Hearth). The iOS app builds. New simulator screenshots were not taken,
+because the shared simulator on the build Mac hung. Layout, touch bounds,
+safe areas, largest Dynamic Type, and Reduce Motion on iOS are not yet
+checked on a device.
 
 ### Hearth web (hearth-web)
 
@@ -292,6 +295,8 @@ service on the build Mac is down.
 | Playing | C3, H12 | The heading over a bright scene measures about 2.1:1 to 2.4:1, with the current text shadow. The top of the strip has only a light gradient. | screenshot, sampled pixels, styles.css:345 |
 | Error | K1, K6 | "UN MOMENTO" is an upper case eyebrow above the message. | screenshot |
 | Error | H10, A5 | The error goes back to the clock after 3.5 s, before a slow reader can read it twice. | js/main.js:17 |
+| All | A1 | The strip is the only control, but it has no button role and no accessible name. A screen reader does not announce record or play. Taps come from a window pointerdown listener. | index.html:18, js/main.js:165 |
+| All | T3 | The viewport sets maximum-scale=1 and user-scalable=no, so the user cannot zoom. | index.html:9 |
 
 ### Hearth on iOS (HearthView, role elder)
 
@@ -318,7 +323,8 @@ RootView still sends role elder to HearthView
 | Almanac | L8, C1 | "Settings" is a tiny caps fog label. It does not look like a control and fails contrast. | Views/Family/AlmanacView.swift:57 |
 | Entry | L8 | "Close" is a tiny caps label on video, styled the same as static labels. | Views/Family/EntryView.swift:117 |
 | Onboarding | C1 | The demo note is #9C968D on paper, 2.41:1. | Views/Onboarding/OnboardingFlow.swift:208 |
-| All | C1 | sub (#77726B, 3.91:1) and soft (#6F6B65, 4.34:1) on paper fail for body text at 17 to 20 pt. | Views/Common/Theme.swift:21, 22 |
+| Several | C1 | sub (#77726B, 3.91:1) and soft (#6F6B65, 4.34:1) on paper fail for text under 18 pt. Text in these colors at 18 pt and up passes. | Views/Family/AlmanacView.swift:104 (11 pt), :173 (17 pt); Views/Common/SettingsView.swift:85 (17 pt), :120 (16 pt); Views/Onboarding/OnboardingFlow.swift:207 (17 pt); Views/Onboarding/VoiceEnrollView.swift:32, :53 (17 pt) |
+| Write back | N2, N5 | Recording works only with press and hold. There is no single tap path and no accessibility action. A press under 0.8 s throws the recording away. This is the required reply path. | Views/Family/WriteBackView.swift:125, :146, :173 |
 
 ## Sources
 
