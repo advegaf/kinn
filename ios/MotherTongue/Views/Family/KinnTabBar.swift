@@ -9,7 +9,7 @@ struct KinnTabBar: View {
         VStack(spacing: 0) {
             Hairline()
             HStack(spacing: 0) {
-                item("Home", action: home)
+                item("Home", selected: true, action: home)
                 item("New note", action: compose)
                 item("Settings", action: settings)
             }
@@ -19,18 +19,20 @@ struct KinnTabBar: View {
         .background { Color.paper.ignoresSafeArea(edges: .bottom) }
     }
 
-    private func item(_ label: String, action: @escaping () -> Void) -> some View {
+    /// The bar only shows on the week, so Home is always the selected item.
+    private func item(_ label: String, selected: Bool = false, action: @escaping () -> Void) -> some View {
         Button {
             Haptics.tap()
             action()
         } label: {
             Text(label)
                 .font(.serif(19))
-                .foregroundStyle(Color.ink)
+                .foregroundStyle(selected ? Color.ink : Color.soft)
                 .frame(maxWidth: .infinity, minHeight: 44)
                 .contentShape(.rect)
         }
         .buttonStyle(PressStyle())
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
 

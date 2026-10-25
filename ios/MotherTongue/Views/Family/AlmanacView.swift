@@ -154,12 +154,13 @@ struct AlmanacView: View {
         VStack(spacing: 0) {
             ForEach(Array(rows.enumerated()), id: \.element.id) { i, m in
                 let sameDay = i > 0 && Almanac.calendar.isDate(rows[i - 1].date, inSameDayAs: m.date)
+                let mine = session.isMine(m)
                 Button { open(m.id) } label: {
                     HStack(alignment: .firstTextBaseline, spacing: 0) {
                         Text(sameDay ? "" : "\(Almanac.dayNumber(m.date))")
                             .font(.serif(22))
                             .monospacedDigit()
-                            .foregroundStyle(Color.fog)
+                            .foregroundStyle(mine ? Color.later : Color.fog)
                             .frame(width: 44, alignment: .leading)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(Almanac.titleEn(m))
@@ -168,6 +169,11 @@ struct AlmanacView: View {
                             Text(Almanac.titleEs(m))
                                 .font(.serifItalic(15))
                                 .foregroundStyle(Color.sub)
+                            if mine {
+                                Text("You sent this")
+                                    .font(.serif(15))
+                                    .foregroundStyle(Color.soft)
+                            }
                         }
                         .multilineTextAlignment(.leading)
                         Spacer(minLength: 0)
