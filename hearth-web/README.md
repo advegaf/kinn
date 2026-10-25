@@ -48,7 +48,7 @@ Fill in `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `PROFILE_ID` (grandma's elder profi
 Other params:
 
 - `?demo=1` canned data, fake mic, no backend. Add `&state=clock|waiting|recording|sending|playing|error` to jump to a state.
-  Demo data is `demo/demo-stories.json` (6 stories of Rosa's, 5 scenes each, stills in `demo/scenes/`, plus 2 replies from Sofía). Demo narration is pre-generated ElevenLabs audio at `demo/audio/{id}-{es|en}.mp3`. Files exist for `s1` to `s3` (both languages) and `r1-en`; anything missing falls back to `speechSynthesis`. With `&state=playing`, `&msg=<id>` picks the row (`s1` to `s6` her stories, `r1` or `r2` a reply).
+  Demo data is `demo/demo-stories.json` (6 stories of Margaret's, 5 scenes each, stills in `demo/scenes/`, plus 2 replies from Angel). Demo narration is pre-generated ElevenLabs audio at `demo/audio/{id}-{es|en}.mp3`. Files exist for `s1` to `s3` (both languages) and `r1-en`; anything missing falls back to `speechSynthesis`. With `&state=playing`, `&msg=<id>` picks the row (`s1` to `s6` her stories, `r1` or `r2` a reply).
 - `&at=0..1` (DEBUG, with `state=playing`) freezes playback at that fraction of the narration with no sound, for screenshots. Without `&msg` it plays her newest story.
 - `?calibrate=1` strip overlay, plus the button zone for the optional button build (below).
 - `?template=1` full screen mat cutting guide (below).

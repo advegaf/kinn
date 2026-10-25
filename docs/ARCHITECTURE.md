@@ -46,7 +46,7 @@ flowchart LR
 
 ## One story, Hearth to iPhone
 
-1. Rosa taps the Hearth. The web app records her voice as webm and shows
+1. Margaret taps the Hearth. The web app records her voice as webm and shows
    "te escucho" with a REC counter.
 2. She taps again. The Hearth uploads the clip to `audio/{thread_id}/{message_id}.webm`,
    inserts a `messages` row with `status = 'uploaded'`, and calls `process-message`.
@@ -54,7 +54,7 @@ flowchart LR
    for a Spanish transcript, then asks GPT-6 Luna for an English translation
    that keeps her endearments, a few cultural notes, and three "ask her about"
    questions.
-4. It speaks the translation with ElevenLabs `eleven_multilingual_v2` in Rosa's
+4. It speaks the translation with ElevenLabs `eleven_multilingual_v2` in Margaret's
    cloned voice, uploads `{message_id}-tr.mp3`, and sets the row to `ready`.
 5. Realtime tells the iPhone. The story appears on today in the Almanac and
    can already be played as audio.
@@ -71,13 +71,13 @@ flowchart LR
 
 ## One reply, iPhone to Hearth
 
-1. Sofía taps Write back. The Almanac offers the three questions from step 3.
+1. Angel taps Write back. The Almanac offers the three questions from step 3.
 2. She holds to record and lets go. The app uploads `audio/{thread_id}/{message_id}.m4a`,
    inserts a `messages` row from her profile, and calls `process-message`.
 3. Scribe transcribes her English, GPT-6 Luna translates it into Spanish, and
-   ElevenLabs speaks it in Sofía's cloned voice.
-4. The row turns `ready`. Realtime tells the Hearth, which shows "Sofía te escribió".
-5. Rosa taps and hears the question in Spanish, in her granddaughter's voice.
+   ElevenLabs speaks it in Angel's cloned voice.
+4. The row turns `ready`. Realtime tells the Hearth, which shows "Angel te escribió".
+5. Margaret taps and hears the question in Spanish, in her grandson's voice.
 
 Voices come from `enroll-voice`: each person records a short sample, the
 iPhone app uploads it to `voices/{profile_id}.m4a` (the iPhone app is the

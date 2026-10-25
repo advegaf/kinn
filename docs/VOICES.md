@@ -17,10 +17,12 @@ Files live in `hearth-web/demo/audio/{id}-{es|en}.mp3` and are copied to `ios/Mo
 
 | Role | Voice | Voice id | Used for |
 | --- | --- | --- | --- |
-| Rosa, Spanish and English | Sarah (premade) | `EXAVITQu4vr4xnSDxMaL` | `s1` to `s4`, both languages |
-| Sofía, Spanish and English | Jessica (premade) | `cgSgspJ2msm6clMCkdW9` | `r1`, `r2`, both languages |
+| Margaret, Spanish and English | Sarah (premade) | `EXAVITQu4vr4xnSDxMaL` | `s1` to `s4`, both languages |
+| Angel, Spanish and English | Jessica (premade) | `cgSgspJ2msm6clMCkdW9` | `r1`, `r2`, both languages |
 
-Rosa uses the same voice in both languages, which is the product promise: her own voice, translated.
+Margaret uses the same voice in both languages, which is the product promise: her own voice, translated.
+
+Jessica is a female voice, picked when the grandchild was a granddaughter. Angel is a grandson now, so swap in a male voice before regenerating `r1` and `r2`.
 
 Model `eleven_multilingual_v2`, `output_format=mp3_44100_128`, voice settings: stability 0.45, similarity_boost 0.85, style 0.15, use_speaker_boost true. The English text is the story `translation` with the `*italic*` markers stripped.
 
@@ -41,8 +43,8 @@ Characters sent: 9,107 (8 stories at about 1,050 each, 4 replies at about 175 ea
 
 These library voices are already added to the account and work as soon as the plan is Starter or higher:
 
-- Rosa: Azu, "Calm, Soft and Melodic", Mexican, old (`D3ws14YxTqcjPaXEOehR`).
-- Sofía: Ale Rodriguez, "Natural Mexican", young (`yUdDEHhLHqO1mgoIOV5o`).
+- Margaret: Azu, "Calm, Soft and Melodic", Mexican, old (`D3ws14YxTqcjPaXEOehR`).
+- Angel: Ale Rodriguez, "Natural Mexican", young (`yUdDEHhLHqO1mgoIOV5o`).
 
 An A/B of the first beat of `s1` on `eleven_v3` (stability 0.35, with audio tags like `[softly]` and `[pause]`) is in `~/Desktop/voice-ab/`: A is Lily, B is Matilda, C is Sarah. Pick one there before regenerating. Strip the bracketed tags from anything shown on screen. Regenerating all 6 stories plus replies costs about 13,300 characters (v3 accepts at most 5,000 characters a request; each story is about 1,050).
 
@@ -65,7 +67,7 @@ Set them with `supabase secrets set TTS_STABILITY=0.4` and so on.
 The demo voices are stock. The real product speaks in each person's own voice, and the clone is only as good as the recording.
 
 1. **Grandma, 2 to 3 minutes of Spanish.** Her speaking naturally, ideally telling a real story. Not reading a script.
-2. **Sofía, 2 to 3 minutes of English**, same way.
+2. **Angel, 2 to 3 minutes of English**, same way.
 3. **Quiet room.** No music, no TV, no fans or kitchen noise. Soft furnishings help.
 4. **Phone 20 to 30 cm from the mouth**, held steady, not in a pocket or on the far side of a table.
 5. **One session.** Same room, same phone, same day. Mixing sessions blurs the clone.

@@ -38,7 +38,7 @@ messages (
   transcript text,
   translation text,
   translated_path text,            -- storage path in bucket 'audio'
-  cultural_notes jsonb default '[]', -- [{ "term": "mija", "note": "..." }]
+  cultural_notes jsonb default '[]', -- [{ "term": "mijo", "note": "..." }]
   ask_about jsonb default '[]',      -- ["Ask her about ...", ...] only for messages the family receives
   story jsonb,                       -- { "title", "title_es", "world", "scenes": [...], "video_path": "videos/...", "thumb_path": "videos/...", "image_paths": ["images/..."] } (all optional, see Story worker)
   heard_at timestamptz,              -- set by the receiving device when the translated audio is played
