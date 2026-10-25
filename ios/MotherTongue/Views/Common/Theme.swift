@@ -82,6 +82,8 @@ extension Animation {
     static let enter = Animation.timingCurve(0.23, 1, 0.32, 1, duration: 0.6)
     static let exit = Animation.timingCurve(0.23, 1, 0.32, 1, duration: 0.3)
     static let press = Animation.timingCurve(0.23, 1, 0.32, 1, duration: 0.16)
+    static let push = Animation.timingCurve(0.23, 1, 0.32, 1, duration: 0.3)
+    static let pop = Animation.timingCurve(0.23, 1, 0.32, 1, duration: 0.24)
     static let gentle = enter
 }
 

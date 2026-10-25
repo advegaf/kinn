@@ -24,7 +24,7 @@ struct VoiceEnrollView: View {
     }
 
     var body: some View {
-        OnbPage(back: BackButton(title: es ? "Atr\u{E1}s" : "Back", action: back)) {
+        OnbPage(back: BackButton(title: es ? "Atr\u{E1}s" : "Back", action: onBack)) {
             VStack(alignment: .leading, spacing: 0) {
                 OnbHeadline(title: es ? "Tu voz" : "Your voice",
                             note: es ? "Lee esto en voz alta, con calma. Unos 30 segundos." : "Read this aloud, slowly. About thirty seconds.")
@@ -62,6 +62,7 @@ struct VoiceEnrollView: View {
             }
             .animation(.enter, value: phase)
         }
+        .onDisappear { session.recorder.cancel() }
     }
 
     /// The script on ruled lines, one hairline under each line of type.
@@ -125,11 +126,6 @@ struct VoiceEnrollView: View {
             .accessibilityValue(hint)
         }
         .animation(.enter, value: live)
-    }
-
-    private func back() {
-        session.recorder.cancel()
-        onBack()
     }
 
     private func counter(_ t: TimeInterval) -> String {

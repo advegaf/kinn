@@ -4,7 +4,6 @@ import SwiftUI
 /// The film and the lit paragraph follow the narration, one scene per beat.
 struct EntryView: View {
     var message: Message
-    var autoplay: Bool
     var back: () -> Void
     var writeBack: () -> Void
     private let scenes: [StoryScene]
@@ -12,9 +11,8 @@ struct EntryView: View {
     @Environment(AppSession.self) private var session
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    init(message: Message, autoplay: Bool, back: @escaping () -> Void, writeBack: @escaping () -> Void) {
+    init(message: Message, back: @escaping () -> Void, writeBack: @escaping () -> Void) {
         self.message = message
-        self.autoplay = autoplay
         self.back = back
         self.writeBack = writeBack
         scenes = message.story?.timedScenes(translation: message.translation) ?? []
@@ -131,10 +129,9 @@ struct EntryView: View {
                 .padding(.horizontal, 30)
                 .padding(.top, 8)
         }
-        .backSwipe(back)
         .task(id: message.id) {
             session.markHeard(message.id)
-            guard Self.simulated == nil, autoplay else { return }
+            guard Self.simulated == nil else { return }
             if let src = primarySource { session.player.play(src, key: primaryKey) }
         }
         .task(id: sceneIndex) {

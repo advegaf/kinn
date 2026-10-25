@@ -1,23 +1,19 @@
 import SwiftUI
 
 struct SettingsView: View {
+    var back: BackButton
+    var recordVoice: () -> Void
     @Environment(AppSession.self) private var session
     @Environment(\.dismiss) private var dismiss
     @AppStorage(StorageKeys.onboarded) private var onboarded = false
     @AppStorage(StorageKeys.demoMode) private var demoMode = false
     @AppStorage(StorageKeys.shutterRemote) private var shutterRemote = false
     @AppStorage(StorageKeys.role) private var role: Role = .family
-    @State private var reenroll = false
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                Button("Done") { dismiss() }
-                    .font(.serif(19))
-                    .foregroundStyle(Color.ink)
-                    .buttonStyle(PressStyle())
-                    .tapTarget()
-                    .frame(maxWidth: .infinity, alignment: .trailing)
+                back.accessibilityIdentifier("settings.done")
                 OnbHeadline(title: "Settings", note: "The back of the book")
                     .padding(.top, 22)
 
@@ -28,7 +24,7 @@ struct SettingsView: View {
                         row("Family code", code.map(String.init).joined(separator: " "))
                     }
                     row("Voice", session.profile?.voiceId == nil ? "Not recorded" : "Cloned")
-                    link("Record my voice again") { reenroll = true }
+                    link("Record my voice again", action: recordVoice)
                 }
 
                 if role == .elder {
@@ -54,18 +50,13 @@ struct SettingsView: View {
                 .padding(.top, 40)
             }
             .padding(.horizontal, 30)
-            .padding(.top, 28)
+            .padding(.top, 24)
             .padding(.bottom, 40)
             .frame(maxWidth: 560)
             .frame(maxWidth: .infinity)
         }
         .scrollIndicators(.hidden)
         .background { PaperCanvas() }
-        .presentationBackground(Color.paper)
-        .sheet(isPresented: $reenroll) {
-            VoiceEnrollView(onBack: { reenroll = false }) { reenroll = false }
-                .presentationBackground(Color.paper)
-        }
     }
 
     private func section<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
