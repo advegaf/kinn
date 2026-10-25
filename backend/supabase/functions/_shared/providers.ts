@@ -1,4 +1,4 @@
-import { env, metaUrl, requireEnv } from "./util.ts";
+import { env, metaUrl, relayUrl, requireEnv } from "./util.ts";
 
 async function check(res: Response, what: string): Promise<Response> {
   if (!res.ok) {
@@ -111,31 +111,39 @@ function b64ToBytes(b64: string): Uint8Array {
   return Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
 }
 
-// Image generation, returns PNG bytes. IMAGE_PROVIDER picks meta (default, Muse Image) or openai.
+// Image generation, returns PNG bytes. IMAGE_PROVIDER picks meta (default, Muse Image), openai or codex.
 export async function generateImage(prompt: string): Promise<Uint8Array> {
   const provider = env("IMAGE_PROVIDER", "meta").toLowerCase();
-  const isMeta = provider !== "openai";
-  const body: Record<string, unknown> = isMeta
-    ? {
-      model: env("IMAGE_MODEL").startsWith("muse") ? env("IMAGE_MODEL") : "muse-image-1.0",
-      prompt,
-      n: 1,
-      size: "1024x1024",
-      response_format: "b64_json",
-      output_format: "png",
-      reasoning_strength: "low",
-    }
-    : { model: env("IMAGE_MODEL", "gpt-image-1"), prompt, n: 1, size: "1024x1024", quality: "low" };
-  const res = await check(
-    await fetch(isMeta ? metaUrl("/images/generations") : "https://api.openai.com/v1/images/generations", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${requireEnv(isMeta ? "META_API_KEY" : "OPENAI_API_KEY")}`,
-        "Content-Type": "application/json",
+  const name = provider === "openai" || provider === "codex" ? provider : "meta";
+  const routes = {
+    meta: {
+      url: () => metaUrl("/images/generations"),
+      key: "META_API_KEY",
+      body: {
+        model: env("IMAGE_MODEL").startsWith("muse") ? env("IMAGE_MODEL") : "muse-image-1.0",
+        prompt,
+        n: 1,
+        size: "1024x1024",
+        response_format: "b64_json",
+        output_format: "png",
+        reasoning_strength: "low",
       },
-      body: JSON.stringify(body),
+    },
+    openai: {
+      url: () => "https://api.openai.com/v1/images/generations",
+      key: "OPENAI_API_KEY",
+      body: { model: env("IMAGE_MODEL", "gpt-image-1"), prompt, n: 1, size: "1024x1024", quality: "low" },
+    },
+    codex: { url: () => relayUrl("/images/generations"), key: "CODEX_RELAY_SECRET", body: { prompt } },
+  };
+  const route = routes[name];
+  const res = await check(
+    await fetch(route.url(), {
+      method: "POST",
+      headers: { Authorization: `Bearer ${requireEnv(route.key)}`, "Content-Type": "application/json" },
+      body: JSON.stringify(route.body),
     }),
-    `Image generation (${isMeta ? "meta" : "openai"})`,
+    `Image generation (${name})`,
   );
   const data = await res.json();
   const item = data.data?.[0] ?? {};

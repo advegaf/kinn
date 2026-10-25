@@ -128,7 +128,7 @@ granddaughter's own voice.
 | Step | Model | Where it runs |
 | --- | --- | --- |
 | Speech to text | ElevenLabs Scribe | Supabase edge function |
-| Translation that keeps endearments, cultural notes, "ask her about" questions, and the story split into five beats with cinematic prompts | Meta Muse Spark (muse-spark-1.3) | Edge function and story worker |
+| Translation that keeps endearments, cultural notes, "ask her about" questions, and the story split into five beats with cinematic prompts | OpenAI GPT-6 Luna through the Codex CLI on a ChatGPT subscription (codex-relay) | Edge function and story worker |
 | Voice, so each person is heard in their own voice in the other language | ElevenLabs Instant Voice Clone with eleven_multilingual_v2 | Edge function |
 | Scenes, five clips per story | Luma ray-3.2 through the Luma Agents API | Story worker (Python, with an ffmpeg film grain chain adapted from Dream Recorder) |
 | Data and realtime | Supabase Postgres, storage, realtime | Supabase |

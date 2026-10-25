@@ -28,6 +28,11 @@ export function metaUrl(path: string): string {
   return env("META_API_URL", "https://api.meta.ai/v1").replace(/\/+$/, "") + path;
 }
 
+// Codex relay base (codex-relay/relay.py), for example https://<host>.ts.net/v1.
+export function relayUrl(path: string): string {
+  return requireEnv("CODEX_RELAY_URL").replace(/\/+$/, "") + path;
+}
+
 export function adminClient() {
   return createClient(requireEnv("SUPABASE_URL"), requireEnv("SUPABASE_SERVICE_ROLE_KEY"), {
     auth: { persistSession: false },

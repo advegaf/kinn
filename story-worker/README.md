@@ -56,7 +56,7 @@ set -a; source .env; set +a
 caffeinate -i python main.py
 ```
 
-The LLM defaults to Meta `muse-spark-1.3` (`LLM_PROVIDER=meta`, `META_API_KEY`). Set `LLM_PROVIDER=openai` or `anthropic` with the matching key to switch.
+The LLM defaults to Meta `muse-spark-1.3` (`LLM_PROVIDER=meta`, `META_API_KEY`). Set `LLM_PROVIDER=openai` or `anthropic` with the matching key to switch, or `LLM_PROVIDER=codex` with `CODEX_RELAY_URL` and `CODEX_RELAY_SECRET` to use the ChatGPT subscription through `../codex-relay`.
 
 ## Fly.io (optional)
 
@@ -76,7 +76,7 @@ fly scale count worker=1 --yes
 fly logs
 ```
 
-The app has no HTTP service; it is a single `worker` process on a shared-cpu-1x with 1 GB. Optional secrets: `LLM_PROVIDER` (`meta`, `openai`, `anthropic`), `LLM_MODEL`, `META_API_URL`, `META_REASONING_EFFORT`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, and any `SCENES`, `LUMA_*` or `FFMPEG_*` value from `.env.example`.
+The app has no HTTP service; it is a single `worker` process on a shared-cpu-1x with 1 GB. Optional secrets: `LLM_PROVIDER` (`meta`, `openai`, `anthropic`, `codex`), `CODEX_RELAY_URL`, `CODEX_RELAY_SECRET`, `LLM_MODEL`, `META_API_URL`, `META_REASONING_EFFORT`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, and any `SCENES`, `LUMA_*` or `FFMPEG_*` value from `.env.example`.
 
 Running more than one machine is safe because of the claim step, but one is enough.
 

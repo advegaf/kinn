@@ -1,0 +1,14 @@
+[Unit]
+Description=Kinn codex relay (ChatGPT subscription for the LLM step)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+EnvironmentFile=%h/.config/kinn-codex-relay.env
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/python3 %h/.local/share/kinn-codex-relay/relay.py
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=default.target

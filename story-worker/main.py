@@ -17,7 +17,6 @@ import argparse
 import json
 import logging
 import os
-import re
 import socket
 import sys
 import tempfile
@@ -28,41 +27,17 @@ from datetime import datetime, timedelta, timezone
 import ffmpeg
 import requests
 
+from llm import env, require_env
+from luma import LUMA_API_STYLE, LUMA_ASPECT_RATIO, LUMA_DURATION, LUMA_MODEL, LUMA_RESOLUTION, generate_with_retry
+from scenes import make_scenes
+
 log = logging.getLogger("story-worker")
-
-
-def env(name, default=""):
-    value = os.environ.get(name, "").strip()
-    return value or default
-
-
-def require_env(name):
-    value = env(name)
-    if not value:
-        raise RuntimeError(f"Missing env {name}")
-    return value
-
 
 SUPABASE_URL = env("SUPABASE_URL", "http://127.0.0.1:54321").rstrip("/")
 POLL_SECONDS = float(env("POLL_SECONDS", "5"))
 STALE_MINUTES = float(env("CLAIM_STALE_MINUTES", "10"))
 WORKER_ID = f"{socket.gethostname()}:{os.getpid()}"
 
-# "agents" is the Luma Agents API (luma-api- keys); "dream_machine" is the older API.
-LUMA_API_STYLE = env("LUMA_API_STYLE", "agents")
-_AGENTS = LUMA_API_STYLE == "agents"
-LUMA_API_URL = env(
-    "LUMA_API_URL", "https://agents.lumalabs.ai/v1" if _AGENTS else "https://api.lumalabs.ai/dream-machine/v1"
-).rstrip("/")
-LUMA_GENERATIONS_ENDPOINT = env("LUMA_GENERATIONS_ENDPOINT", f"{LUMA_API_URL}/generations")
-LUMA_MODEL = env("LUMA_MODEL", "ray-3.2" if _AGENTS else "ray-flash-2")
-LUMA_ASPECT_RATIO = env("LUMA_ASPECT_RATIO", "21:9")
-LUMA_RESOLUTION = env("LUMA_RESOLUTION", "540p")
-LUMA_DURATION = env("LUMA_DURATION", "5s")
-LUMA_POLL_INTERVAL = float(env("LUMA_POLL_INTERVAL", "5"))
-LUMA_TIMEOUT = float(env("LUMA_TIMEOUT", "240"))
-LUMA_RETRIES = int(env("LUMA_RETRIES", "2"))
-SCENES = int(env("SCENES", "5"))
 # The Luma Agents account allows 4 concurrent generations; a 5th gets HTTP 429 and waits for a slot.
 LUMA_CONCURRENCY = int(env("LUMA_CONCURRENCY", "4"))
 LUMA_SLOWDOWN = float(env("LUMA_SLOWDOWN", "2.0"))  # setpts factor, 2.0 turns a 5 s clip into about 10 s
@@ -73,33 +48,6 @@ FFMPEG_VIBRANCE = float(env("FFMPEG_VIBRANCE", "0.25"))
 FFMPEG_DENOISE_THRESHOLD = float(env("FFMPEG_DENOISE_THRESHOLD", "20"))
 FFMPEG_BILATERAL_SIGMA = float(env("FFMPEG_BILATERAL_SIGMA", "12"))
 FFMPEG_NOISE_STRENGTH = float(env("FFMPEG_NOISE_STRENGTH", "34"))
-
-DEFAULT_MODELS = {
-    "openai": "gpt-4o",
-    "anthropic": "claude-opus-5-5",
-    "meta": "muse-spark-1.3",
-}
-
-# Adapted from Dream Recorder's GPT_SYSTEM_PROMPT (Copyright 2025 Modem, MIT), dreams turned into memories.
-SYSTEM_PROMPT = (
-    "You are a creative video prompt engineer specializing in Luma Dream Machine. "
-    "You receive a grandmother's spoken memory (the original transcript) and its English translation. "
-    "Split the story into exactly {n} consecutive beats, in order. "
-    "For each beat, text_en is copied word for word from the English translation and text_es is copied word for word "
-    "from the original transcript. Do not paraphrase, fix or skip anything: the {n} text_en excerpts joined together "
-    "must equal the whole translation, and the {n} text_es excerpts joined together must equal the whole transcript. "
-    "First write one world line that fixes the characters (described without faces), the place, the era and the color palette. "
-    "Then for each beat write a video prompt: a single, succinct cinematic sentence for a wide 21:9 frame that restates "
-    "the world line and shows what happens in that beat, so all {n} clips feel like one film. "
-    "Be specific about useful visual elements and emotional tone: the place, the light, the objects, "
-    "the textures, the weather and the feeling of the moment. "
-    "The look is warm, nostalgic and painterly, like a faded memory. "
-    "Never include on-screen text, letters or signs, and never show close-up faces "
-    "(show people from behind, at a distance, or as small figures in the scene). "
-    "Also write a short warm title in English (under 8 words) and the same title in Spanish. "
-    'Respond with only a JSON object: {{"title": "...", "title_es": "...", "world": "...", '
-    '"scenes": [{{"text_en": "...", "text_es": "...", "prompt": "..."}}]}}'
-)
 
 
 class Timer:
@@ -205,226 +153,6 @@ def upload(path, file_path, content_type):
     return f"videos/{path}"
 
 
-# LLM
-
-
-def parse_json(text):
-    cleaned = text.replace("```json", "").replace("```", "").strip()
-    try:
-        return json.loads(cleaned)
-    except ValueError:
-        start, end = cleaned.find("{"), cleaned.rfind("}")
-        if start >= 0 and end > start:
-            return json.loads(cleaned[start : end + 1])
-        raise RuntimeError(f"LLM did not return JSON: {text[:300]}")
-
-
-def post_json(url, hdrs, body, what):
-    res = requests.post(url, headers={"Content-Type": "application/json", **hdrs}, json=body, timeout=90)
-    if not res.ok:
-        raise RuntimeError(f"{what} failed ({res.status_code}): {res.text[:500]}")
-    return res.json()
-
-
-def call_llm(system, user):
-    provider = env("LLM_PROVIDER", "meta").lower()
-    model = env("LLM_MODEL", DEFAULT_MODELS.get(provider, DEFAULT_MODELS["meta"]))
-
-    if provider == "anthropic":
-        data = post_json(
-            "https://api.anthropic.com/v1/messages",
-            {
-                "x-api-key": require_env("ANTHROPIC_API_KEY"),
-                "anthropic-version": "2023-06-01",
-                "anthropic-beta": "server-side-fallback-2026-07-01",
-            },
-            {
-                "model": model,
-                "max_tokens": 16000,
-                "output_config": {"effort": "low"},
-                "fallbacks": "default",
-                "system": system,
-                "messages": [{"role": "user", "content": user}],
-            },
-            "Anthropic LLM",
-        )
-        if data.get("stop_reason") == "refusal":
-            raise RuntimeError("Anthropic LLM declined the request")
-        text = "".join(b.get("text", "") for b in data.get("content", []) if b.get("type") == "text")
-        return parse_json(text)
-
-    is_meta = provider == "meta"
-    # META_API_URL is the base (https://api.meta.ai/v1), same as the backend.
-    base = env("META_API_URL", "https://api.meta.ai/v1").rstrip("/") if is_meta else "https://api.openai.com/v1"
-    key = require_env("META_API_KEY") if is_meta else require_env("OPENAI_API_KEY")
-    body = {
-        "model": model,
-        "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
-        "response_format": {"type": "json_object"},
-    }
-    # Muse Spark is a reasoning model; low effort keeps latency down.
-    if is_meta:
-        body["reasoning_effort"] = env("META_REASONING_EFFORT", "low")
-    data = post_json(f"{base}/chat/completions", {"Authorization": f"Bearer {key}"}, body, f"{provider} LLM")
-    message = ((data.get("choices") or [{}])[0] or {}).get("message") or {}
-    if message.get("refusal"):
-        raise RuntimeError(f"{provider} LLM refused: {str(message['refusal'])[:300]}")
-    if not message.get("content"):
-        raise RuntimeError(f"{provider} LLM returned no content")
-    return parse_json(message["content"])
-
-
-def find_beats(text, excerpts):
-    """Start offsets of each excerpt in text, searched in order with flexible whitespace. None if any is missing."""
-    offsets, cursor = [], 0
-    for excerpt in excerpts:
-        words = str(excerpt or "").split()
-        if not words:
-            return None
-        m = re.compile(r"\s+".join(map(re.escape, words)), re.I).search(text, cursor)
-        if not m:
-            return None
-        offsets.append(m.start())
-        cursor = m.end()
-    return offsets
-
-
-def split_beats(text, n):
-    """Fallback: n roughly equal groups of sentences (words if too few). Returns (offsets, excerpts)."""
-    pieces = [m for m in re.finditer(r"\S.*?(?:[.!?]+(?=\s|$)|$)", text, re.S)]
-    if len(pieces) < n:
-        pieces = list(re.finditer(r"\S+", text))
-    if len(pieces) < n:
-        raise RuntimeError(f"Story too short for {n} scenes")
-    offsets, j = [0], 0
-    for k in range(1, n):
-        target = len(text) * k / n
-        # the piece start nearest the target, leaving at least one piece for each remaining beat
-        j = min(range(j + 1, len(pieces) - (n - k) + 1), key=lambda i: abs(pieces[i].start() - target))
-        offsets.append(pieces[j].start())
-    bounds = offsets + [len(text)]
-    return offsets, [text[bounds[i] : bounds[i + 1]].strip() for i in range(n)]
-
-
-def beat_texts(text, excerpts, n, label):
-    offsets = find_beats(text, excerpts)
-    if offsets is None:
-        log.warning("%s excerpts did not match the text, splitting evenly", label)
-        return split_beats(text, n)
-    # each beat runs to the next beat's start, so words the model skipped are not lost
-    offsets[0] = 0
-    bounds = offsets[1:] + [len(text)]
-    return offsets, [text[offsets[i] : bounds[i]].strip() for i in range(n)]
-
-
-def make_scenes(msg, n=None):
-    n = n or SCENES
-    transcript = (msg.get("transcript") or "").strip()
-    translation = (msg.get("translation") or "").strip() or transcript
-    user = f"Memory ({msg.get('source_lang', '')}):\n{transcript}\n\nEnglish translation:\n{translation}"
-    for attempt in range(2):
-        out = call_llm(SYSTEM_PROMPT.format(n=n), user)
-        beats = out.get("scenes") if isinstance(out.get("scenes"), list) else []
-        prompts = [str((b or {}).get("prompt") or "").strip() if isinstance(b, dict) else "" for b in beats]
-        if len(beats) == n and all(prompts):
-            break
-        log.warning("LLM returned %d beats (want %d), attempt %d", len(beats), n, attempt + 1)
-    else:
-        raise RuntimeError(f"LLM did not return {n} scenes with prompts")
-    world = str(out.get("world") or "").strip()
-    en_off, en = beat_texts(translation, [b.get("text_en") for b in beats], n, "English")
-    _, es = beat_texts(transcript, [b.get("text_es") for b in beats], n, "Spanish")
-    total = max(len(translation), 1)
-    starts = [round(o / total, 3) for o in en_off] + [1.0]
-    starts[0] = 0.0
-    scenes = [
-        {"start": starts[i], "end": starts[i + 1], "text_es": es[i], "text_en": en[i], "prompt": prompts[i]}
-        for i in range(n)
-    ]
-    title = str(out.get("title") or "A memory").strip()
-    return {"title": title, "title_es": str(out.get("title_es") or title).strip(), "world": world, "scenes": scenes}
-
-
-# Luma, adapted from Dream Recorder functions/video.py
-
-
-def luma_headers():
-    return {"accept": "application/json", "authorization": f"Bearer {require_env('LUMA_API_KEY')}"}
-
-
-def luma_body(prompt):
-    if _AGENTS:
-        return {
-            "model": LUMA_MODEL,
-            "type": "video",
-            "prompt": prompt,
-            "aspect_ratio": LUMA_ASPECT_RATIO,
-            "video": {"resolution": LUMA_RESOLUTION, "duration": LUMA_DURATION},
-        }
-    return {
-        "prompt": prompt,
-        "model": LUMA_MODEL,
-        "resolution": LUMA_RESOLUTION,
-        "duration": LUMA_DURATION,
-        "aspect_ratio": LUMA_ASPECT_RATIO,
-    }
-
-
-def luma_video_url(data):
-    if _AGENTS:
-        for item in data.get("output") or []:
-            if isinstance(item, dict) and item.get("type") == "video" and item.get("url"):
-                return item["url"]
-        return None
-    assets = data.get("assets") or {}
-    return assets.get("video") or assets.get("url") or (data.get("result") or {}).get("url")
-
-
-def generate_video(prompt, dest):
-    res = requests.post(
-        LUMA_GENERATIONS_ENDPOINT,
-        headers={**luma_headers(), "content-type": "application/json"},
-        json=luma_body(prompt),
-        timeout=60,
-    )
-    if res.status_code not in (200, 201):
-        raise RuntimeError(f"Luma API error ({res.status_code}): {res.text[:500]}")
-    gen_id = res.json().get("id")
-    if not gen_id:
-        raise RuntimeError("Luma returned no generation id")
-    log.info("Luma generation %s started", gen_id)
-
-    deadline = time.monotonic() + LUMA_TIMEOUT
-    video_url = None
-    while time.monotonic() < deadline:
-        time.sleep(LUMA_POLL_INTERVAL)
-        status = requests.get(f"{LUMA_API_URL}/generations/{gen_id}", headers=luma_headers(), timeout=30)
-        if status.status_code not in (200, 201):
-            log.warning("Luma status check %s: %s", status.status_code, status.text[:200])
-            continue
-        data = status.json()
-        state = data.get("state")
-        if state in ("completed", "succeeded"):
-            video_url = luma_video_url(data)
-            if not video_url:
-                raise RuntimeError("Luma completed without a video url")
-            break
-        if state in ("failed", "error"):
-            reason = data.get("failure_reason") or data.get("error") or "unknown"
-            code = f" [{data['failure_code']}]" if data.get("failure_code") else ""
-            raise RuntimeError(f"Luma generation failed{code}: {reason}")
-        # any other state (queued, dreaming, processing...) is still pending
-    if not video_url:
-        raise RuntimeError(f"Luma timed out after {int(LUMA_TIMEOUT)} s")
-
-    with requests.get(video_url, stream=True, timeout=120) as dl:
-        dl.raise_for_status()
-        with open(dest, "wb") as f:
-            for chunk in dl.iter_content(chunk_size=65536):
-                f.write(chunk)
-    return dest
-
-
 # ffmpeg look, ported from Dream Recorder functions/video.py (Copyright 2025 Modem, MIT)
 
 
@@ -488,17 +216,6 @@ def call_make_story(message_id):
         detail = res.text
     return res.status_code, str(detail)[:500]
 
-
-def generate_with_retry(prompt, dest):
-    for attempt in range(LUMA_RETRIES + 1):
-        try:
-            return generate_video(prompt, dest)
-        except Exception as e:
-            if attempt == LUMA_RETRIES:
-                raise
-            log.warning("Luma attempt %d failed, retrying: %s", attempt + 1, e)
-            # a concurrency 429 clears when another clip finishes, about 30 to 45 s
-            time.sleep(30 if "(429)" in str(e) else 5)
 
 
 def render_scene(label, n, prompt, out_dir, raw_dir):

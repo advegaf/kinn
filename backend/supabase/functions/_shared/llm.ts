@@ -1,9 +1,10 @@
-import { env, metaUrl, requireEnv } from "./util.ts";
+import { env, metaUrl, relayUrl, requireEnv } from "./util.ts";
 
 const DEFAULT_MODELS: Record<string, string> = {
   openai: "gpt-4o",
   anthropic: "claude-opus-5-5",
   meta: "muse-spark-1.3",
+  codex: "gpt-6-luna",
 };
 
 // Pulls the first JSON object out of a model reply, tolerating code fences or stray prose.
@@ -24,6 +25,7 @@ async function post(url: string, headers: Record<string, string>, body: unknown,
     method: "POST",
     headers: { "Content-Type": "application/json", ...headers },
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(90_000),
   });
   if (!res.ok) {
     throw new Error(`${what} failed (${res.status}): ${(await res.text()).slice(0, 500)}`);
@@ -63,8 +65,13 @@ export async function callLLM(system: string, user: string): Promise<Record<stri
   }
 
   const isMeta = provider === "meta";
-  const url = isMeta ? metaUrl("/chat/completions") : "https://api.openai.com/v1/chat/completions";
-  const key = isMeta ? requireEnv("META_API_KEY") : requireEnv("OPENAI_API_KEY");
+  const isCodex = provider === "codex";
+  const url = isMeta
+    ? metaUrl("/chat/completions")
+    : isCodex
+    ? relayUrl("/chat/completions")
+    : "https://api.openai.com/v1/chat/completions";
+  const key = requireEnv(isMeta ? "META_API_KEY" : isCodex ? "CODEX_RELAY_SECRET" : "OPENAI_API_KEY");
   const body: Record<string, unknown> = {
     model,
     messages: [

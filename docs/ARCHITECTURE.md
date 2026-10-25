@@ -19,7 +19,7 @@ flowchart LR
 
   worker["Story worker<br/>Python, ffmpeg"]
   el["ElevenLabs<br/>Scribe and TTS<br/>Instant Voice Clone"]
-  muse["Meta Muse Spark<br/>muse-spark-1.3"]
+  muse["OpenAI GPT-6 Luna<br/>Codex CLI relay"]
   luma["Luma<br/>ray-3.2, Agents API"]
 
   hearth -- "upload audio, insert message" --> storage
@@ -51,7 +51,7 @@ flowchart LR
 2. She taps again. The Hearth uploads the clip to `audio/{thread_id}/{message_id}.webm`,
    inserts a `messages` row with `status = 'uploaded'`, and calls `process-message`.
 3. `process-message` sets `processing`, sends the audio to ElevenLabs Scribe
-   for a Spanish transcript, then asks Muse Spark for an English translation
+   for a Spanish transcript, then asks GPT-6 Luna for an English translation
    that keeps her endearments, a few cultural notes, and three "ask her about"
    questions.
 4. It speaks the translation with ElevenLabs `eleven_multilingual_v2` in Rosa's
@@ -59,7 +59,7 @@ flowchart LR
 5. Realtime tells the iPhone. The story appears on today in the Almanac and
    can already be played as audio.
 6. The story worker, polling every 5 seconds, claims the message by writing
-   `story = {status: "generating"}`. It asks Muse Spark to split the story into
+   `story = {status: "generating"}`. It asks GPT-6 Luna to split the story into
    five beats, each with an English excerpt, the matching Spanish excerpt and a
    cinematic prompt that shares one world line.
 7. It sends the five prompts to Luma `ray-3.2`, runs each clip through the
@@ -74,7 +74,7 @@ flowchart LR
 1. Sofía taps Write back. The Almanac offers the three questions from step 3.
 2. She holds to record and lets go. The app uploads `audio/{thread_id}/{message_id}.m4a`,
    inserts a `messages` row from her profile, and calls `process-message`.
-3. Scribe transcribes her English, Muse Spark translates it into Spanish, and
+3. Scribe transcribes her English, GPT-6 Luna translates it into Spanish, and
    ElevenLabs speaks it in Sofía's cloned voice.
 4. The row turns `ready`. Realtime tells the Hearth, which shows "Sofía te escribió".
 5. Rosa taps and hears the question in Spanish, in her granddaughter's voice.
