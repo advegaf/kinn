@@ -2,11 +2,12 @@ import SwiftUI
 
 struct PairView: View {
     @Environment(AppSession.self) private var session
+    @Binding var code: String
+    var onBack: () -> Void
     /// `joinedByCode` is true when the family phone joined an existing thread, so there is no voice step.
     var onDone: (_ joinedByCode: Bool) -> Void
 
     @State private var openThreads: [OpenThread] = []
-    @State private var code = ""
     @State private var busy = false
     @State private var error: String?
 
@@ -22,7 +23,7 @@ struct PairView: View {
     // MARK: Family: type the code her Hearth shows
 
     private var familyPage: some View {
-        OnbPage(left: "Kinn", right: "First page") {
+        OnbPage(left: "Kinn", right: "First page", back: BackButton(action: onBack)) {
             VStack(alignment: .leading, spacing: 0) {
                 OnbHeadline(title: "Type the code on her Hearth", note: "Six letters and numbers on her clock.")
 
@@ -59,7 +60,7 @@ struct PairView: View {
     // MARK: Elder: type the code from the family phone
 
     private var elderPage: some View {
-        OnbPage(left: "Kinn", right: "Primera p\u{E1}gina") {
+        OnbPage(left: "Kinn", right: "Primera p\u{E1}gina", back: BackButton(title: "Atr\u{E1}s", action: onBack)) {
             VStack(alignment: .leading, spacing: 0) {
                 OnbHeadline(title: "Tu familia", note: "Escribe las letras que ves en su tel\u{E9}fono.")
 

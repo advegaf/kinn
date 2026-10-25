@@ -64,7 +64,7 @@ struct SettingsView: View {
         .background { PaperCanvas() }
         .presentationBackground(Color.paper)
         .sheet(isPresented: $reenroll) {
-            VoiceEnrollView { reenroll = false }
+            VoiceEnrollView(onBack: { reenroll = false }) { reenroll = false }
                 .presentationBackground(Color.paper)
         }
     }

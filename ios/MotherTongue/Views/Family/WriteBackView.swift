@@ -3,7 +3,7 @@ import SwiftUI
 /// 03 writing back: her line quoted when replying, three prompts in the margin, and a disc to tap or hold while you talk.
 struct WriteBackView: View {
     var message: Message?
-    var close: () -> Void
+    var back: () -> Void
     var sent: () -> Void
 
     @Environment(AppSession.self) private var session
@@ -21,7 +21,9 @@ struct WriteBackView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
+            BackButton(action: back)
             head
+                .padding(.top, 8)
             if let message {
                 Text(Almanac.quote(message))
                     .font(.serifItalic(22))
@@ -41,7 +43,9 @@ struct WriteBackView: View {
         .padding(.top, 16)
         .padding(.bottom, 12)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .onDisappear { if recorder.isRecording { recorder.cancel() } }
+        .contentShape(.rect)
+        .backSwipe(back)
+        .onDisappear { recorder.cancel() }
         #if DEBUG
         .task {
             if UserDefaults.standard.bool(forKey: "fakeRecording") {
@@ -58,14 +62,6 @@ struct WriteBackView: View {
                 .font(.serif(24, relativeTo: .title2))
                 .foregroundStyle(Color.ink)
             Spacer()
-            Button("Close") {
-                if recorder.isRecording { recorder.cancel() }
-                close()
-            }
-            .tinyCaps()
-            .buttonStyle(PressStyle())
-            .frame(minWidth: 44, minHeight: 44, alignment: .trailing)
-            .contentShape(.rect)
         }
     }
 

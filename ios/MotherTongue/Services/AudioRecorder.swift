@@ -13,6 +13,8 @@ final class AudioRecorder {
     private var meterTask: Task<Void, Never>?
     private var startDate: Date?
     private var simulated = false
+    /// Bumped by cancel, so a start still waiting on the mic permission does not record after it.
+    private var startToken = 0
 
     enum RecorderError: LocalizedError {
         case permissionDenied
@@ -25,8 +27,12 @@ final class AudioRecorder {
 
     func start(allowSimulated: Bool = false) async throws {
         guard !isRecording else { return }
+        startToken += 1
+        let token = startToken
         do {
-            guard await Self.requestPermission() else { throw RecorderError.permissionDenied }
+            let granted = await Self.requestPermission()
+            guard token == startToken else { return }
+            guard granted else { throw RecorderError.permissionDenied }
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothA2DP])
             try session.setActive(true)
@@ -80,6 +86,7 @@ final class AudioRecorder {
     }
 
     func cancel() {
+        startToken += 1
         let result = stop()
         if let url = result.url { try? FileManager.default.removeItem(at: url) }
     }
