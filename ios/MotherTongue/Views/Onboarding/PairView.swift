@@ -28,21 +28,12 @@ struct PairView: View {
     private var familyPage: some View {
         OnbPage(left: "Kinn", right: "First page", back: BackButton(action: onBack)) {
             VStack(alignment: .leading, spacing: 0) {
-                OnbHeadline(title: "Type the code on her Hearth", note: "Six letters and numbers on her clock.")
+                OnbHeadline(title: "Type the code on her Kinn")
 
                 CodeEntry(code: $code, label: "Family code").padding(.top, 34)
 
-                if code.count < 6 {
-                    Text("Connect works once all six are in.")
-                        .font(.serif(17))
-                        .foregroundStyle(Color.soft)
-                        .padding(.top, 16)
-                        .transition(.fade)
-                }
-
                 if let error { OnbNotice(text: error).padding(.top, 20) }
             }
-            .animation(.enter, value: code.count < 6)
         } footer: {
             VStack(spacing: 14) {
                 slab("Connect", enabled: code.count == 6) {

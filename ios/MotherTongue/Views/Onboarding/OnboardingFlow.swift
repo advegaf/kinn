@@ -203,7 +203,7 @@ struct OnbPage<Content: View, Footer: View>: View {
 
 struct OnbHeadline: View {
     var title: String
-    var note: String
+    var note: String?
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
@@ -213,9 +213,11 @@ struct OnbHeadline: View {
                 .lineLimit(2)
                 .minimumScaleFactor(0.7)
                 .fixedSize(horizontal: false, vertical: true)
-            Text(note)
-                .font(.serif(19))
-                .foregroundStyle(Color.sub)
+            if let note {
+                Text(note)
+                    .font(.serif(19))
+                    .foregroundStyle(Color.sub)
+            }
         }
         .padding(.top, 22)
         .accessibilityElement(children: .combine)
