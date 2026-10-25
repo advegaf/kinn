@@ -2,9 +2,9 @@
 // recorder.js (RMS of time domain data), github.com/modem-works/dream-recorder (MIT).
 
 const CANDIDATES = [
+  ['audio/mp4', 'm4a'],
   ['audio/webm;codecs=opus', 'webm'],
   ['audio/webm', 'webm'],
-  ['audio/mp4', 'm4a'],
   ['audio/ogg;codecs=opus', 'ogg'],
 ];
 

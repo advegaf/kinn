@@ -3,18 +3,20 @@
 
 import config from '../config.js';
 import { SupabaseBackend, DemoBackend } from './backend.js';
-import { MicRecorder, FakeRecorder, resumeAudio } from './recorder.js';
-import { loadRect, applyRect, loadStrip, applyStrip, inRect, toPct, startCalibration, startTemplate } from './calibrate.js';
+import { MicRecorder, FakeRecorder } from './recorder.js';
+import { loadRect, applyRect, loadStrip, applyStrip, startCalibration, startTemplate } from './calibrate.js';
 import { $, setText } from './dom.js';
 import { dayLabel, sentAt, tickClock, setFamilyCode } from './clock.js';
-import { hasStory, storyFor, answeredStory, buildScenes, startScenes, setProgress, teardown } from './scenes.js';
-import { narrate, retryPending, clearTimers, stopAll } from './narration.js';
+import { titles, recPrompt } from './lines.js';
+import { hasStory, filmPending, storyFor, buildScenes, startScenes, setProgress, teardown } from './scenes.js';
+import { narrate, clearTimers, stopAll } from './narration.js';
 import { showToast, hideToast } from './toast.js';
+import { bindInput, startHold, cancelHold, unlock } from './input.js';
 
 const S = { CLOCK: 'clock', WAITING: 'waiting', RECORDING: 'recording', SENDING: 'sending', SAVED: 'saved', PLAYING: 'playing', ERROR: 'error' };
 
 const DEBOUNCE_MS = 250;
-const DOUBLE_MS = 650; // a second press this soon after the first counts as a double press
+const DOUBLE_MS = 650; // a second tap this soon after the first counts as a double tap
 const MIN_RECORD_MS = 900;
 const MAX_RECORD_MS = 3 * 60 * 1000;
 const MIN_SENDING_MS = 1400;
@@ -25,7 +27,7 @@ const LINGER_MS = 1500;
 const HISTORY = 7;
 const HEARD_KEY = 'hearth.heard';
 const SAVED_STATUS = 'tu historia est\u00e1 guardada';
-const PENDING = 'traducci\u00f3n pendiente';
+const MAKING = ['preparando la pel\u00edcula', 'making the film'];
 
 const root = $('hearth');
 const html = document.documentElement;
@@ -41,6 +43,7 @@ applyStrip(strip);
 let state = 'boot';
 let enteredAt = 0;
 let lastPress = -Infinity;
+let lastTap = -Infinity;
 let messages = [];
 const heardLocal = loadHeard();
 
@@ -60,25 +63,6 @@ const history = () => messages.filter((m) => !isMine(m) && m.status === 'ready')
 const idleState = () => (unheard().length ? S.WAITING : S.CLOCK);
 const wait = (ms) => new Promise((r) => setTimeout(r, Math.max(0, ms)));
 
-// [Spanish, English] title of the story a message is about. A free note carries the worker's
-// placeholder as its Spanish title until it is translated.
-function titles(msg) {
-  const own = msg.story?.title_es || msg.story?.title;
-  const st = own ? msg.story : answeredStory(msg, messages, isMine);
-  if (st?.title_es === PENDING) return [st.title, st.title];
-  return [st?.title_es || st?.title || '', st?.title || st?.title_es || ''];
-}
-
-// The last question in her family's newest message, if it is short enough to read at a glance.
-// The English line is the last question of that message's original, under the same limit.
-function recPrompt(name) {
-  const latest = messages.filter((m) => !isMine(m) && m.translation).at(-1);
-  const q = latest?.translation.match(/\u00bf[^\u00bf?]*\?/g)?.at(-1)?.trim();
-  if (!q || q.length > 60) return [`cu\u00e9ntale a ${name} lo que recuerdas`, `tell ${name} what you remember`];
-  const en = latest.transcript?.match(/[^.!?]*\?/g)?.at(-1)?.trim();
-  return [q, en && en.length <= 80 ? en : `tell ${name} what you remember`];
-}
-
 function renderText() {
   const name = partnerName();
   const latest = unheard().at(-1);
@@ -86,11 +70,12 @@ function renderText() {
     const [when, whenEn] = sentAt(new Date(latest.created_at));
     setText('waiting-line', `${name} te escribi\u00f3`);
     setText('waiting-line-en', `${name} wrote to you`);
-    const [es, en] = titles(latest);
-    setText('waiting-sub', es ? `${when}, sobre \u00ab${es}\u00bb` : when);
-    setText('waiting-sub-en', en ? `${whenEn}, about \u00ab${en}\u00bb` : whenEn);
+    const [es, en] = titles(latest, messages, isMine);
+    const film = filmPending(latest);
+    setText('waiting-sub', film ? MAKING[0] : es ? `${when}, sobre \u00ab${es}\u00bb` : when);
+    setText('waiting-sub-en', film ? MAKING[1] : en ? `${whenEn}, about \u00ab${en}\u00bb` : whenEn);
   }
-  const [prompt, promptEn] = recPrompt(name);
+  const [prompt, promptEn] = recPrompt(name, messages, isMine);
   setText('rec-prompt', prompt);
   setText('rec-prompt-en', promptEn);
   setText('send-line', 'guardando tu historia');
@@ -118,7 +103,7 @@ let refreshing = false;
 let refreshAgain = false;
 let failures = 0;
 let primed = false;
-const toasted = new Set();
+const toasted = new Map(); // message id -> 'film' or 'ready', as it was when last toasted
 
 async function refresh() {
   if (refreshing) { refreshAgain = true; return; }
@@ -150,18 +135,17 @@ function press(source) {
 
   switch (state) {
     case S.CLOCK:
-      return startRecording();
+    case S.ERROR:
+      if (source === 'key') return startRecording();
+      return startHold(() => (state === S.CLOCK || state === S.ERROR) && startRecording());
     case S.WAITING:
-      return play(unheard().at(-1));
+      return listen(unheard().at(-1));
     case S.RECORDING:
-      if (age < DOUBLE_MS) { cancelRecording(); return replay(); }
+      if (age < DOUBLE_MS) return; // bounce guard
       return stopAndSend();
     case S.PLAYING:
       if (age < DOUBLE_MS) return; // bounce guard, and keeps a double press from stopping its own replay
       return stopPlayback();
-    case S.ERROR:
-      clearTimeout(errorTimer);
-      return startRecording();
     case S.SAVED:
       clearTimeout(savedTimer);
       return setState(idleState());
@@ -170,30 +154,21 @@ function press(source) {
   }
 }
 
-const PRESS_KEYS = new Set(['Enter', 'NumpadEnter', ' ', 'Spacebar', 'MediaPlayPause', 'AudioVolumeUp', 'VolumeUp']);
-
-addEventListener('keydown', (e) => {
-  if (e.repeat || !PRESS_KEYS.has(e.key)) return;
-  e.preventDefault();
-  press('key');
-});
-
-addEventListener('pointerdown', (e) => {
-  if (config.calibrate || !e.isPrimary) return;
-  const p = toPct(e);
-  if (inRect(zone, p.x, p.y)) press('button');
-  else if (inRect(strip, p.x, p.y)) press('strip');
-});
-
-addEventListener('contextmenu', (e) => e.preventDefault());
-
-// Touch pointerdown is not a user activation in Chromium; pointerup and keydown are.
-// Anything that was blocked by autoplay policy gets retried on the next one.
-function unlock() {
-  resumeAudio();
-  retryPending();
+// A release before the hold is done is a short tap: it goes back, and a double tap on the clock
+// replays her latest notes.
+function release() {
+  if (!cancelHold()) return;
+  root.removeAttribute('data-reply');
+  if (state === S.ERROR) {
+    clearTimeout(errorTimer);
+    return setState(idleState());
+  }
+  const now = performance.now();
+  if (now - lastTap < DOUBLE_MS) { lastTap = -Infinity; return replay(); }
+  lastTap = now;
 }
-for (const type of ['pointerup', 'touchend', 'keyup']) addEventListener(type, unlock, { passive: true });
+
+bindInput(press, release, zone, strip);
 
 let recToken = 0;
 let recReady = null;
@@ -208,6 +183,8 @@ function setLevel(raw) {
 }
 
 function startRecording() {
+  clearTimeout(errorTimer);
+  root.removeAttribute('data-reply');
   setState(S.RECORDING);
   const token = ++recToken;
   level = 0;
@@ -238,13 +215,6 @@ function startRecording() {
 function clearRecTimers() {
   clearInterval(recTick);
   clearTimeout(recMax);
-}
-
-function cancelRecording() {
-  recToken += 1;
-  clearRecTimers();
-  recorder.cancel();
-  html.style.setProperty('--level', '0');
 }
 
 async function stopAndSend() {
@@ -297,28 +267,38 @@ function showError(text, en, hold = false) {
 
 const busy = () => state === S.RECORDING || state === S.SENDING;
 
-// The first fetch only records what is already there; later arrivals get a toast.
+const filmState = (m) => (filmPending(m) ? 'film' : 'ready');
+
+// The first fetch only records what is already there; later arrivals get a toast, and a note that
+// waited for its film gets a second toast when the film is in.
 // During playback the newest arrival waits and shows once the story ends.
 let queuedToast = null;
 function toastNew() {
-  const fresh = messages.filter((m) => !isMine(m) && m.status === 'ready' && !toasted.has(m.id));
-  for (const m of fresh) toasted.add(m.id);
-  if (primed && fresh.length) {
-    queuedToast = fresh.at(-1).id;
-    if (state !== S.PLAYING) flushToast();
-  }
+  const fresh = messages.filter((m) => !isMine(m) && m.status === 'ready' && toasted.get(m.id) !== filmState(m));
+  const last = fresh.at(-1);
+  if (primed && last) queuedToast = { id: last.id, again: toasted.get(last.id) === 'film' };
+  for (const m of fresh) toasted.set(m.id, filmState(m));
+  if (primed && last && state !== S.PLAYING) flushToast();
   primed = true;
 }
 
 function flushToast() {
-  const id = queuedToast;
+  const q = queuedToast;
   queuedToast = null;
-  const msg = messages.find((m) => m.id === id);
-  if (!msg || heardLocal.has(id) || busy()) return;
-  showToast(partnerName(), titles(msg), () => {
-    const now = messages.find((m) => m.id === id);
-    if (now && !busy()) play(now);
+  const msg = q && messages.find((m) => m.id === q.id);
+  if (!msg || heardLocal.has(msg.id) || busy()) return;
+  const name = partnerName();
+  const line = q.again ? ['Ya est\u00e1 lista', "It's ready"] : [`Nuevo mensaje de ${name}`, `New note from ${name}`];
+  showToast(line, filmPending(msg) ? MAKING : titles(msg, messages, isMine), () => {
+    const now = messages.find((m) => m.id === msg.id);
+    if (now && !busy()) listen(now);
   });
+}
+
+// A note whose film is still being made does not play yet. A tap says so instead.
+function listen(msg) {
+  if (msg && filmPending(msg)) return showToast(MAKING, titles(msg, messages, isMine), null);
+  play(msg);
 }
 
 // Her story is in. The title shows when the story worker has already named it.
@@ -403,6 +383,8 @@ function clearPlayTimers() {
 }
 
 function stopPlayback() {
+  const heard = messages.find((m) => m.id === playingId);
+  root.toggleAttribute('data-reply', Boolean(heard && !isMine(heard)));
   clearPlayTimers();
   playingId = null;
   stopAll();
