@@ -109,9 +109,6 @@
 		B198108154832FDA4E862AB5 /* Inter-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Inter-OFL.txt"; sourceTree = "<group>"; };
 		B82A3A1453777A713F59058E /* Inter-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Light.ttf"; sourceTree = "<group>"; };
 		BCBFB19AA3A163C83919A9F4 /* s4-es.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "s4-es.mp3"; sourceTree = "<group>"; };
-		BDCB273091465F05CD61FB5B /* Icon
- */ = {isa = PBXFileReference; path = "Icon
-"; sourceTree = "<group>"; };
 		C0704B58F7EA8262C935358C /* MotherTongueUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = MotherTongueUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7AC9EA0F9AD30F465BD1E7A /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
 		C8075A1030F44F75C7ECFA1A /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
@@ -228,8 +225,6 @@
 		9EEF37FB13C1C8557E332B27 /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
-				9E52EE0931A8CBA30F8DE241 /* Icon
- */,
 				98127B5F8EE5E9B6961FE753 /* InstrumentSerif-OFL.txt */,
 				92B36C8373F868DD8A9BA1C6 /* InstrumentSerif-Regular.ttf */,
 				B82A3A1453777A713F59058E /* Inter-Light.ttf */,
@@ -298,8 +293,6 @@
 		E3F44818941ABA0637CC404F /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				BDCB273091465F05CD61FB5B /* Icon
- */,
 				BAC0C0B5D1A7E3F20C4B6A02 /* BackControl.swift */,
 				49A886B4B7B7E0DBDF8BD78C /* SettingsView.swift */,
 				5B0FF920894F05B6F826F084 /* StoryImage.swift */,
