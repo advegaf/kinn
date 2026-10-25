@@ -25,7 +25,7 @@ title_en and title_es summarize the message in English and in Spanish, at most 6
 type Row = { id: string; sender_id: string; transcript: string | null };
 type Msg = { id: string; sender_id: string; source_lang: string };
 
-function demoFields(msg: Msg, role: string, heard: string, existing: Row[]): Record<string, unknown> {
+function demoFields(msg: Msg, role: string, heard: string, existing: Row[]): Record<string, unknown> | null {
   const tag = `[process-message ${msg.id}] demo heard "${heard.slice(0, 80)}"`;
   if (role === "elder") {
     const story = pickStory(heard, existing);
@@ -34,7 +34,7 @@ function demoFields(msg: Msg, role: string, heard: string, existing: Row[]): Rec
   }
   const { index, score, heard: words } = pickReply(heard, existing);
   console.log(`${tag} score ${score}/${words} -> index ${index}`);
-  if (index < 0) return freeFields(heard, msg.source_lang);
+  if (index < 0) return null;
   const others = existing.filter((m) => m.sender_id !== msg.sender_id);
   return { ...replyFields(REPLIES[index], index), reply_to: replyTarget(REPLIES[index], others) };
 }
@@ -52,7 +52,7 @@ async function readMessageId(req: Request): Promise<string> {
   }
 }
 
-async function loadJob(db: Db, t: Timer, msg: any): Promise<{ job: Job; history: Hist[]; demo: boolean }> {
+async function loadJob(db: Db, t: Timer, msg: any): Promise<{ job: Job; history: Hist[]; demo: boolean; llm: boolean }> {
   await db.from("messages").update({ status: "processing", error: null }).eq("id", msg.id);
   const originalPath = stripBucket("audio", msg.original_path);
   const [sender, audio, history, thread] = await Promise.all([
@@ -81,8 +81,8 @@ async function loadJob(db: Db, t: Timer, msg: any): Promise<{ job: Job; history:
     audio: audio.data,
     filename: originalPath.split("/").pop() || "audio.m4a",
   };
-  const demo = thread.data?.demo === true || !env(LLM_KEY[provider] ?? "META_API_KEY");
-  return { job, history: history.data ?? [], demo };
+  const llm = Boolean(env(LLM_KEY[provider] ?? "META_API_KEY"));
+  return { job, history: history.data ?? [], demo: thread.data?.demo === true || !llm, llm };
 }
 
 async function saveReady(job: Job, fields: Record<string, unknown>): Promise<unknown> {
@@ -106,7 +106,7 @@ async function saveError(db: Db, t: Timer, id: string, e: unknown): Promise<Resp
 }
 
 // Presenter mode: real Scribe for the logs, then map onto the canned stories. No LLM, no TTS.
-async function runDemo(job: Job): Promise<unknown> {
+async function runDemo(job: Job, history: Hist[], llm: boolean): Promise<unknown> {
   let heard = "";
   try {
     heard = await transcribe(job.audio, job.filename, job.msg.source_lang);
@@ -119,7 +119,10 @@ async function runDemo(job: Job): Promise<unknown> {
     .eq("thread_id", job.msg.thread_id)
     .neq("id", job.id)
     .order("created_at", { ascending: false });
-  return saveReady(job, demoFields(job.msg, job.role, heard, rows ?? []));
+  const canned = demoFields(job.msg, job.role, heard, rows ?? []);
+  if (canned) return saveReady(job, canned);
+  if (!llm || !heard) return saveReady(job, freeFields(heard, job.msg.source_lang));
+  return finishReal(job, heard, history);
 }
 
 async function transcribeOrFail(job: Job): Promise<string> {
@@ -170,7 +173,10 @@ async function speakAndUpload(job: Job, translation: string): Promise<string> {
 }
 
 async function runReal(job: Job, history: Hist[]): Promise<unknown> {
-  const transcript = await transcribeOrFail(job);
+  return finishReal(job, await transcribeOrFail(job), history);
+}
+
+async function finishReal(job: Job, transcript: string, history: Hist[]): Promise<unknown> {
   const out = await translate(job, transcript, history);
   const translatedPath = await speakAndUpload(job, out.translation as string);
   const done = await saveReady(job, {
@@ -195,8 +201,8 @@ Deno.serve(async (req) => {
   if (loadErr || !msg) return json({ error: `Message not found: ${loadErr?.message ?? messageId}` }, 404);
 
   try {
-    const { job, history, demo } = await loadJob(db, t, msg);
-    return json(demo ? await runDemo(job) : await runReal(job, history));
+    const { job, history, demo, llm } = await loadJob(db, t, msg);
+    return json(demo ? await runDemo(job, history, llm) : await runReal(job, history));
   } catch (e) {
     return saveError(db, t, messageId, e);
   }
