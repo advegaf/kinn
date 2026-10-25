@@ -179,7 +179,7 @@ final class AppSession {
     }
 
     var latestStoryImage: String? {
-        messages.reversed().lazy.compactMap { $0.story?.scenes?.first?.imagePath ?? $0.story?.imagePaths?.first }.first
+        messages.reversed().lazy.compactMap { $0.story?.coverPath }.first
     }
 
     var hasPending: Bool { messages.contains { isMine($0) && $0.status.isPending } }

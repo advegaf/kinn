@@ -2,6 +2,7 @@ import SwiftUI
 
 struct KinnTabBar: View {
     var home: () -> Void
+    var archive: () -> Void
     var compose: () -> Void
     var settings: () -> Void
 
@@ -10,6 +11,7 @@ struct KinnTabBar: View {
             Hairline()
             HStack(spacing: 0) {
                 item("Home", selected: true, action: home)
+                item("Archive", action: archive)
                 item("New note", action: compose)
                 item("Settings", action: settings)
             }
@@ -28,6 +30,8 @@ struct KinnTabBar: View {
             Text(label)
                 .font(.serif(19))
                 .foregroundStyle(selected ? Color.ink : Color.soft)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
                 .frame(maxWidth: .infinity, minHeight: 44)
                 .contentShape(.rect)
         }
@@ -37,9 +41,10 @@ struct KinnTabBar: View {
 }
 
 extension View {
-    func kinnTabBar(home: @escaping () -> Void, compose: @escaping () -> Void, settings: @escaping () -> Void) -> some View {
+    func kinnTabBar(home: @escaping () -> Void, archive: @escaping () -> Void, compose: @escaping () -> Void,
+                    settings: @escaping () -> Void) -> some View {
         safeAreaInset(edge: .bottom, spacing: 0) {
-            KinnTabBar(home: home, compose: compose, settings: settings)
+            KinnTabBar(home: home, archive: archive, compose: compose, settings: settings)
         }
     }
 }

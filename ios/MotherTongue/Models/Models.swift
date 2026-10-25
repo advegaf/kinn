@@ -66,6 +66,8 @@ struct Story: Codable, Hashable, Sendable {
         self.scenes = scenes
     }
 
+    var coverPath: String? { scenes?.first?.imagePath ?? imagePaths?.first }
+
     /// Tolerant: a malformed `scenes` entry drops the scenes, never the story.
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)

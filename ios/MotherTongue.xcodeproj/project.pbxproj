@@ -14,6 +14,7 @@
 		042F278D646CBDDEECA76B77 /* AppSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB0DA76E6FD005010B422A29 /* AppSession.swift */; };
 		076BBD297C5304FAACE04E05 /* KinnTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED65A0420DC62B765E45507D /* KinnTabBar.swift */; };
 		07F538B1AF69C543F527B4CE /* AlmanacView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85890C565D115D1C6052879F /* AlmanacView.swift */; };
+		89F158D3647C97761749F583 /* ArchiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DCE51DCBE395FE883D29643 /* ArchiveView.swift */; };
 		0F3D1A356952825C95AE910C /* s1-en.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7BB525800F3967C02F367611 /* s1-en.mp3 */; };
 		102CD473BB6D9F7BA2DD84AD /* Inter-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B82A3A1453777A713F59058E /* Inter-Light.ttf */; };
 		11DFF285D8FDC1D01FB259DB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CD4C23C8CD48D32C50FA9E97 /* Assets.xcassets */; };
@@ -93,6 +94,7 @@
 		7AD573B033D587CB97914D55 /* Icon */ = {isa = PBXFileReference; path = "Icon"; sourceTree = "<group>"; };
 		7BB525800F3967C02F367611 /* s1-en.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "s1-en.mp3"; sourceTree = "<group>"; };
 		85890C565D115D1C6052879F /* AlmanacView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlmanacView.swift; sourceTree = "<group>"; };
+		3DCE51DCBE395FE883D29643 /* ArchiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveView.swift; sourceTree = "<group>"; };
 		922B049C5CB85C915C3B0BE0 /* Icon */ = {isa = PBXFileReference; path = "Icon"; sourceTree = "<group>"; };
 		92B36C8373F868DD8A9BA1C6 /* InstrumentSerif-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "InstrumentSerif-Regular.ttf"; sourceTree = "<group>"; };
 		93B77A96E381A5A59A905654 /* Icon */ = {isa = PBXFileReference; path = "Icon"; sourceTree = "<group>"; };
@@ -239,6 +241,7 @@
 			children = (
 				AC186A8BA87FC3ED77EE9515 /* Almanac.swift */,
 				85890C565D115D1C6052879F /* AlmanacView.swift */,
+				3DCE51DCBE395FE883D29643 /* ArchiveView.swift */,
 				5A416AB801891D4DB0E217FE /* EntryView.swift */,
 				525D5938525D22FF5814987A /* FamilyRoot.swift */,
 				4B8461CD8C2627BC579C73C5 /* Icon */,
@@ -411,6 +414,7 @@
 			files = (
 				911678348123B027D2BE33E4 /* Almanac.swift in Sources */,
 				07F538B1AF69C543F527B4CE /* AlmanacView.swift in Sources */,
+				89F158D3647C97761749F583 /* ArchiveView.swift in Sources */,
 				030BACB98B263B0DB5469EDC /* AppConfig.swift in Sources */,
 				042F278D646CBDDEECA76B77 /* AppSession.swift in Sources */,
 				2AE14B927C8E8450423B1A9A /* AudioPlayer.swift in Sources */,

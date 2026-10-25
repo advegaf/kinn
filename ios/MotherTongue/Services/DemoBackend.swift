@@ -12,7 +12,12 @@ final class DemoBackend: Backend {
     private var replyIndex = 0
 
     init() {
+        #if DEBUG
+        // Screenshot aid: `-emptyDemo YES` is a new family with no stories yet.
+        messages = UserDefaults.standard.bool(forKey: "emptyDemo") ? [] : Self.seed()
+        #else
         messages = Self.seed()
+        #endif
     }
 
     func createProfile(name: String, role: Role, lang: String) async throws -> Profile {
@@ -160,16 +165,17 @@ final class DemoBackend: Backend {
         }
         // audio names the bundled ElevenLabs narration, Resources/DemoAudio/{audio}-{es|en}.mp3.
         // AppSession resolves the demo-audio/ paths from the bundle and falls back to speech.
-        func msg(_ n: Int, from: Profile, at date: Date, transcript: String, translation: String, ask: [String] = [], story: Story? = nil, audio: String) -> Message {
+        func msg(_ n: Int, from: Profile, at date: Date, transcript: String, translation: String, ask: [String] = [], story: Story? = nil, audio: String, replyTo: UUID? = nil) -> Message {
             let id = UUID(uuidString: String(format: "00000000-0000-4000-8000-%012d", n))!
             let to = from.role == .elder ? family : elder
             return Message(id: id, threadId: t, senderId: from.id, sourceLang: from.lang, targetLang: to.lang,
                            originalPath: "\(Self.audioPrefix)\(audio)-\(from.lang)", transcript: transcript, translation: translation,
                            translatedPath: "\(Self.audioPrefix)\(audio)-\(to.lang)", culturalNotes: [], askAbout: ask, story: story, status: .ready,
-                           createdAt: Message.timestamp(date))
+                           createdAt: Message.timestamp(date), replyTo: replyTo)
         }
         var out: [Message] = []
         var dates: [String: Date] = [:]
+        var ids: [String: UUID] = [:]
         func scenes(_ list: [DemoFile.DemoScene]) -> [StoryScene] {
             list.map {
                 StoryScene(start: $0.t_en?.first, end: $0.t_en?.last, textEs: $0.text_es, textEn: $0.text_en, prompt: $0.prompt,
@@ -182,14 +188,16 @@ final class DemoBackend: Backend {
                               status: "ready", scenes: list)
             let date = day(s.days_ago)
             dates[s.id] = date
-            out.append(msg(i + 1, from: elder, at: date, transcript: s.transcript, translation: s.translation,
-                           ask: s.ask_about ?? [], story: story, audio: s.id))
+            let row = msg(i + 1, from: elder, at: date, transcript: s.transcript, translation: s.translation,
+                          ask: s.ask_about ?? [], story: story, audio: s.id)
+            ids[s.id] = row.id
+            out.append(row)
         }
         for (i, r) in file.replies.enumerated() {
             let date = (dates[r.after_story] ?? .now).addingTimeInterval(r.minutes_after * 60)
             let story = r.title == nil && r.scenes == nil ? nil : Story(title: r.title, titleEs: r.title_es, status: "ready", scenes: r.scenes.map(scenes))
             out.append(msg(file.stories.count + i + 1, from: family, at: date, transcript: r.text_en, translation: r.translation_es,
-                           story: story, audio: "r\(i + 1)"))
+                           story: story, audio: "r\(i + 1)", replyTo: ids[r.after_story]))
         }
         return out.sorted { $0.date < $1.date }
     }

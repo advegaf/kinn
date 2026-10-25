@@ -11,6 +11,7 @@
   <title>Hearth</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="toast.css">
+  <link rel="stylesheet" href="past.css">
   <link rel="stylesheet" href="calibrate.css">
   <!-- Fallback only: the bundled fonts in fonts/ come first in the stack. Non-blocking so an offline Hearth still renders. -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@300;400;500&display=swap" media="print" onload="this.media='all'">
@@ -31,6 +32,24 @@
         <div class="clk"><span id="clock-h">0</span><span class="colon" id="clock-colon">:</span><span id="clock-m">00</span></div>
         <p class="hint">toca para contar una historia<span class="en">tap to tell a story</span></p>
         <p class="family-code"><span id="fam-code-es"></span><span class="family-code-en" id="fam-code-en"></span></p>
+        <div class="side">
+          <div class="side-btn" data-act="past"><span class="side-line">Escuchar otra vez</span><span class="en">Listen again</span></div>
+        </div>
+      </div>
+
+      <div class="layer past" id="past">
+        <img class="past-img" id="past-img" alt="">
+        <div class="past-main">
+          <h1 class="headline" id="past-title"></h1>
+          <p class="en" id="past-title-en"></p>
+          <p class="sub" id="past-stamp"></p>
+          <p class="en" id="past-stamp-en"></p>
+        </div>
+        <p class="hint">toca para escuchar<span class="en">tap to listen</span></p>
+        <div class="side">
+          <div class="side-btn" data-act="next"><span class="side-line">Siguiente</span><span class="side-sub" id="past-count"></span><span class="en" id="past-count-en"></span></div>
+          <div class="side-btn" data-act="back"><span class="side-line">Volver</span><span class="en">Back</span></div>
+        </div>
       </div>
 
       <div class="layer col waiting">

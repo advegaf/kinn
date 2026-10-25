@@ -7,14 +7,16 @@ import { MicRecorder, FakeRecorder, resumeAudio } from './recorder.js';
 import { loadRect, applyRect, loadStrip, applyStrip, inRect, toPct, startCalibration, startTemplate } from './calibrate.js';
 import { $, setText } from './dom.js';
 import { dayLabel, sentAt, tickClock, setFamilyCode } from './clock.js';
-import { hasStory, storyFor, answeredStory, buildScenes, startScenes, setProgress, teardown } from './scenes.js';
+import { hasStory, storyFor, buildScenes, startScenes, setProgress, teardown } from './scenes.js';
 import { narrate, retryPending, clearTimers, stopAll } from './narration.js';
 import { showToast, hideToast } from './toast.js';
+import { titles as titlesFor, recPrompt } from './text.js';
+import { inPast, pastItem, openPast, nextPast, closePast, renderPast } from './past.js';
 
-const S = { CLOCK: 'clock', WAITING: 'waiting', RECORDING: 'recording', SENDING: 'sending', SAVED: 'saved', PLAYING: 'playing', ERROR: 'error' };
+const S = { CLOCK: 'clock', WAITING: 'waiting', RECORDING: 'recording', SENDING: 'sending', SAVED: 'saved', PLAYING: 'playing', ERROR: 'error', PAST: 'past' };
 
 const DEBOUNCE_MS = 250;
-const DOUBLE_MS = 650; // a second press this soon after the first counts as a double press
+const BOUNCE_MS = 650; // a press this soon after a state change is a bounce or a shaky double tap
 const MIN_RECORD_MS = 900;
 const MAX_RECORD_MS = 3 * 60 * 1000;
 const MIN_SENDING_MS = 1400;
@@ -22,10 +24,9 @@ const READY_TIMEOUT_MS = 90 * 1000;
 const ERROR_MS = 3500;
 const SAVED_MS = 4000;
 const LINGER_MS = 1500;
-const HISTORY = 7;
+const PAST_IDLE_MS = 60 * 1000;
 const HEARD_KEY = 'hearth.heard';
 const SAVED_STATUS = 'tu historia est\u00e1 guardada';
-const PENDING = 'traducci\u00f3n pendiente';
 
 const root = $('hearth');
 const html = document.documentElement;
@@ -56,28 +57,11 @@ function setState(next) {
 const partnerName = () => backend.partner?.name || 'tu familia';
 const isMine = (m) => m.sender_id === backend.profile?.id;
 const unheard = () => messages.filter((m) => !isMine(m) && m.status === 'ready' && !m.heard_at && !heardLocal.has(m.id));
-const history = () => messages.filter((m) => !isMine(m) && m.status === 'ready').slice(-HISTORY).reverse();
+const past = () => messages.filter((m) => m.status === 'ready').reverse();
 const idleState = () => (unheard().length ? S.WAITING : S.CLOCK);
 const wait = (ms) => new Promise((r) => setTimeout(r, Math.max(0, ms)));
 
-// [Spanish, English] title of the story a message is about. A free note carries the worker's
-// placeholder as its Spanish title until it is translated.
-function titles(msg) {
-  const own = msg.story?.title_es || msg.story?.title;
-  const st = own ? msg.story : answeredStory(msg, messages, isMine);
-  if (st?.title_es === PENDING) return [st.title, st.title];
-  return [st?.title_es || st?.title || '', st?.title || st?.title_es || ''];
-}
-
-// The last question in her family's newest message, if it is short enough to read at a glance.
-// The English line is the last question of that message's original, under the same limit.
-function recPrompt(name) {
-  const latest = messages.filter((m) => !isMine(m) && m.translation).at(-1);
-  const q = latest?.translation.match(/\u00bf[^\u00bf?]*\?/g)?.at(-1)?.trim();
-  if (!q || q.length > 60) return [`cu\u00e9ntale a ${name} lo que recuerdas`, `tell ${name} what you remember`];
-  const en = latest.transcript?.match(/[^.!?]*\?/g)?.at(-1)?.trim();
-  return [q, en && en.length <= 80 ? en : `tell ${name} what you remember`];
-}
+const titles = (msg) => titlesFor(msg, messages, isMine);
 
 function renderText() {
   const name = partnerName();
@@ -90,7 +74,8 @@ function renderText() {
     setText('waiting-sub', es ? `${when}, sobre \u00ab${es}\u00bb` : when);
     setText('waiting-sub-en', en ? `${whenEn}, about \u00ab${en}\u00bb` : whenEn);
   }
-  const [prompt, promptEn] = recPrompt(name);
+  root.toggleAttribute('data-past', past().length > 0);
+  const [prompt, promptEn] = recPrompt(messages, isMine, name);
   setText('rec-prompt', prompt);
   setText('rec-prompt-en', promptEn);
   setText('send-line', 'guardando tu historia');
@@ -140,7 +125,7 @@ async function refresh() {
   if (refreshAgain) { refreshAgain = false; refresh(); }
 }
 
-function press(source) {
+function press(source, act) {
   const now = performance.now();
   if (now - lastPress < DEBOUNCE_MS) return;
   lastPress = now;
@@ -150,15 +135,19 @@ function press(source) {
 
   switch (state) {
     case S.CLOCK:
+      if (act === 'past' && past().length) return showPast();
       return startRecording();
+    case S.PAST:
+      if (age < BOUNCE_MS) return;
+      if (act === 'back') return leavePast();
+      if (act === 'next') { nextPast(); return showPast(); }
+      return play(pastItem(), !unheard().some((m) => m.id === pastItem().id));
     case S.WAITING:
       return play(unheard().at(-1));
     case S.RECORDING:
-      if (age < DOUBLE_MS) { cancelRecording(); return replay(); }
-      return stopAndSend();
     case S.PLAYING:
-      if (age < DOUBLE_MS) return; // bounce guard, and keeps a double press from stopping its own replay
-      return stopPlayback();
+      if (age < BOUNCE_MS) return;
+      return state === S.RECORDING ? stopAndSend() : stopPlayback();
     case S.ERROR:
       clearTimeout(errorTimer);
       return startRecording();
@@ -182,7 +171,7 @@ addEventListener('pointerdown', (e) => {
   if (config.calibrate || !e.isPrimary) return;
   const p = toPct(e);
   if (inRect(zone, p.x, p.y)) press('button');
-  else if (inRect(strip, p.x, p.y)) press('strip');
+  else if (inRect(strip, p.x, p.y)) press('strip', e.target.closest?.('[data-act]')?.dataset.act);
 });
 
 addEventListener('contextmenu', (e) => e.preventDefault());
@@ -238,13 +227,6 @@ function startRecording() {
 function clearRecTimers() {
   clearInterval(recTick);
   clearTimeout(recMax);
-}
-
-function cancelRecording() {
-  recToken += 1;
-  clearRecTimers();
-  recorder.cancel();
-  html.style.setProperty('--level', '0');
 }
 
 async function stopAndSend() {
@@ -336,20 +318,28 @@ function showSaved(row, hold = false) {
 let playingId = null;
 let lingerTimer = 0;
 let cleanupTimer = 0;
-let replayCursor = 0;
-let lastReplayAt = -Infinity;
+let pastTimer = 0;
 
-function replay() {
-  const list = history();
-  if (!list.length) return setState(idleState());
-  const now = performance.now();
-  replayCursor = now - lastReplayAt < 60000 ? (replayCursor + 1) % list.length : 0;
-  lastReplayAt = now;
-  play(list[replayCursor], true);
+function showPast() {
+  if (!inPast()) openPast(past());
+  const msg = pastItem();
+  const m = backend.media(storyFor(msg, messages));
+  renderPast({ mine: isMine(msg), name: partnerName(), titles: titles(msg), image: m.scenes[0]?.image || m.images[0] });
+  setState(S.PAST);
+  clearTimeout(pastTimer);
+  pastTimer = setTimeout(() => state === S.PAST && leavePast(), PAST_IDLE_MS);
+}
+
+function leavePast() {
+  clearTimeout(pastTimer);
+  closePast();
+  setState(idleState());
 }
 
 function play(msg, isReplay = false) {
   hideToast();
+  clearTimeout(pastTimer);
+  if (msg?.id !== pastItem()?.id) closePast();
   if (!msg) return setState(idleState());
   clearPlayTimers();
   playingId = msg.id;
@@ -406,7 +396,8 @@ function stopPlayback() {
   clearPlayTimers();
   playingId = null;
   stopAll();
-  setState(idleState());
+  if (inPast()) showPast();
+  else setState(idleState());
   flushToast();
   // Let the strip fade before tearing the media down.
   cleanupTimer = setTimeout(() => {
@@ -450,8 +441,9 @@ function enterDemoState(s) {
     const pick = messages.find((m) => m.id === config.startMsg)
       || (config.at != null ? messages.filter((m) => isMine(m) && hasStory(m.story)).at(-1) : null);
     if (pick) play(pick, true);
-    else play(unheard().at(-1) || history()[0]);
+    else play(unheard().at(-1) || past().find((m) => !isMine(m)));
   }
+  else if (s === S.PAST) showPast();
   else if (s === S.ERROR) showError(SEND_FAILED, SEND_FAILED_EN, true);
   else if (s === S.SAVED) showSaved(messages.filter((m) => isMine(m) && hasStory(m.story)).at(-1), true);
 }
