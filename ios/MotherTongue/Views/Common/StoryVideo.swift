@@ -54,7 +54,7 @@ struct LoopingVideo: UIViewRepresentable {
 
     final class PlayerView: UIView {
         override class var layerClass: AnyClass { AVPlayerLayer.self }
-        private var playerLayer: AVPlayerLayer { layer as! AVPlayerLayer }
+        private var playerLayer: AVPlayerLayer? { layer as? AVPlayerLayer }
         let player = AVQueuePlayer()
         private var looper: AVPlayerLooper?
         private(set) var url: URL?
@@ -65,8 +65,8 @@ struct LoopingVideo: UIViewRepresentable {
             isUserInteractionEnabled = false
             player.isMuted = true
             player.preventsDisplaySleepDuringVideoPlayback = false
-            playerLayer.player = player
-            playerLayer.videoGravity = .resizeAspectFill
+            playerLayer?.player = player
+            playerLayer?.videoGravity = .resizeAspectFill
         }
 
         required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }

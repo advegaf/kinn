@@ -77,7 +77,7 @@ struct EntryView: View {
                             .foregroundStyle(Color.cream)
                             .padding(.top, 2)
                         Text(Almanac.titleEs(message))
-                            .font(.serifItalic(19))
+                            .font(.serif(19))
                             .foregroundStyle(Color.fog)
                             .padding(.top, 6)
                         prose
@@ -311,7 +311,7 @@ struct EntryView: View {
                     session.player.play(src, key: mine ? translatedKey : originalKey)
                 }
             }
-            .font(.serifItalic(20))
+            .font(.serif(20))
             .foregroundStyle(Color.wordsEm)
             .dottedUnderline(.wordsEm)
             Spacer()

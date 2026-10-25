@@ -23,7 +23,7 @@ struct AlmanacView: View {
                     .foregroundStyle(Color.ink)
                     .padding(.top, 14)
                 Text(Almanac.monthLine(now))
-                    .font(.serifItalic(20))
+                    .font(.serif(20))
                     .foregroundStyle(Color.sub)
                     .padding(.top, -5)
                 weekRow(now)
@@ -32,10 +32,7 @@ struct AlmanacView: View {
                     featured(today)
                         .padding(.top, 26)
                 } else {
-                    Text("Nothing from \(session.partnerName) yet. Her stories will land on this page.")
-                        .font(.serifItalic(19))
-                        .foregroundStyle(Color.soft)
-                        .padding(.top, 26)
+                    empty.padding(.top, 26)
                 }
                 status
                 index(others)
@@ -106,7 +103,7 @@ struct AlmanacView: View {
                         .foregroundStyle(Color.ink)
                         .multilineTextAlignment(.leading)
                     Text(Almanac.titleEs(m))
-                        .font(.serifItalic(17))
+                        .font(.serif(17))
                         .foregroundStyle(Color.sub)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -116,7 +113,7 @@ struct AlmanacView: View {
             .padding(.top, 10)
             HStack(spacing: 18) {
                 Button("Listen") { open(m.id) }
-                    .font(.serifItalic(19))
+                    .font(.serif(19))
                     .foregroundStyle(Color.ink)
                     .dottedUnderline(.ink)
                 let key = "o-\(m.id)"
@@ -124,7 +121,7 @@ struct AlmanacView: View {
                 Button(playing ? "Stop her voice" : "Hear her original") {
                     if let src = session.originalSource(m) { session.player.toggle(src, key: key) }
                 }
-                .font(.serifItalic(19))
+                .font(.serif(19))
                 .foregroundStyle(Color.soft)
             }
             .buttonStyle(PressStyle())
@@ -133,17 +130,44 @@ struct AlmanacView: View {
         }
     }
 
+    @ViewBuilder private var empty: some View {
+        if !session.hasLoaded, session.lastError != nil {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("This week could not load. Check the connection.")
+                    .font(.serif(19))
+                    .foregroundStyle(Color.soft)
+                Button("Try again") { Task { await session.start() } }
+                    .font(.serif(19))
+                    .foregroundStyle(Color.ink)
+                    .dottedUnderline(.ink)
+                    .buttonStyle(PressStyle())
+                    .tapTarget()
+            }
+        } else if !session.hasLoaded {
+            Breathing {
+                Text("Opening this week.")
+                    .font(.serif(19))
+                    .foregroundStyle(Color.soft)
+            }
+        } else {
+            Text("Nothing from \(session.partnerName) yet. Her stories will land on this page.")
+                .font(.serif(19))
+                .foregroundStyle(Color.soft)
+        }
+    }
+
     @ViewBuilder private var status: some View {
         if let failed = session.messages.last(where: { session.isMine($0) && $0.status == .error }) {
             Button("Your note did not send. Try again") { Task { await session.retry(failed) } }
-                .font(.serifItalic(18))
+                .font(.serif(18))
                 .foregroundStyle(Color.rec)
                 .buttonStyle(PressStyle())
+                .tapTarget()
                 .padding(.top, 14)
         } else if session.hasPending {
             Breathing {
                 Text("Your note to \(session.partnerName) is on its way.")
-                    .font(.serifItalic(18))
+                    .font(.serif(18))
                     .foregroundStyle(Color.soft)
             }
             .padding(.top, 14)
@@ -160,14 +184,14 @@ struct AlmanacView: View {
                         Text(sameDay ? "" : "\(Almanac.dayNumber(m.date))")
                             .font(.serif(22))
                             .monospacedDigit()
-                            .foregroundStyle(mine ? Color.later : Color.fog)
+                            .foregroundStyle(mine ? Color.later : Color.sub)
                             .frame(width: 44, alignment: .leading)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(Almanac.titleEn(m))
                                 .font(.serif(19))
                                 .foregroundStyle(Color.ink)
                             Text(Almanac.titleEs(m))
-                                .font(.serifItalic(15))
+                                .font(.serif(15))
                                 .foregroundStyle(Color.sub)
                             if mine {
                                 Text("You sent this")
