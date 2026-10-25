@@ -184,7 +184,6 @@ def bezel(X, Y, Z):
 def shell(X, Y, Z):
     e = envelope(X, Y, Z)
     d = np.maximum.reduce([smax(e, FACE_T - Z, K_SEAM), -(inner(X, Y, Z) + T), FACE_T - Z])
-    ux = USB_SIDE * W / 2
     notch = np.maximum.reduce([W / 2 - 14 - USB_SIDE * X, np.abs(Y - USB_Y) - USB_W / 2 + np.maximum(Z - FACE_T, 0),
                                Z - (FACE_T + USB_H)])
     d = np.maximum(d, -notch)
