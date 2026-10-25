@@ -157,8 +157,6 @@ struct OnboardingFlow: View {
     }
 }
 
-// MARK: Diary page parts shared by the onboarding pages and settings
-
 /// A diary page: two tiny caps labels at the head, content, and one action held at the foot.
 struct OnbPage<Content: View, Footer: View>: View {
     var left: String

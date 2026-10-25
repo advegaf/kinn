@@ -31,8 +31,6 @@ final class AppSession {
         configureBackend()
     }
 
-    // MARK: Setup
-
     func configureBackend() {
         stopSync()
         isDemo = defaults.bool(forKey: StorageKeys.demoMode)
@@ -79,8 +77,6 @@ final class AppSession {
         guard let partnerId else { return }
         partner = try? await backend.fetchProfile(id: partnerId)
     }
-
-    // MARK: Onboarding
 
     func createProfile(name: String, role: Role, lang: String) async throws {
         guard let backend else { throw SessionError.notConfigured }
@@ -159,8 +155,6 @@ final class AppSession {
         messages = []
         heardIds = []
     }
-
-    // MARK: Messages
 
     func isMine(_ m: Message) -> Bool { m.senderId == profile?.id }
 
@@ -270,8 +264,6 @@ final class AppSession {
         if partner == nil { await loadPartner() }
     }
 
-    // MARK: Sync
-
     func startSync() {
         stopSync()
         guard let backend, let thread else { return }
@@ -305,8 +297,6 @@ final class AppSession {
         pollTask = nil
         if let backend { Task { await backend.stopListening() } }
     }
-
-    // MARK: Playback
 
     func translatedSource(_ m: Message) -> PlaybackSource? {
         let speech = m.translation.map { PlaybackSource.speech(text: $0.unmarked, lang: m.targetLang) }

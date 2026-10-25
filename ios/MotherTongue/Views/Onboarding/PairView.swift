@@ -19,8 +19,6 @@ struct PairView: View {
         .task { if isElder { await load() } }
     }
 
-    // MARK: Family: type the code her Hearth shows
-
     private var familyPage: some View {
         OnbPage(left: "Kinn", right: "First page") {
             VStack(alignment: .leading, spacing: 0) {
@@ -55,8 +53,6 @@ struct PairView: View {
             }
         }
     }
-
-    // MARK: Elder: type the code from the family phone
 
     private var elderPage: some View {
         OnbPage(left: "Kinn", right: "Primera p\u{E1}gina") {
@@ -154,8 +150,6 @@ struct PairView: View {
         }
     }
 }
-
-// MARK: Code parts
 
 /// Six serif characters, each on its own underline.
 struct CodeSlots: View {
