@@ -86,12 +86,12 @@ struct ArchiveView: View {
             Text("No stories yet. When \(session.partnerName) tells one on her Hearth, it lands here with your replies.")
                 .font(.serif(19))
                 .foregroundStyle(Color.soft)
-            Button("Write her a note", action: compose)
-                .font(.serif(19))
-                .foregroundStyle(Color.ink)
-                .dottedUnderline(.ink)
-                .buttonStyle(PressStyle())
-                .tapTarget()
+            Button(action: compose) {
+                Text("Write her a note").dottedUnderline(.ink).tapTarget()
+            }
+            .font(.serif(19))
+            .foregroundStyle(Color.ink)
+            .buttonStyle(PressStyle())
         }
     }
 

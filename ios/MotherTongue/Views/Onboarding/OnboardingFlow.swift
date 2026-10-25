@@ -93,12 +93,13 @@ struct OnboardingFlow: View {
                 }
                 .padding(.top, 26)
 
-                Button(isElder ? "This phone is for family" : "This phone is her Hearth") { switchRole() }
-                    .font(.serif(18))
-                    .foregroundStyle(Color.soft)
-                    .underline(color: .faint)
-                    .buttonStyle(PressStyle())
-                    .tapTarget()
+                Button { switchRole() } label: {
+                    Text(isElder ? "This phone is for family" : "This phone is her Hearth").tapTarget()
+                }
+                .font(.serif(18))
+                .foregroundStyle(Color.soft)
+                .underline(color: .faint)
+                .buttonStyle(PressStyle())
                     .padding(.top, 12)
 
                 Toggle(isOn: $demoMode) {

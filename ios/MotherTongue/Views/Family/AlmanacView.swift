@@ -126,21 +126,23 @@ struct AlmanacView: View {
                 .padding(.top, 10)
             }
             HStack(spacing: 18) {
-                Button("Listen") { open(m.id) }
-                    .font(.serif(19))
-                    .foregroundStyle(making ? Color.later : Color.ink)
-                    .dottedUnderline(making ? .later : .ink)
-                    .disabled(making)
+                Button { open(m.id) } label: {
+                    Text("Listen").dottedUnderline(making ? .later : .ink).tapTarget()
+                }
+                .font(.serif(19))
+                .foregroundStyle(making ? Color.later : Color.ink)
+                .disabled(making)
                 let key = "o-\(m.id)"
                 let playing = session.player.isPlaying && session.player.currentKey == key
-                Button(playing ? "Stop her voice" : "Hear her original") {
+                Button {
                     if let src = session.originalSource(m) { session.player.toggle(src, key: key) }
+                } label: {
+                    Text(playing ? "Stop her voice" : "Hear her original").tapTarget()
                 }
                 .font(.serif(19))
                 .foregroundStyle(Color.soft)
             }
             .buttonStyle(PressStyle())
-            .frame(minHeight: 44)
             .padding(.top, 2)
         }
     }
@@ -155,12 +157,13 @@ struct AlmanacView: View {
 
     @ViewBuilder private var status: some View {
         if let failed = session.messages.last(where: { session.isMine($0) && $0.status == .error }) {
-            Button("Your note did not send. Try again") { Task { await session.retry(failed) } }
-                .font(.serif(18))
-                .foregroundStyle(Color.rec)
-                .buttonStyle(PressStyle())
-                .tapTarget()
-                .padding(.top, 14)
+            Button { Task { await session.retry(failed) } } label: {
+                Text("Your note did not send. Try again").tapTarget()
+            }
+            .font(.serif(18))
+            .foregroundStyle(Color.rec)
+            .buttonStyle(PressStyle())
+            .padding(.top, 14)
         } else if session.hasPending {
             Breathing {
                 Text("Your note to \(session.partnerName) is on its way.")
@@ -225,12 +228,12 @@ struct FirstLoad<Empty: View>: View {
                 Text(failed)
                     .font(.serif(19))
                     .foregroundStyle(Color.soft)
-                Button("Try again") { Task { await session.start() } }
-                    .font(.serif(19))
-                    .foregroundStyle(Color.ink)
-                    .dottedUnderline(.ink)
-                    .buttonStyle(PressStyle())
-                    .tapTarget()
+                Button { Task { await session.start() } } label: {
+                    Text("Try again").dottedUnderline(.ink).tapTarget()
+                }
+                .font(.serif(19))
+                .foregroundStyle(Color.ink)
+                .buttonStyle(PressStyle())
             }
         } else if !session.hasLoaded {
             Breathing {

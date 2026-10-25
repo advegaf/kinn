@@ -37,12 +37,13 @@ struct PairView: View {
                 slab("Connect", enabled: code.count == 6) {
                     run(joinedByCode: true) { try await session.join(code: code) }
                 }
-                Button("Continue without pairing") {
+                Button {
                     run { if session.thread == nil { try await session.createThread() } }
+                } label: {
+                    Text("Continue without pairing").tapTarget()
                 }
                 .font(.serif(17))
                 .foregroundStyle(Color.soft)
-                .frame(minHeight: 44)
                 .buttonStyle(PressStyle())
                 .disabled(busy)
             }
@@ -88,9 +89,9 @@ struct PairView: View {
                         .foregroundStyle(Color.soft)
                         .underline(color: .faint)
                         .multilineTextAlignment(.leading)
+                        .tapTarget()
                 }
                 .buttonStyle(PressStyle())
-                .tapTarget()
                 .padding(.top, 8)
 
                 if let error { OnbNotice(text: error).padding(.top, 20) }

@@ -196,12 +196,12 @@ struct HearthView: View {
             .frame(maxWidth: .infinity)
             HStack {
                 Spacer()
-                Button("Ajustes") { showSettings = true }
-                    .font(.serif(19))
-                    .foregroundStyle(Color(UIColor(hex: 0xFBEEDD)).opacity(0.75))
-                    .buttonStyle(PressStyle())
-                    .frame(minWidth: 44)
-                    .tapTarget()
+                Button { showSettings = true } label: {
+                    Text("Ajustes").frame(minWidth: 44).tapTarget()
+                }
+                .font(.serif(19))
+                .foregroundStyle(Color(UIColor(hex: 0xFBEEDD)).opacity(0.75))
+                .buttonStyle(PressStyle())
             }
             .frame(maxHeight: .infinity, alignment: .bottom)
         }

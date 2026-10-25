@@ -49,15 +49,16 @@ struct VoiceEnrollView: View {
                         .transition(.fade)
                 } else {
                     recordControl
-                    Button(es ? "Saltar por ahora" : "Skip for now") {
+                    Button {
                         session.recorder.cancel()
                         onDone()
+                    } label: {
+                        Text(es ? "Saltar por ahora" : "Skip for now").tapTarget()
                     }
                     .font(.serif(17))
                     .foregroundStyle(Color.sub)
                     .underline(color: .faint)
                     .buttonStyle(PressStyle())
-                    .tapTarget()
                 }
             }
             .animation(.enter, value: phase)
