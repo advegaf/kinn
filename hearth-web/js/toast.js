@@ -1,4 +1,4 @@
-// A banner at the top of the strip when a new family message arrives. Tapping it plays the message.
+// A banner over the strip: a new family message, or a note about one. Tapping it runs onTap.
 import { $, setText } from './dom.js';
 
 const HOLD_MS = 5000;
@@ -7,7 +7,7 @@ let timer = 0;
 let onTapNow = null;
 let bound = false;
 
-export function showToast(name, [es, en], onTap) {
+export function showToast([line, lineEn], [es, en], onTap) {
   const el = $('toast');
   if (!bound) {
     bound = true;
@@ -20,9 +20,9 @@ export function showToast(name, [es, en], onTap) {
     });
   }
   onTapNow = onTap;
-  setText('toast-es', `Nuevo mensaje de ${name}`);
+  setText('toast-es', line);
   setText('toast-sum-es', es || '');
-  setText('toast-en', `New note from ${name}`);
+  setText('toast-en', lineEn);
   setText('toast-sum-en', en || '');
   el.classList.add('on');
   clearTimeout(timer);

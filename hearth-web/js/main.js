@@ -3,14 +3,15 @@
 
 import config from '../config.js';
 import { SupabaseBackend, DemoBackend } from './backend.js';
-import { MicRecorder, FakeRecorder, resumeAudio } from './recorder.js';
-import { loadRect, applyRect, loadStrip, applyStrip, inRect, toPct, startCalibration, startTemplate } from './calibrate.js';
+import { MicRecorder, FakeRecorder } from './recorder.js';
+import { loadRect, applyRect, loadStrip, applyStrip, startCalibration, startTemplate } from './calibrate.js';
 import { $, setText } from './dom.js';
 import { dayLabel, sentAt, tickClock, setFamilyCode } from './clock.js';
-import { hasStory, storyFor, buildScenes, startScenes, setProgress, teardown } from './scenes.js';
-import { narrate, retryPending, clearTimers, stopAll } from './narration.js';
+import { titles, recPrompt } from './lines.js';
+import { hasStory, filmPending, storyFor, buildScenes, startScenes, setProgress, teardown } from './scenes.js';
+import { narrate, clearTimers, stopAll } from './narration.js';
 import { showToast, hideToast } from './toast.js';
-import { titles as titlesFor, recPrompt } from './text.js';
+import { bindInput, startHold, cancelHold, unlock } from './input.js';
 import { inPast, pastItem, openPast, nextPast, closePast, renderPast } from './past.js';
 
 const S = { CLOCK: 'clock', WAITING: 'waiting', RECORDING: 'recording', SENDING: 'sending', SAVED: 'saved', PLAYING: 'playing', ERROR: 'error', PAST: 'past' };
@@ -27,6 +28,7 @@ const LINGER_MS = 1500;
 const PAST_IDLE_MS = 60 * 1000;
 const HEARD_KEY = 'hearth.heard';
 const SAVED_STATUS = 'tu historia est\u00e1 guardada';
+const MAKING = ['preparando la pel\u00edcula', 'making the film'];
 
 const root = $('hearth');
 const html = document.documentElement;
@@ -61,8 +63,6 @@ const past = () => messages.filter((m) => m.status === 'ready').reverse();
 const idleState = () => (unheard().length ? S.WAITING : S.CLOCK);
 const wait = (ms) => new Promise((r) => setTimeout(r, Math.max(0, ms)));
 
-const titles = (msg) => titlesFor(msg, messages, isMine);
-
 function renderText() {
   const name = partnerName();
   const latest = unheard().at(-1);
@@ -70,12 +70,13 @@ function renderText() {
     const [when, whenEn] = sentAt(new Date(latest.created_at));
     setText('waiting-line', `${name} te escribi\u00f3`);
     setText('waiting-line-en', `${name} wrote to you`);
-    const [es, en] = titles(latest);
-    setText('waiting-sub', es ? `${when}, sobre \u00ab${es}\u00bb` : when);
-    setText('waiting-sub-en', en ? `${whenEn}, about \u00ab${en}\u00bb` : whenEn);
+    const [es, en] = titles(latest, messages, isMine);
+    const film = filmPending(latest);
+    setText('waiting-sub', film ? MAKING[0] : es ? `${when}, sobre \u00ab${es}\u00bb` : when);
+    setText('waiting-sub-en', film ? MAKING[1] : en ? `${whenEn}, about \u00ab${en}\u00bb` : whenEn);
   }
   root.toggleAttribute('data-past', past().length > 0);
-  const [prompt, promptEn] = recPrompt(messages, isMine, name);
+  const [prompt, promptEn] = recPrompt(name, messages, isMine);
   setText('rec-prompt', prompt);
   setText('rec-prompt-en', promptEn);
   setText('send-line', 'guardando tu historia');
@@ -103,7 +104,7 @@ let refreshing = false;
 let refreshAgain = false;
 let failures = 0;
 let primed = false;
-const toasted = new Set();
+const toasted = new Map(); // message id -> 'film' or 'ready', as it was when last toasted
 
 async function refresh() {
   if (refreshing) { refreshAgain = true; return; }
@@ -135,22 +136,21 @@ function press(source, act) {
 
   switch (state) {
     case S.CLOCK:
-      if (act === 'past' && past().length) return showPast();
-      return startRecording();
+    case S.ERROR:
+      if (state === S.CLOCK && act === 'past' && past().length) return showPast();
+      if (source === 'key') return startRecording();
+      return startHold(() => (state === S.CLOCK || state === S.ERROR) && startRecording());
     case S.PAST:
       if (age < BOUNCE_MS) return;
       if (act === 'back') return leavePast();
       if (act === 'next') { nextPast(); return showPast(); }
-      return play(pastItem(), !unheard().some((m) => m.id === pastItem().id));
+      return listen(pastItem(), !unheard().some((m) => m.id === pastItem().id));
     case S.WAITING:
-      return play(unheard().at(-1));
+      return listen(unheard().at(-1));
     case S.RECORDING:
     case S.PLAYING:
       if (age < BOUNCE_MS) return;
       return state === S.RECORDING ? stopAndSend() : stopPlayback();
-    case S.ERROR:
-      clearTimeout(errorTimer);
-      return startRecording();
     case S.SAVED:
       clearTimeout(savedTimer);
       return setState(idleState());
@@ -159,30 +159,17 @@ function press(source, act) {
   }
 }
 
-const PRESS_KEYS = new Set(['Enter', 'NumpadEnter', ' ', 'Spacebar', 'MediaPlayPause', 'AudioVolumeUp', 'VolumeUp']);
-
-addEventListener('keydown', (e) => {
-  if (e.repeat || !PRESS_KEYS.has(e.key)) return;
-  e.preventDefault();
-  press('key');
-});
-
-addEventListener('pointerdown', (e) => {
-  if (config.calibrate || !e.isPrimary) return;
-  const p = toPct(e);
-  if (inRect(zone, p.x, p.y)) press('button');
-  else if (inRect(strip, p.x, p.y)) press('strip', e.target.closest?.('[data-act]')?.dataset.act);
-});
-
-addEventListener('contextmenu', (e) => e.preventDefault());
-
-// Touch pointerdown is not a user activation in Chromium; pointerup and keydown are.
-// Anything that was blocked by autoplay policy gets retried on the next one.
-function unlock() {
-  resumeAudio();
-  retryPending();
+// A release before the hold is done is a short tap: it goes back.
+function release() {
+  if (!cancelHold()) return;
+  root.removeAttribute('data-reply');
+  if (state === S.ERROR) {
+    clearTimeout(errorTimer);
+    setState(idleState());
+  }
 }
-for (const type of ['pointerup', 'touchend', 'keyup']) addEventListener(type, unlock, { passive: true });
+
+bindInput(press, release, zone, strip);
 
 let recToken = 0;
 let recReady = null;
@@ -197,6 +184,8 @@ function setLevel(raw) {
 }
 
 function startRecording() {
+  clearTimeout(errorTimer);
+  root.removeAttribute('data-reply');
   setState(S.RECORDING);
   const token = ++recToken;
   level = 0;
@@ -279,28 +268,38 @@ function showError(text, en, hold = false) {
 
 const busy = () => state === S.RECORDING || state === S.SENDING;
 
-// The first fetch only records what is already there; later arrivals get a toast.
+const filmState = (m) => (filmPending(m) ? 'film' : 'ready');
+
+// The first fetch only records what is already there; later arrivals get a toast, and a note that
+// waited for its film gets a second toast when the film is in.
 // During playback the newest arrival waits and shows once the story ends.
 let queuedToast = null;
 function toastNew() {
-  const fresh = messages.filter((m) => !isMine(m) && m.status === 'ready' && !toasted.has(m.id));
-  for (const m of fresh) toasted.add(m.id);
-  if (primed && fresh.length) {
-    queuedToast = fresh.at(-1).id;
-    if (state !== S.PLAYING) flushToast();
-  }
+  const fresh = messages.filter((m) => !isMine(m) && m.status === 'ready' && toasted.get(m.id) !== filmState(m));
+  const last = fresh.at(-1);
+  if (primed && last) queuedToast = { id: last.id, again: toasted.get(last.id) === 'film' };
+  for (const m of fresh) toasted.set(m.id, filmState(m));
+  if (primed && last && state !== S.PLAYING) flushToast();
   primed = true;
 }
 
 function flushToast() {
-  const id = queuedToast;
+  const q = queuedToast;
   queuedToast = null;
-  const msg = messages.find((m) => m.id === id);
-  if (!msg || heardLocal.has(id) || busy()) return;
-  showToast(partnerName(), titles(msg), () => {
-    const now = messages.find((m) => m.id === id);
-    if (now && !busy()) play(now);
+  const msg = q && messages.find((m) => m.id === q.id);
+  if (!msg || heardLocal.has(msg.id) || busy()) return;
+  const name = partnerName();
+  const line = q.again ? ['Ya est\u00e1 lista', "It's ready"] : [`Nuevo mensaje de ${name}`, `New note from ${name}`];
+  showToast(line, filmPending(msg) ? MAKING : titles(msg, messages, isMine), () => {
+    const now = messages.find((m) => m.id === msg.id);
+    if (now && !busy()) listen(now);
   });
+}
+
+// A note whose film is still being made does not play yet. A tap says so instead.
+function listen(msg, isReplay = false) {
+  if (msg && filmPending(msg)) return showToast(MAKING, titles(msg, messages, isMine), null);
+  play(msg, isReplay);
 }
 
 // Her story is in. The title shows when the story worker has already named it.
@@ -324,7 +323,7 @@ function showPast() {
   if (!inPast()) openPast(past());
   const msg = pastItem();
   const m = backend.media(storyFor(msg, messages));
-  renderPast({ mine: isMine(msg), name: partnerName(), titles: titles(msg), image: m.scenes[0]?.image || m.images[0] });
+  renderPast({ mine: isMine(msg), name: partnerName(), titles: titles(msg, messages, isMine), image: m.scenes[0]?.image || m.images[0] });
   setState(S.PAST);
   clearTimeout(pastTimer);
   pastTimer = setTimeout(() => state === S.PAST && leavePast(), PAST_IDLE_MS);
@@ -393,6 +392,8 @@ function clearPlayTimers() {
 }
 
 function stopPlayback() {
+  const heard = messages.find((m) => m.id === playingId);
+  root.toggleAttribute('data-reply', Boolean(heard && !isMine(heard)));
   clearPlayTimers();
   playingId = null;
   stopAll();
