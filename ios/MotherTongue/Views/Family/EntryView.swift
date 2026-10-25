@@ -259,11 +259,9 @@ struct EntryView: View {
                 Text(Almanac.weekdayMonth(message.date))
                     .font(.serif(19))
                     .foregroundStyle(Color.fog)
-                Text(mine ? "To \(session.partnerName)" : "From \(session.partnerName)")
+                Text("\(mine ? "To" : "From") \(session.partnerName) at \(Almanac.time(message.date))")
                     .font(.serif(19))
                     .foregroundStyle(Color.fog)
-                Text(Almanac.time(message.date))
-                    .tinyCaps()
             }
             .padding(.bottom, 2)
         }
@@ -312,10 +310,7 @@ struct EntryView: View {
             .dottedUnderline(.wordsEm)
             Spacer()
             Button(action: writeBack) {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text("Write back").font(.serif(21)).foregroundStyle(Color.cream)
-                    Text("to \(session.partnerName)").tinyCaps()
-                }
+                Text("Write back to \(session.partnerName)").font(.serif(21)).foregroundStyle(Color.cream)
             }
         }
         .buttonStyle(PressStyle())

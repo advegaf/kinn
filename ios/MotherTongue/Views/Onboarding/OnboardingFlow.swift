@@ -65,7 +65,7 @@ struct OnboardingFlow: View {
     }
 
     private var welcome: some View {
-        OnbPage(left: "Kinn", right: isElder ? "Primera p\u{E1}gina" : "First page") {
+        OnbPage {
             VStack(alignment: .leading, spacing: 0) {
                 OnbHeadline(title: headline, note: isElder ? "Para ti, de tu familia" : "Who this is for")
 
@@ -163,10 +163,8 @@ struct OnboardingFlow: View {
 
 // MARK: Diary page parts shared by the onboarding pages and settings
 
-/// A diary page: two tiny caps labels at the head, content, and one action held at the foot.
+/// A diary page: content, and one action held at the foot.
 struct OnbPage<Content: View, Footer: View>: View {
-    var left: String
-    var right: String
     var back: BackButton? = nil
     @ViewBuilder var content: Content
     @ViewBuilder var footer: Footer
@@ -175,12 +173,7 @@ struct OnbPage<Content: View, Footer: View>: View {
         GeometryReader { geo in
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    if let back { back.padding(.bottom, 8) }
-                    HStack(alignment: .firstTextBaseline) {
-                        Text(left).tinyCaps()
-                        Spacer(minLength: 12)
-                        Text(right).tinyCaps()
-                    }
+                    if let back { back.padding(.bottom, 22) }
                     content
                     Spacer(minLength: 32)
                     footer
@@ -216,7 +209,6 @@ struct OnbHeadline: View {
                 .font(.serifItalic(19))
                 .foregroundStyle(Color.sub)
         }
-        .padding(.top, 22)
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isHeader)
     }
