@@ -20,6 +20,11 @@ struct EntryView: View {
 
     private var translatedKey: String { "t-\(message.id)" }
     private var originalKey: String { "o-\(message.id)" }
+    private var mine: Bool { session.isMine(message) }
+
+    /// The voice the page follows: her translation, or my own recording on a note I sent.
+    private var primaryKey: String { mine ? originalKey : translatedKey }
+    private var primarySource: PlaybackSource? { mine ? session.originalSource(message) : session.translatedSource(message) }
 
     #if DEBUG
     /// Screenshot aid: `-seekFraction 0.5` holds the entry at that point of the narration, silent.
@@ -29,16 +34,20 @@ struct EntryView: View {
     private static let simulated: Double? = nil
     #endif
 
-    private var playingTranslation: Bool {
-        session.player.isPlaying && session.player.currentKey == translatedKey
+    private var playingPrimary: Bool {
+        session.player.isPlaying && session.player.currentKey == primaryKey
+    }
+
+    private var total: Double {
+        (playingPrimary ? session.player.duration : nil) ?? Almanac.duration(message)
     }
 
     /// One clock for the film, the lit beat and the track.
     private var progress: Double {
-        Self.simulated ?? (playingTranslation ? session.player.progress : 0)
+        Self.simulated ?? (playingPrimary ? session.player.progress : 0)
     }
 
-    private var following: Bool { Self.simulated != nil || playingTranslation }
+    private var following: Bool { Self.simulated != nil || playingPrimary }
 
     private var sceneIndex: Int {
         following && !scenes.isEmpty ? StoryScene.index(in: scenes, at: progress) : 0
@@ -130,7 +139,13 @@ struct EntryView: View {
         .task(id: message.id) {
             session.markHeard(message.id)
             guard Self.simulated == nil else { return }
-            if let src = session.translatedSource(message) { session.player.play(src, key: translatedKey) }
+            if let src = primarySource { session.player.play(src, key: primaryKey) }
+        }
+        .task(id: sceneIndex) {
+            let next = sceneIndex + 1
+            guard !session.isDemo, scenes.indices.contains(next), let path = scenes[next].imagePath,
+                  let url = session.imageURL(path) else { return }
+            _ = try? await URLSession.shared.data(from: url)
         }
         .onDisappear { session.player.stop() }
     }
@@ -138,13 +153,13 @@ struct EntryView: View {
     @ViewBuilder private var film: some View {
         ZStack {
             Color.night
-            filmMedia
+            Push(seconds: pushSeconds) { filmMedia }
                 .id(sceneIndex)
-                // Dream Recorder dissolve: the next scene surfaces slowly, the last one lets go sooner.
-                .transition(.asymmetric(insertion: .opacity.animation(.easeOut(duration: 1.5)),
-                                        removal: .opacity.animation(.easeOut(duration: 0.9))))
+                // Dream Recorder dissolve: the next scene surfaces, the last one lets go a little sooner.
+                .transition(.asymmetric(insertion: .opacity.animation(.easeOut(duration: 0.7)),
+                                        removal: .opacity.animation(.easeOut(duration: 0.5))))
         }
-        .animation(.easeOut(duration: 1.5), value: sceneIndex)
+        .animation(.easeOut(duration: 0.7), value: sceneIndex)
         .saturation(0.85)
         .brightness(-0.04)
         .frame(height: 310)
@@ -179,6 +194,13 @@ struct EntryView: View {
         }
     }
 
+    /// How long the current scene is on screen while the voice plays; nil holds the frame still.
+    private var pushSeconds: Double? {
+        guard following, Self.simulated == nil, !reduceMotion, scenes.indices.contains(sceneIndex),
+              let start = scenes[sceneIndex].start, let end = scenes[sceneIndex].end, end > start else { return nil }
+        return (end - start) * total
+    }
+
     private func thumbImage(_ path: String) -> some View {
         AsyncImage(url: session.videoURL(path)) { phase in
             if case .success(let image) = phase { image.resizable().scaledToFill() } else { Color.night }
@@ -194,7 +216,7 @@ struct EntryView: View {
                 }
             }
         } else {
-            emphasized(message.translation ?? "", size: 21, color: .words, emColor: .wordsEm)
+            emphasized(message.translation ?? message.transcript ?? "", size: 21, color: .words, emColor: .wordsEm)
                 .lineSpacing(4)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -223,9 +245,9 @@ struct EntryView: View {
     private func play(from i: Int) {
         guard Self.simulated == nil, scenes.indices.contains(i) else { return }
         let start = scenes[i].start ?? 0
-        if !playingTranslation {
-            guard let src = session.translatedSource(message) else { return }
-            session.player.play(src, key: translatedKey)
+        if !playingPrimary {
+            guard let src = primarySource else { return }
+            session.player.play(src, key: primaryKey)
         }
         session.player.seek(to: start)
     }
@@ -241,7 +263,10 @@ struct EntryView: View {
                 Text(Almanac.weekdayMonth(message.date))
                     .font(.serif(19))
                     .foregroundStyle(Color.fog)
-                Text(Almanac.dateEn(message.date))
+                Text(mine ? "To \(session.partnerName)" : "From \(session.partnerName)")
+                    .font(.serif(19))
+                    .foregroundStyle(Color.fog)
+                Text(Almanac.time(message.date))
                     .tinyCaps()
             }
             .padding(.bottom, 2)
@@ -251,7 +276,6 @@ struct EntryView: View {
     }
 
     private var track: some View {
-        let total = (playingTranslation ? session.player.duration : nil) ?? Almanac.duration(message)
         let progress = following ? self.progress : 0
         return VStack(spacing: 10) {
             GeometryReader { geo in
@@ -271,18 +295,20 @@ struct EntryView: View {
             .foregroundStyle(Color.fog)
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Translation playing")
+        .accessibilityLabel(mine ? "Your recording" : "Translation playing")
         .accessibilityValue("\(Int(progress * 100)) percent")
     }
 
     private var foot: some View {
-        let playingOriginal = session.player.isPlaying && session.player.currentKey == originalKey
+        let playingOther = session.player.isPlaying && session.player.currentKey == (mine ? translatedKey : originalKey)
+        let label = mine ? (playingOther ? "Back to my voice" : "Hear it in Spanish")
+            : (playingOther ? "Back to English" : "Hear her original")
         return HStack(alignment: .firstTextBaseline) {
-            Button(playingOriginal ? "Back to English" : "Hear her original") {
-                if playingOriginal, let src = session.translatedSource(message) {
-                    session.player.play(src, key: translatedKey)
-                } else if let src = session.originalSource(message) {
-                    session.player.play(src, key: originalKey)
+            Button(label) {
+                if playingOther, let src = primarySource {
+                    session.player.play(src, key: primaryKey)
+                } else if let src = mine ? session.translatedSource(message) : session.originalSource(message) {
+                    session.player.play(src, key: mine ? translatedKey : originalKey)
                 }
             }
             .font(.serifItalic(20))
@@ -298,5 +324,21 @@ struct EntryView: View {
         }
         .buttonStyle(PressStyle())
         .frame(minHeight: 44)
+    }
+}
+
+/// A slow push into the still, held for as long as its scene is spoken.
+private struct Push<Content: View>: View {
+    var seconds: Double?
+    @ViewBuilder var content: Content
+    @State private var scale = 1.0
+
+    var body: some View {
+        content
+            .scaleEffect(scale)
+            .onChange(of: seconds != nil, initial: true) { _, on in
+                guard on, let seconds else { return }
+                withAnimation(.linear(duration: seconds)) { scale = 1.08 }
+            }
     }
 }

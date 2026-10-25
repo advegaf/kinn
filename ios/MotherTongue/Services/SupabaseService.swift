@@ -69,6 +69,29 @@ final class SupabaseService: Backend {
             .value
     }
 
+    func findThread(code: String) async throws -> ChatThread? {
+        guard let range = UUID.range(prefix: code) else { return nil }
+        let rows: [ChatThread] = try await client.from("threads")
+            .select()
+            .gte("id", value: range.lo)
+            .lte("id", value: range.hi)
+            .limit(1)
+            .execute()
+            .value
+        return rows.first
+    }
+
+    func claimThread(id: UUID, familyId: UUID) async throws -> ChatThread {
+        struct Row: Encodable { let family_id: String }
+        return try await client.from("threads")
+            .update(Row(family_id: familyId.lower))
+            .eq("id", value: id.lower)
+            .select()
+            .single()
+            .execute()
+            .value
+    }
+
     func fetchMessages(threadId: UUID) async throws -> [Message] {
         try await client.from("messages")
             .select()

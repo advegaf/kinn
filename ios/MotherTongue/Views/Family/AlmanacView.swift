@@ -3,19 +3,20 @@ import SwiftUI
 /// 01 the week: the month, this week's row with the ribbon on today, today's story, and the index.
 struct AlmanacView: View {
     var open: (UUID) -> Void
-    var settings: () -> Void
 
     @Environment(AppSession.self) private var session
 
-    private var stories: [Message] {
-        session.messages.filter { !session.isMine($0) && $0.status == .ready }.reversed()
+    /// Every ready note, hers and mine, newest first, minus the one featured above.
+    private var others: [Message] {
+        let featuredId = session.latestFromPartner?.id
+        return session.messages.filter { $0.status == .ready && $0.id != featuredId }.reversed()
     }
 
     var body: some View {
         let now = Date.now
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                head(now)
+                head
                 Text(Almanac.month(now))
                     .font(.serif(66, relativeTo: .largeTitle))
                     .tracking(-1.65)
@@ -27,7 +28,7 @@ struct AlmanacView: View {
                     .padding(.top, -5)
                 weekRow(now)
                     .padding(.top, 30)
-                if let today = stories.first {
+                if let today = session.latestFromPartner {
                     featured(today)
                         .padding(.top, 26)
                 } else {
@@ -37,7 +38,7 @@ struct AlmanacView: View {
                         .padding(.top, 26)
                 }
                 status
-                index(Array(stories.dropFirst()))
+                index(others)
                     .padding(.top, 24)
             }
             .padding(.horizontal, 30)
@@ -48,21 +49,16 @@ struct AlmanacView: View {
         .scrollIndicators(.hidden)
     }
 
-    private func head(_ now: Date) -> some View {
-        // On Sundays the ribbon hangs where the label sits, so the label steps left of it.
-        let sunday = Almanac.calendar.component(.weekday, from: now) == 1
-        return HStack(alignment: .firstTextBaseline) {
-            Text(session.isDemo ? "Rosa, Monterrey" : session.partnerName)
-                .tinyCaps()
-            Spacer()
-            Button("Settings", action: settings)
-                .tinyCaps()
-                .buttonStyle(PressStyle())
-                .frame(minHeight: 44, alignment: .trailing)
-                .contentShape(.rect)
-                .padding(.trailing, sunday ? 52 : 0)
+    private var head: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text("Kinn")
+                .font(.serif(28, relativeTo: .title))
+                .foregroundStyle(Color.ink)
+            Text("To \(session.partnerName)\(session.isDemo ? ", Monterrey" : "")")
+                .font(.serif(17))
+                .foregroundStyle(Color.soft)
         }
-        .frame(height: 22)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func weekRow(_ now: Date) -> some View {
@@ -100,17 +96,17 @@ struct AlmanacView: View {
 
     private func featured(_ m: Message) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("\(Almanac.dayEs(m.date)), \(Almanac.time(m.date))")
+            Text("\(Almanac.day(m.date)), \(Almanac.time(m.date))")
                 .tinyCaps(.soft)
             Button { open(m.id) } label: {
                 VStack(alignment: .leading, spacing: -2) {
-                    Text(Almanac.titleEs(m))
+                    Text(Almanac.titleEn(m))
                         .font(.serif(34, relativeTo: .title))
                         .tracking(-0.5)
                         .foregroundStyle(Color.ink)
                         .multilineTextAlignment(.leading)
-                    Text(Almanac.titleEn(m))
-                        .font(.serifItalic(19))
+                    Text(Almanac.titleEs(m))
+                        .font(.serifItalic(17))
                         .foregroundStyle(Color.sub)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -166,11 +162,11 @@ struct AlmanacView: View {
                             .foregroundStyle(Color.fog)
                             .frame(width: 44, alignment: .leading)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(Almanac.titleEs(m))
+                            Text(Almanac.titleEn(m))
                                 .font(.serif(19))
                                 .foregroundStyle(Color.ink)
-                            Text(Almanac.titleEn(m))
-                                .font(.serifItalic(17))
+                            Text(Almanac.titleEs(m))
+                                .font(.serifItalic(15))
                                 .foregroundStyle(Color.sub)
                         }
                         .multilineTextAlignment(.leading)

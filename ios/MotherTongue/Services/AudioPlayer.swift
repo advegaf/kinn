@@ -1,8 +1,9 @@
 import AVFoundation
 import Observation
 
-enum PlaybackSource: Equatable {
-    case url(URL)
+indirect enum PlaybackSource: Equatable {
+    /// A file to stream. `fallback` plays instead if the file 404s or never loads.
+    case url(URL, fallback: PlaybackSource? = nil)
     case speech(text: String, lang: String)
 }
 
@@ -18,6 +19,8 @@ final class AudioPlayer: NSObject {
     private var player: AVPlayer?
     private var timeObserver: Any?
     private var endObserver: NSObjectProtocol?
+    private var statusObserver: NSKeyValueObservation?
+    private var loadWatchdog: Task<Void, Never>?
     private let synth = AVSpeechSynthesizer()
     private var speechLength = 1
     private var speechText = ""
@@ -45,8 +48,19 @@ final class AudioPlayer: NSObject {
         progress = 0
         duration = nil
         switch source {
-        case .url(let url):
+        case .url(let url, let fallback):
             let item = AVPlayerItem(url: url)
+            if let fallback {
+                statusObserver = item.observe(\.status) { [weak self] item, _ in
+                    guard item.status == .failed else { return }
+                    Task { @MainActor in self?.fallBack(to: fallback, key: key, item: item) }
+                }
+                loadWatchdog = Task { [weak self] in
+                    try? await Task.sleep(for: .seconds(8))
+                    guard !Task.isCancelled, item.status != .readyToPlay else { return }
+                    self?.fallBack(to: fallback, key: key, item: item)
+                }
+            }
             let player = AVPlayer(playerItem: item)
             self.player = player
             timeObserver = player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.05, preferredTimescale: 600), queue: .main) { [weak self] time in
@@ -107,7 +121,17 @@ final class AudioPlayer: NSObject {
         synth.speak(utterance)
     }
 
+    /// The file failed to load: speak the fallback instead of sitting on a silent player.
+    private func fallBack(to source: PlaybackSource, key: String, item: AVPlayerItem) {
+        guard currentKey == key, player?.currentItem === item else { return }
+        play(source, key: key)
+    }
+
     func stop() {
+        statusObserver?.invalidate()
+        statusObserver = nil
+        loadWatchdog?.cancel()
+        loadWatchdog = nil
         if let timeObserver { player?.removeTimeObserver(timeObserver) }
         if let endObserver { NotificationCenter.default.removeObserver(endObserver) }
         timeObserver = nil

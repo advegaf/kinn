@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// 03 writing back: her line quoted, three prompts in the margin, and a disc to hold while you talk.
+/// 03 writing back: her line quoted when replying, three prompts in the margin, and a disc to hold while you talk.
 struct WriteBackView: View {
-    var message: Message
+    var message: Message?
     var close: () -> Void
     var sent: () -> Void
 
@@ -12,16 +12,21 @@ struct WriteBackView: View {
     @State private var note: String?
 
     private var recorder: AudioRecorder { session.recorder }
-    private var prompts: [String] { Array((message.askAbout ?? []).prefix(3)) }
+    private var prompts: [String] {
+        let asked = Array((message?.askAbout ?? []).prefix(3))
+        return asked.isEmpty ? ["Tell her about your day", "Tell her what you ate", "Tell her what made you laugh"] : asked
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             head
-            Text(Almanac.quote(message))
-                .font(.serifItalic(22))
-                .foregroundStyle(Color.soft)
-                .lineSpacing(5)
-                .padding(.top, 26)
+            if let message {
+                Text(Almanac.quote(message))
+                    .font(.serifItalic(22))
+                    .foregroundStyle(Color.soft)
+                    .lineSpacing(5)
+                    .padding(.top, 26)
+            }
             if !prompts.isEmpty {
                 margin.padding(.top, 26)
             }
@@ -47,8 +52,9 @@ struct WriteBackView: View {
 
     private var head: some View {
         HStack(alignment: .firstTextBaseline) {
-            Text("To \(session.partnerName), \(Almanac.dayEs(message.date))")
-                .tinyCaps()
+            Text(message == nil ? "A new note to \(session.partnerName)" : "To \(session.partnerName)")
+                .font(.serif(24, relativeTo: .title2))
+                .foregroundStyle(Color.ink)
             Spacer()
             Button("Close") {
                 if recorder.isRecording { recorder.cancel() }
@@ -59,7 +65,6 @@ struct WriteBackView: View {
             .frame(minWidth: 44, minHeight: 44, alignment: .trailing)
             .contentShape(.rect)
         }
-        .frame(height: 22)
     }
 
     private var margin: some View {
@@ -175,7 +180,7 @@ struct WriteBackView: View {
             note = "Hold a little longer"
             return
         }
-        Task { await session.send(recording: result.url) }
+        Task { await session.send(recording: result.url, replyTo: message?.id) }
         sent()
     }
 }

@@ -10,6 +10,7 @@
 		00ABE7050576014F3D62B3FE /* Backend.swift in Sources */ = {isa = PBXBuildFile; fileRef = A148432D16A5F5C99A059F3D /* Backend.swift */; };
 		030BACB98B263B0DB5469EDC /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8075A1030F44F75C7ECFA1A /* AppConfig.swift */; };
 		042F278D646CBDDEECA76B77 /* AppSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB0DA76E6FD005010B422A29 /* AppSession.swift */; };
+		076BBD297C5304FAACE04E05 /* KinnTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED65A0420DC62B765E45507D /* KinnTabBar.swift */; };
 		07F538B1AF69C543F527B4CE /* AlmanacView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85890C565D115D1C6052879F /* AlmanacView.swift */; };
 		0F3D1A356952825C95AE910C /* s1-en.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7BB525800F3967C02F367611 /* s1-en.mp3 */; };
 		102CD473BB6D9F7BA2DD84AD /* Inter-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B82A3A1453777A713F59058E /* Inter-Light.ttf */; };
@@ -115,6 +116,7 @@
 		E5794D1C5957360B6FB2F734 /* r1-en.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "r1-en.mp3"; sourceTree = "<group>"; };
 		EBFD41BD873FB4F35B63EC9D /* WriteBackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteBackView.swift; sourceTree = "<group>"; };
 		ED3758D4AF5D72D0EF952644 /* s3-en.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "s3-en.mp3"; sourceTree = "<group>"; };
+		ED65A0420DC62B765E45507D /* KinnTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KinnTabBar.swift; sourceTree = "<group>"; };
 		F6EFBB7AC63FB428B891EF22 /* r1-es.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "r1-es.mp3"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -239,6 +241,7 @@
 				5A416AB801891D4DB0E217FE /* EntryView.swift */,
 				525D5938525D22FF5814987A /* FamilyRoot.swift */,
 				4B8461CD8C2627BC579C73C5 /* Icon */,
+				ED65A0420DC62B765E45507D /* KinnTabBar.swift */,
 				EBFD41BD873FB4F35B63EC9D /* WriteBackView.swift */,
 			);
 			path = Family;
@@ -416,6 +419,7 @@
 				C0002611A70804F436AF5AEE /* FamilyRoot.swift in Sources */,
 				81F3BF7C65FBA3C6BD58DA06 /* Haptics.swift in Sources */,
 				1E8500A750F51F05BB4B944B /* HearthView.swift in Sources */,
+				076BBD297C5304FAACE04E05 /* KinnTabBar.swift in Sources */,
 				1A4882A618E8ACF8513F7395 /* Models.swift in Sources */,
 				BBDFCBCBBF418825A97635E0 /* MotherTongueApp.swift in Sources */,
 				1E2E7FA297E3E07B32657A88 /* OnboardingFlow.swift in Sources */,

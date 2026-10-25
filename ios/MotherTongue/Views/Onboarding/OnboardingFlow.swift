@@ -17,12 +17,13 @@ struct OnboardingFlow: View {
 
     private var isElder: Bool { role == .elder }
     private var trimmedName: String { name.trimmingCharacters(in: .whitespaces) }
+    private func languageLabel(_ code: String) -> String { isElder ? endonym(code) : languageName(code) }
 
     var body: some View {
         ZStack {
             switch step {
             case .welcome: welcome.transition(.fade)
-            case .pair: PairView { advance(to: .voice) }.transition(.fade)
+            case .pair: PairView { joined in joined ? finish() : advance(to: .voice) }.transition(.fade)
             case .voice: VoiceEnrollView(onDone: finish).transition(.fade)
             }
         }
@@ -33,11 +34,21 @@ struct OnboardingFlow: View {
     }
 
     #if DEBUG
-    /// Debug screenshots only: `-onboardingStep pair|voice` skips ahead.
+    /// Debug screenshots only: `-onboardingStep pair|voice` skips ahead, and with `-pairCode XXXXXX`
+    /// the family phone joins that thread by code, as typing it on the pair page would.
     private func jumpForScreenshot() async {
         guard let target = UserDefaults.standard.string(forKey: "onboardingStep"), step == .welcome else { return }
         session.configureBackend()
-        try? await session.createProfile(name: name.isEmpty ? "Sofia" : name, role: role, lang: lang)
+        try? await session.createProfile(name: name.isEmpty ? "Angel" : name, role: role, lang: role == .family ? "en" : lang)
+        if let code = UserDefaults.standard.string(forKey: "pairCode"), role == .family {
+            do {
+                try await session.join(code: code)
+                finish()
+            } catch {
+                self.error = error.localizedDescription
+            }
+            return
+        }
         if target != "voice", role == .family, session.thread == nil { try? await session.createThread() }
         step = target == "voice" ? .voice : .pair
     }
@@ -45,8 +56,8 @@ struct OnboardingFlow: View {
 
     private var headline: String {
         if isElder { return "Tu Hearth" }
-        if let partner = session.partner?.name, !partner.isEmpty { return "Para Abuela \(partner)" }
-        return "Para tu abuela"
+        if let partner = session.partner?.name, !partner.isEmpty { return "For Grandma \(partner)" }
+        return "For your grandma"
     }
 
     private var welcome: some View {
@@ -56,8 +67,8 @@ struct OnboardingFlow: View {
 
                 VStack(spacing: 0) {
                     Hairline()
-                    DiaryFormRow(key: isElder ? "Nombre" : "De", note: isElder ? "Name" : "From") {
-                        TextField("", text: $name, prompt: Text(isElder ? "Rosa" : "Sof\u{ED}a").foregroundStyle(Color.faint))
+                    DiaryFormRow(key: isElder ? "Nombre" : "From", note: isElder ? "Name" : "Your name") {
+                        TextField("", text: $name, prompt: Text(isElder ? "Margaret" : "Angel").foregroundStyle(Color.faint))
                             .textContentType(.givenName)
                             .font(.serif(26))
                             .foregroundStyle(Color.ink)
@@ -65,9 +76,18 @@ struct OnboardingFlow: View {
                             .submitLabel(.done)
                     }
                     if !isElder {
-                        DiaryFormRow(key: "Ella habla", note: "She speaks") { LanguageMenu(selection: $herLang) }
+                        DiaryFormRow(key: "She speaks", note: "Her language") { LanguageMenu(selection: $herLang, name: languageName) }
                     }
-                    DiaryFormRow(key: isElder ? "Hablas" : "T\u{FA} hablas", note: "You speak") { LanguageMenu(selection: $lang) }
+                    if isElder {
+                        DiaryFormRow(key: "Hablas", note: "You speak") { LanguageMenu(selection: $lang, name: languageLabel) }
+                    } else {
+                        DiaryFormRow(key: "You speak", note: "Your language") {
+                            Text("English")
+                                .font(.serif(26))
+                                .foregroundStyle(Color.ink)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
                 }
                 .padding(.top, 26)
 
@@ -120,7 +140,7 @@ struct OnboardingFlow: View {
             defer { busy = false }
             session.configureBackend()
             do {
-                try await session.createProfile(name: trimmedName, role: role, lang: lang)
+                try await session.createProfile(name: trimmedName, role: role, lang: role == .family ? "en" : lang)
                 advance(to: .pair)
             } catch {
                 self.error = error.localizedDescription
@@ -165,6 +185,7 @@ struct OnbPage<Content: View, Footer: View>: View {
                 .frame(maxWidth: 560, minHeight: geo.size.height, alignment: .top)
                 .frame(maxWidth: .infinity)
             }
+            .scrollIndicators(.hidden)
             .scrollDismissesKeyboard(.interactively)
             .screenshotAnchor()
         }
@@ -220,15 +241,17 @@ struct DiaryFormRow<Value: View>: View {
 /// The language, written as a word. Tapping it opens the choices.
 struct LanguageMenu: View {
     @Binding var selection: String
+    /// How each language is written: its endonym on the Hearth, English names on the family phone.
+    var name: (String) -> String = endonym
     private let options = ["es", "en"]
 
     var body: some View {
         Menu {
             Picker("Language", selection: $selection) {
-                ForEach(options, id: \.self) { Text(endonym($0)).tag($0) }
+                ForEach(options, id: \.self) { Text(name($0)).tag($0) }
             }
         } label: {
-            Text(endonym(selection))
+            Text(name(selection))
                 .font(.serif(26))
                 .foregroundStyle(Color.ink)
                 .frame(maxWidth: .infinity, alignment: .leading)

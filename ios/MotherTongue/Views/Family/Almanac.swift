@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Calendar math and the bilingual date lines the almanac prints.
+/// Calendar math and the date lines the almanac prints, in English.
 enum Almanac {
-    static let weekdays = ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"]
+    static let weekdays = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 
     static let calendar: Calendar = {
         var c = Calendar(identifier: .iso8601)
@@ -13,12 +13,11 @@ enum Almanac {
     private static let formatters: [String: DateFormatter] = {
         var out: [String: DateFormatter] = [:]
         for (key, locale, format) in [
-            ("month", "es_MX", "LLLL"),
-            ("dayEs", "es_MX", "EEEE d"),
-            ("weekdayMonth", "es_MX", "EEEE, MMMM"),
+            ("month", "en_US", "LLLL"),
+            ("day", "en_US", "EEEE d"),
+            ("weekdayMonth", "en_US", "EEEE, MMMM"),
             ("monthYearEn", "en_US", "MMMM yyyy"),
-            ("dateEn", "en_US", "EEEE, MMMM d"),
-            ("time", "en_US", "h:mm")
+            ("time", "en_US", "h:mm a")
         ] {
             let f = DateFormatter()
             f.locale = Locale(identifier: locale)
@@ -32,19 +31,17 @@ enum Almanac {
         formatters[key]!.string(from: date)
     }
 
-    /// "octubre"
+    /// "October"
     static func month(_ d: Date) -> String { format("month", d) }
-    /// "sábado 24"
-    static func dayEs(_ d: Date) -> String { format("dayEs", d) }
-    /// "sábado, octubre"
+    /// "Saturday 24"
+    static func day(_ d: Date) -> String { format("day", d) }
+    /// "Saturday, October"
     static func weekdayMonth(_ d: Date) -> String { format("weekdayMonth", d) }
-    /// "Saturday, October 24"
-    static func dateEn(_ d: Date) -> String { format("dateEn", d) }
-    /// "2:48"
+    /// "2:48 PM"
     static func time(_ d: Date) -> String { format("time", d) }
-    /// "October 2026, semana 43"
+    /// "October 2026, week 43"
     static func monthLine(_ d: Date) -> String {
-        "\(format("monthYearEn", d)), semana \(calendar.component(.weekOfYear, from: d))"
+        "\(format("monthYearEn", d)), week \(calendar.component(.weekOfYear, from: d))"
     }
 
     static func dayNumber(_ d: Date) -> Int { calendar.component(.day, from: d) }
@@ -55,14 +52,27 @@ enum Almanac {
         return (0..<7).compactMap { calendar.date(byAdding: .day, value: $0, to: start) }
     }
 
-    /// Spanish title for the index, English for the subtitle. Falls back to the opening words.
+    /// The Spanish title, shown small under the English one. Falls back to the opening words.
     static func titleEs(_ m: Message) -> String {
-        m.story?.titleEs ?? m.story?.title ?? openingWords(m.transcript ?? m.translation ?? "")
+        title(m.story?.titleEs, text(m, english: false), or: "traducci\u{F3}n pendiente")
     }
 
     static func titleEn(_ m: Message) -> String {
-        if let t = m.story?.title, m.story?.titleEs != nil { return t }
-        return openingWords(m.translation ?? "")
+        title(m.story?.title, text(m, english: true), or: "A note to Margaret")
+    }
+
+    private static func text(_ m: Message, english: Bool) -> String {
+        let own = m.sourceLang == "en" ? m.transcript : m.translation
+        let other = m.sourceLang == "en" ? m.translation : m.transcript
+        let first = english ? own : other
+        let second = english ? other : own
+        return [first, second].compactMap { $0 }.first { !$0.isEmpty } ?? ""
+    }
+
+    private static func title(_ story: String?, _ text: String, or empty: String) -> String {
+        if let story, !story.isEmpty { return story }
+        let words = openingWords(text)
+        return words.isEmpty ? empty : words
     }
 
     private static func openingWords(_ text: String) -> String {
@@ -79,7 +89,7 @@ enum Almanac {
     /// The line quoted at the top of a reply: the italic run if there is one, else the last sentence,
     /// cut at a comma so it stays short.
     static func quote(_ m: Message) -> String {
-        let text = m.translation ?? ""
+        let text = m.translation ?? m.transcript ?? ""
         let parts = text.split(separator: "*", omittingEmptySubsequences: false)
         var line = parts.count > 2 ? String(parts[1]) : String(text.unmarked.split(separator: ".").last ?? "")
         line = line.trimmingCharacters(in: .whitespaces.union(.punctuationCharacters))

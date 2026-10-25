@@ -2,7 +2,8 @@ import SwiftUI
 
 struct PairView: View {
     @Environment(AppSession.self) private var session
-    var onDone: () -> Void
+    /// `joinedByCode` is true when the family phone joined an existing thread, so there is no voice step.
+    var onDone: (_ joinedByCode: Bool) -> Void
 
     @State private var openThreads: [OpenThread] = []
     @State private var code = ""
@@ -44,11 +45,28 @@ struct PairView: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.top, 30)
 
+                VStack(alignment: .leading, spacing: 0) {
+                    Hairline()
+                    Text("Already connected? Type the code from her Hearth.")
+                        .font(.serifItalic(18))
+                        .foregroundStyle(Color.soft)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.top, 18)
+                    CodeEntry(code: $code, label: "Family code").padding(.top, 18)
+                }
+                .padding(.top, 30)
+
                 if let error { OnbNotice(text: error).padding(.top, 20) }
             }
             .animation(.enter, value: session.thread?.code)
         } footer: {
-            slab("Next, your voice", enabled: session.thread != nil) { onDone() }
+            if code.count >= 4 {
+                slab("Join with this code", enabled: true) {
+                    run(joinedByCode: true) { try await session.join(code: code) }
+                }
+            } else {
+                slab("Next, your voice", enabled: session.thread != nil) { onDone(false) }
+            }
         }
     }
 
@@ -138,7 +156,7 @@ struct PairView: View {
         run { try await session.join(thread) }
     }
 
-    private func run(_ work: @escaping () async throws -> Void) {
+    private func run(joinedByCode: Bool = false, _ work: @escaping () async throws -> Void) {
         busy = true
         error = nil
         Task {
@@ -146,7 +164,7 @@ struct PairView: View {
             do {
                 try await work()
                 Haptics.arrival()
-                onDone()
+                onDone(joinedByCode)
             } catch {
                 Haptics.error()
                 self.error = error.localizedDescription
@@ -194,6 +212,7 @@ struct CodeSlots: View {
 /// Code slots with a hidden field on top, for typing on the Hearth.
 struct CodeEntry: View {
     @Binding var code: String
+    var label = "C\u{F3}digo"
     @FocusState private var focused: Bool
 
     var body: some View {
@@ -207,7 +226,7 @@ struct CodeEntry: View {
                     .foregroundStyle(.clear)
                     .tint(.clear)
                     .focused($focused)
-                    .accessibilityLabel("C\u{F3}digo")
+                    .accessibilityLabel(label)
             }
             .contentShape(.rect)
             .onTapGesture { focused = true }
