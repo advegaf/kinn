@@ -5,7 +5,7 @@
 <h1 align="center">Kinn</h1>
 
 <p align="center">
-  Grandma tells a story in Spanish. Her granddaughter hears it in English, in her grandma's own voice, and watches it come alive.
+  Grandma tells a story in Spanish. Her grandson hears it in English, in her own voice, and watches it come alive.
 </p>
 
 <p align="center">
@@ -28,25 +28,25 @@
 > AI translates what each of them says, speaks it in the speaker's own voice, and turns her stories into short films.\
 > You can [try the Hearth in your browser](https://mothertongue-hearth.netlify.app/?demo=1) now, no account needed.
 
-Rosa lives in Monterrey. Her granddaughter Sofía lives in Austin, and the
-Spanish Sofía has is mostly "te quiero". They love each other and they cannot
+Margaret lives in Monterrey. Her grandson Angel lives in Austin, and the
+Spanish Angel has is mostly "te quiero". They love each other and they cannot
 really talk.
 
-One morning Rosa sits at her kitchen table and taps the frame on the shelf.
+One morning Margaret sits at her kitchen table and taps the frame on the shelf.
 There is nothing to press and nothing to set up. She tells the story of
 Christmas when she was a girl: her mother waking her and her sister Lupe at
 five, the kitchen dark and smelling of firewood, the yellow bulb over the
 table, "ándale, que la masa no espera". The two girls sat on the floor with
 the husks in their laps, still damp and warm, and spread the masa thin with
 the back of a spoon. Her mother sang very low so their father would keep
-sleeping. "Y ya no hay nadie a quien despertar, mija."
+sleeping. "Y ya no hay nadie a quien despertar, mijo."
 
-An hour later Sofía opens her phone in Austin. She hears the story in English,
-in her grandmother's own voice, while the kitchen at dawn fades in scene by
-scene. She listens twice. Then she holds the button and asks: will you teach
+An hour later Angel opens his phone in Austin. He hears the story in English,
+in his grandmother's own voice, while the kitchen at dawn fades in scene by
+scene. He listens twice. Then he holds the button and asks: will you teach
 me this Christmas, at five in the morning? What song was she singing? In
-Monterrey the frame says "Sofía te escribió", and Rosa hears the question in
-Spanish, in Sofía's voice.
+Monterrey the frame says "Angel te escribió", and Margaret hears the question in
+Spanish, in Angel's voice.
 
 Kids of immigrants often lose the language their family speaks at home. School
 is in English and the parents are working, so by the time the kids are old
@@ -54,10 +54,33 @@ enough to want the family history, the words for it are gone.
 
 The grandparents are the ones who hold the stories, and those stories go when
 they do. Translation apps exist, but nobody tells a story about their mother
-into a translation app. Kinn is two objects, one for each side. Rosa
-gets the Hearth, a framed screen that does one thing. Sofía gets the Almanac,
-an app on her iPhone. Everything said between them crosses the language gap in
+into a translation app. Kinn is two objects, one for each side. Margaret
+gets the Hearth, a framed screen that does one thing. Angel gets the Almanac,
+an app on his iPhone. Everything said between them crosses the language gap in
 the speaker's own voice.
+
+## The voice notes are already there
+
+Meta asked how AI can bring people closer together. Families like Margaret's
+already send each other voice notes, and WhatsApp carries billions of them a
+day. Portal showed that a family will put a simple screen in a grandparent's
+kitchen if it does one thing well. What neither one fixes is language. Margaret
+can send Angel a voice note today, and Angel can play it, and he still won't
+understand most of it.
+
+Kinn is one tap that carries a voice note across that gap in the sender's own
+voice. When Margaret talks to the Hearth, ElevenLabs Scribe turns her Spanish into
+text. An LLM translates it into English and keeps the warmth in, so "mijo"
+stays mijo. The same LLM splits her story into five beats and suggests what
+Angel could ask her next. ElevenLabs speaks the English in a clone of Margaret's
+voice, and Luma ray-3.2 makes a short scene for each beat. Angel's reply runs
+the same way back, into Spanish, in his voice. Take the AI out and these two
+people can't talk.
+
+None of it needs new hardware. The Hearth is a tablet in a frame and the
+Almanac is one app. The same tap could be a button on a voice note in WhatsApp
+or Instagram: Margaret records in Spanish and Angel hears English in his
+grandmother's voice, inside the app where they already talk.
 
 ## The Hearth
 
@@ -66,7 +89,7 @@ the speaker's own voice.
 </p>
 
 The Hearth is an Alexa Tablet 8 (2026) running our web app inside our own
-Android kiosk app. It has no buttons. Rosa taps the screen to talk, and taps
+Android kiosk app. It has no buttons. Margaret taps the screen to talk, and taps
 again when she is done.
 
 <p align="center">
@@ -74,7 +97,7 @@ again when she is done.
 </p>
 
 Most of the day it shows the date in a big serif numeral. When her
-granddaughter has written back it says "Sofía te escribió". While she talks it
+grandson has written back it says "Angel te escribió". While she talks it
 says "te escucho" with a REC counter. Her stories play back as films whose
 scenes change with her voice, with the Spanish line on screen.
 
@@ -113,7 +136,7 @@ voice narrates, and the sentence being spoken is highlighted.
 Hear her original plays her real voice, in Spanish, so the translation never
 replaces her. Write back offers three questions to ask her, drawn from what she
 just said. Hold to record. She hears the reply in Spanish, in her
-granddaughter's own voice.
+grandson's own voice.
 
 <p align="center">
   <img src="docs/images/iphone-write.png" width="300" alt="The Write back screen with three suggested questions and a hold to record button">
@@ -144,7 +167,8 @@ away. Everyone filmed for the demo signed [docs/CONSENT.md](docs/CONSENT.md).
 
 ## Run it yourself
 
-Each part has its own README with the detail. This is the short version.
+Each part has its own README with the detail. This is the short version. The
+two-device run we show judges is in [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md).
 
 The backend, on a hosted Supabase project:
 

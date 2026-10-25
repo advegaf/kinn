@@ -16,7 +16,7 @@ Title: **Kinn.** Talk to the people you love in the language they love.
 
 1. Grandma taps the Hearth's screen and tells a short story in Spanish. The screen shows a gentle "listening" state.
 2. The grandkid's phone buzzes. The voice note plays in English, **in grandma's own voice**. Show the "translated voice" badge and tap to hear the original Spanish.
-3. Show a cultural note chip ("mija: an endearment, like 'my dear daughter'") and the "Ask her about..." chips.
+3. Show a cultural note chip ("mijo: an endearment, like 'my dear son'") and the "Ask her about..." chips.
 4. The grandkid taps "Ask her about the bakery in Monterrey" and records a reply in English, in their own words.
 5. Back in the kitchen, the Hearth glows. Grandma taps the screen and hears her grandkid's voice speaking Spanish. Hold on her reaction. Don't cut early.
 6. Her story comes back as 5 Luma scenes that develop with her voice: the Hearth replays it and each scene changes as she reaches that part of the story. A keepsake of grandma's stories.

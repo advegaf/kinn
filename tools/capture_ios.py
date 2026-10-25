@@ -3,7 +3,7 @@
 Usage: python3 tools/capture_ios.py <outdir> [--build]
 Needs a booted simulator (UDID below, override with SIM_UDID). With --build it first builds the app
 into ios/build/DD-media and installs it. Every shot terminates the app, waits 2 s, launches it in
-demo mode as Sofia (family, English) with extra launch arguments, waits 9 s, then screenshots:
+demo mode as Angel (family, English) with extra launch arguments, waits 9 s, then screenshots:
   week.png         the Almanac week view (no extra args)
   write.png        -writingBack YES
   first.png        -onboarded NO (first screen of onboarding)
@@ -19,7 +19,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UDID = os.environ.get("SIM_UDID", "A9EFBF02-6A11-46D6-A702-43AE720AE49B")
 BUNDLE = "com.hacktx.mothertongue"
 APP = os.path.join(ROOT, "ios/build/DD-media/Build/Products/Debug-iphonesimulator/MotherTongue.app")
-BASE = ["-demoMode", "YES", "-onboarded", "YES", "-role", "family", "-name", "Sofia", "-lang", "en"]
+BASE = ["-demoMode", "YES", "-onboarded", "YES", "-role", "family", "-name", "Angel", "-lang", "en"]
 ENTRY_FRAMES = 30
 
 

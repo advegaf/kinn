@@ -8,11 +8,11 @@ and the grandparents who hold the family stories cannot tell them.
 
 We built two objects. The Hearth is a framed tablet for the grandmother's
 kitchen. It has no buttons: she taps the screen and tells a story in Spanish.
-The Almanac is an iPhone app for her granddaughter, who hears that story in
-English, in her grandmother's own voice, while it plays as a short film whose
-scenes change as she speaks. The granddaughter can play the original Spanish,
-then record a reply that her grandmother hears in Spanish, in the
-granddaughter's voice.
+The Almanac is an iPhone app for her grandson, who hears that story in
+English, in his grandmother's own voice, while it plays as a short film whose
+scenes change as she speaks. The grandson can play the original Spanish,
+then record a reply that his grandmother hears in Spanish, in the
+grandson's voice.
 
 AI handles each step between them. ElevenLabs Scribe turns speech into text. OpenAI GPT-6
 Luna, run through the Codex CLI on a ChatGPT subscription,
@@ -25,20 +25,20 @@ one tap away, so the translation never replaces her.
 
 ## Video outline (2 to 3 minutes)
 
-Problem, 30 s. Rosa in Monterrey, Sofía in Austin. Sofía knows "te quiero" and
-little else. The stories are in Rosa's head and in Spanish, and a translation
+Problem, 30 s. Margaret in Monterrey, Angel in Austin. Angel knows "te quiero" and
+little else. The stories are in Margaret's head and in Spanish, and a translation
 app is not where anyone tells a story about their mother.
 
-Demo, 90 s. The Hearth on the shelf showing the date. Rosa taps, "te escucho"
+Demo, 90 s. The Hearth on the shelf showing the date. Margaret taps, "te escucho"
 and the REC counter, she tells the tamales story. Cut to the iPhone: the week
 calendar with the oxblood ribbon on today, the story opens, the dawn kitchen
 fades in and the scenes change with her voice in English while the spoken
 sentence is highlighted. Tap Hear her original for a few seconds of Spanish.
 Write back, pick "What song did your mother sing while you worked?", hold to
-record. Back on the Hearth: "Sofía te escribió", Rosa taps and hears the
-question in Spanish in Sofía's voice.
+record. Back on the Hearth: "Angel te escribió", Margaret taps and hears the
+question in Spanish in Angel's voice.
 
-How AI is used, 30 s. Speech to text, a translation that keeps "mija" and adds
+How AI is used, 30 s. Speech to text, a translation that keeps "mijo" and adds
 cultural notes, three questions to ask her, five scenes generated from her
 words, and each person's own cloned voice in the other language. Mention
 consent: voices only from samples they recorded, used only in their thread.

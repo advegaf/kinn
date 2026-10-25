@@ -44,9 +44,9 @@ f_btn = ImageFont.truetype(serif, 54)
 f_sm = ImageFont.truetype(sans, 30)
 
 d.text((cx, cy + 6), "Escuchar", font=f_btn, fill=(80, 34, 22), anchor="mm")
-d.text((90, 250), "Buenas tardes, Rosa", font=f_big, fill=(252, 240, 222))
+d.text((90, 250), "Buenas tardes, Margaret", font=f_big, fill=(252, 240, 222))
 d.text((92, 330), "Tamales en Monterrey", font=f_it, fill=(240, 214, 186))
-d.text((92, 400), "Mensaje nuevo de Sofia", font=f_sm, fill=(245, 232, 214))
+d.text((92, 400), "Mensaje nuevo de Angel", font=f_sm, fill=(245, 232, 214))
 
 rng = random.Random(4)
 px = strip.load()

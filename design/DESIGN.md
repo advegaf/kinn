@@ -62,7 +62,7 @@ Inter 400, 11px, line-height 1, tracking .08em, uppercase, `fog`, no wrap. Varia
 | Role | Face | Size / line-height | Tracking | Color |
 | --- | --- | --- | --- | --- |
 | Month display ("octubre") | Serif | 66 / .95 | -.025em | ink |
-| Page title ("Para Abuela Rosa") | Serif | 52 / 1.02 | -.025em | ink |
+| Page title ("Para Abuela Margaret") | Serif | 52 / 1.02 | -.025em | ink |
 | Day numeral, playback header | Serif | 80 / .8 | -.03em | cream |
 | Week row numerals | Serif | 40 / 1 | 0 | soft, today ink, later `later` |
 | Featured title | Serif | 34 / 1.02 | -.015em | ink |
@@ -94,14 +94,14 @@ Hearth frames are authored at 1280 x 400, which is exactly the default strip on 
 | Idle month ("octubre") | Serif | 46 | 11.5 | 1 | 0 | `#57544F`, 12px below weekday |
 | Idle clock ("7:42") | Serif | 110 | 27.5 | 1 | 0 | `#57544F`, right aligned |
 | Waiting label ("SÁBADO 24, 7:42") | Inter 400 caps | 24 | 6 | 1 | .08em | fog |
-| Waiting headline ("Sofía te escribió") | Serif | 112 | 28 | 1 | -.02em | cream, 22px below label |
+| Waiting headline ("Angel te escribió") | Serif | 112 | 28 | 1 | -.02em | cream, 22px below label |
 | Waiting sub ("sobre «...»") | Serif italic | 46 | 11.5 | 1.1 | 0 | fog, 16px below |
 | Recording headline ("te escucho") | Serif italic | 116 | 29 | 1 | -.02em | cream |
 | Recording prompt | Serif italic | 44 | 11 | 1.1 | 0 | fog, 18px below |
 | REC label | Inter 500 caps | 24 | 6 | 1 | .12em | `#C9584B`, dot 22px `rec`, gap 16 |
 | Flip counter digits | Inter 400 | 52 | 13 | 1 | 0 | cream, colon fog |
 | Flip counter cell | | 52 x 76, radius 8, gap 6 | 13u x 19u | | | `#1C1B19`, inset shadow `0 2px 6px rgba(0,0,0,.7)`, top hairline `0 1px 0 rgba(255,255,255,.06)` |
-| Playing stamp ("de Sofía, sábado 24") | Serif italic | 44 | 11 | 1 | 0 | `rgba(236,230,220,.82)`, at left 90, top 56 |
+| Playing stamp ("de Angel, sábado 24") | Serif italic | 44 | 11 | 1 | 0 | `rgba(236,230,220,.82)`, at left 90, top 56 |
 | Playing caption | Serif | 56 | 14 | 1.1 | 0 | cream, shadow `0 2px 30px rgba(0,0,0,.6)`, left 90, right 160, bottom 60, balance |
 
 Hearth layout: side padding 120px (30u); idle row is numeral, then weekday stack 40px to its right (padding-left 110px), clock pushed to the far right. Waiting is a left aligned column, vertically centered. Recording is headline column left, REC plus counter right aligned on the right, 26px apart.
