@@ -14,7 +14,8 @@ scenes change as she speaks. The granddaughter can play the original Spanish,
 then record a reply that her grandmother hears in Spanish, in the
 granddaughter's voice.
 
-AI handles each step between them. ElevenLabs Scribe turns speech into text. Meta Muse Spark
+AI handles each step between them. ElevenLabs Scribe turns speech into text. OpenAI GPT-6
+Luna, run through the Codex CLI on a ChatGPT subscription,
 translates it while keeping endearments, adds cultural notes, suggests three
 questions to ask her, and splits each story into five scenes with film prompts.
 ElevenLabs voice clones, made only from samples each person records, speak the
@@ -43,7 +44,8 @@ words, and each person's own cloned voice in the other language. Mention
 consent: voices only from samples they recorded, used only in their thread.
 
 Tools and models, 30 s. ElevenLabs Scribe and Instant Voice Clone with
-eleven_multilingual_v2, Meta Muse Spark (muse-spark-1.3), Luma ray-3.2 through
+eleven_multilingual_v2, OpenAI GPT-6 Luna through the Codex CLI on a ChatGPT
+subscription (a small relay on our PC), Luma ray-3.2 through
 the Agents API, Supabase Postgres, storage, realtime and edge functions, a
 SwiftUI iPhone app, a web app in our Android kiosk on an Alexa Tablet 8, and the
 printed case. Built with Claude Code as coordinator and parallel subagents.

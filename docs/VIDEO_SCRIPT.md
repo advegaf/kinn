@@ -31,7 +31,7 @@ Consent line: "Voices are cloned only from a sample each person records themselv
 
 ## 2:30 to 2:50 Tools and build
 
-Name the stack plainly: ElevenLabs Scribe for speech to text, Meta Muse Spark (`muse-spark-1.3`) for translation and notes, an ElevenLabs voice clone for the translated voice, Luma `ray-3.2` for the story scenes, Supabase realtime and edge functions, SwiftUI on iPhone and iPad, the Hearth web app on Netlify. Mention Claude Code as the build harness and how it helped (parallel agents for backend and iOS, contract-first). Only say Muse Spark ran live if it did on the day; it has not been verified end to end yet.
+Name the stack plainly: ElevenLabs Scribe for speech to text, OpenAI GPT-6 Luna through the Codex CLI on a ChatGPT subscription for translation, notes, questions and the five scenes, an ElevenLabs voice clone for the translated voice, Luma `ray-3.2` for the story scenes, Supabase realtime and edge functions, SwiftUI on iPhone and iPad, the Hearth web app on Netlify. Mention Claude Code as the build harness and how it helped (parallel agents for backend and iOS, contract-first).
 
 Close on Meta fit: "Portal proved families want a simple device for grandparents. WhatsApp already carries billions of voice notes a day. Kinn is one tap on a voice note: hear it in your language."
 
