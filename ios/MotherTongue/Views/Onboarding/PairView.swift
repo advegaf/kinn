@@ -44,6 +44,7 @@ struct PairView: View {
                 .foregroundStyle(Color.soft)
                 .frame(minHeight: 44)
                 .buttonStyle(PressStyle())
+                .accessibilityIdentifier("onboarding.skipPairing")
                 .disabled(busy)
             }
         }

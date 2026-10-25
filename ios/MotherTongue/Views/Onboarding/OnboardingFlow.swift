@@ -78,6 +78,7 @@ struct OnboardingFlow: View {
                             .foregroundStyle(Color.ink)
                             .tint(.ink)
                             .submitLabel(.done)
+                            .accessibilityIdentifier("onboarding.name")
                     }
                     if !isElder {
                         DiaryFormRow(key: "She speaks", note: "Her language") { LanguageMenu(selection: $herLang, name: languageName) }
@@ -110,6 +111,7 @@ struct OnboardingFlow: View {
                     }
                 }
                 .tint(.ink)
+                .accessibilityIdentifier("onboarding.demoMode")
                 .padding(.top, 34)
 
                 if !AppConfig.isConfigured && !demoMode {
@@ -126,6 +128,7 @@ struct OnboardingFlow: View {
                 }
             }
             .buttonStyle(SlabButtonStyle())
+            .accessibilityIdentifier("onboarding.begin")
             .disabled(busy || trimmedName.isEmpty)
             .opacity(busy || trimmedName.isEmpty ? 0.45 : 1)
         }

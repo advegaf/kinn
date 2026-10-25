@@ -21,6 +21,20 @@
                ReferencedContainer = "container:MotherTongue.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "900C7B4741F572BA87AD6CE3"
+               BuildableName = "MotherTongueUITests.xctest"
+               BlueprintName = "MotherTongueUITests"
+               ReferencedContainer = "container:MotherTongue.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -39,7 +53,20 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "900C7B4741F572BA87AD6CE3"
+               BuildableName = "MotherTongueUITests.xctest"
+               BlueprintName = "MotherTongueUITests"
+               ReferencedContainer = "container:MotherTongue.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <CommandLineArguments>
+      </CommandLineArguments>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"

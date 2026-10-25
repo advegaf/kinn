@@ -126,6 +126,7 @@ struct EntryView: View {
             }
             Vignette()
             BackButton(color: .cream, action: back)
+                .accessibilityIdentifier("entry.back")
                 .shadow(color: .black.opacity(0.6), radius: 8)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 30)
@@ -291,6 +292,7 @@ struct EntryView: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(mine ? "Your recording" : "Translation playing")
         .accessibilityValue("\(Int(progress * 100)) percent")
+        .accessibilityIdentifier("entry.track")
     }
 
     private var foot: some View {
@@ -305,6 +307,7 @@ struct EntryView: View {
                     session.player.play(src, key: mine ? translatedKey : originalKey)
                 }
             }
+            .accessibilityIdentifier("entry.original")
             .font(.serif(20))
             .foregroundStyle(Color.wordsEm)
             .dottedUnderline(.wordsEm)
@@ -312,6 +315,7 @@ struct EntryView: View {
             Button(action: writeBack) {
                 Text("Write back to \(session.partnerName)").font(.serif(21)).foregroundStyle(Color.cream)
             }
+            .accessibilityIdentifier("entry.writeBack")
         }
         .buttonStyle(PressStyle())
         .frame(minHeight: 44)
