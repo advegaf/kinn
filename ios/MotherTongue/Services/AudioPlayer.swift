@@ -15,6 +15,8 @@ final class AudioPlayer: NSObject {
     private(set) var progress: Double = 0
     /// Real length of the playing file, once AVPlayer knows it. Nil for speech.
     private(set) var duration: Double?
+    /// The key whose file failed to load and had no fallback to play instead.
+    private(set) var failedKey: String?
 
     private var player: AVPlayer?
     private var timeObserver: Any?
@@ -40,6 +42,7 @@ final class AudioPlayer: NSObject {
 
     func play(_ source: PlaybackSource, key: String) {
         stop()
+        failedKey = nil
         try? AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothA2DP])
         try? AVAudioSession.sharedInstance().setActive(true)
         currentKey = key
@@ -49,16 +52,14 @@ final class AudioPlayer: NSObject {
         switch source {
         case .url(let url, let fallback):
             let item = AVPlayerItem(url: url)
-            if let fallback {
-                statusObserver = item.observe(\.status) { [weak self] item, _ in
-                    guard item.status == .failed else { return }
-                    Task { @MainActor in self?.fallBack(to: fallback, key: key, item: item) }
-                }
-                loadWatchdog = Task { [weak self] in
-                    try? await Task.sleep(for: .seconds(8))
-                    guard !Task.isCancelled, item.status != .readyToPlay else { return }
-                    self?.fallBack(to: fallback, key: key, item: item)
-                }
+            statusObserver = item.observe(\.status) { [weak self] item, _ in
+                guard item.status == .failed else { return }
+                Task { @MainActor in self?.fallBack(to: fallback, key: key, item: item) }
+            }
+            loadWatchdog = Task { [weak self] in
+                try? await Task.sleep(for: .seconds(8))
+                guard !Task.isCancelled, item.status != .readyToPlay else { return }
+                self?.fallBack(to: fallback, key: key, item: item)
             }
             let player = AVPlayer(playerItem: item)
             self.player = player
@@ -120,10 +121,13 @@ final class AudioPlayer: NSObject {
         synth.speak(utterance)
     }
 
-    /// The file failed to load: speak the fallback instead of sitting on a silent player.
-    private func fallBack(to source: PlaybackSource, key: String, item: AVPlayerItem) {
+    /// The file failed to load: play the fallback, or stop and mark the key as failed.
+    private func fallBack(to source: PlaybackSource?, key: String, item: AVPlayerItem) {
         guard currentKey == key, player?.currentItem === item else { return }
-        play(source, key: key)
+        if let source { play(source, key: key) } else {
+            stop()
+            failedKey = key
+        }
     }
 
     func stop() {

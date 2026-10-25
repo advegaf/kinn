@@ -227,6 +227,15 @@ struct Message: Codable, Identifiable, Hashable, Sendable {
         return Self.parse(createdAt) ?? .now
     }
 
+    /// When to stop waiting for the film and play over the stills. Nil when no film is being made.
+    /// Luma takes 60 to 90 s, so 3 min means the film is late or lost.
+    var filmDeadline: Date? {
+        guard let status = story?.status, status == "pending" || status == "generating" else { return nil }
+        return date.addingTimeInterval(180)
+    }
+
+    func isMakingFilm(at now: Date = .now) -> Bool { filmDeadline.map { $0 > now } ?? false }
+
     nonisolated(unsafe) private static let isoFractional: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()
         f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
