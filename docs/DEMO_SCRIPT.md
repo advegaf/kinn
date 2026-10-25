@@ -64,7 +64,7 @@ clock is how I paired my phone to it."
 
 ### 2. Margaret talks (0:15 to 0:50)
 
-Margaret taps the screen. It says "te escucho / I'm listening".
+Margaret presses and holds the screen for 3 seconds while a ring fills. It says "te escucho / I'm listening".
 
 Margaret reads, word for word:
 
@@ -72,7 +72,7 @@ Margaret reads, word for word:
 > oscuro y la cocina olía a leña. Prendía el foco amarillo de la mesa y nos
 > decía: ándale, que la masa no espera. Desde la noche antes dejaba todo listo.
 
-Say (while she talks, quietly, or right after): "She taps once and tells a
+Say (while she talks, quietly, or right after): "She holds once and tells a
 story, the way she would to someone at the table."
 
 ### 3. Saved (0:50 to 1:00)
@@ -92,15 +92,15 @@ grandmother's story in English, in her voice."
 
 ### 5. Angel writes back (1:45 to 2:20)
 
-Angel taps Write back, holds the disc and reads, word for word:
+Angel taps Write back, taps the disc and reads, word for word:
 
 > Abuela, I listened twice. I didn't know you and Tía Lupe made the tamales
 > sitting on the floor. Will you teach me this Christmas, at five in the
 > morning? What song was she singing?
 
-He lets go.
+He taps the disc to stop, then taps Send.
 
-Say: "The questions on this screen come from what she just said. I hold and
+Say: "The questions on this screen come from what she just said. I tap and
 talk, in English."
 
 ### 6. Margaret hears it (2:20 to 3:00)
