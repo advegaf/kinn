@@ -29,7 +29,7 @@ struct AlmanacView: View {
                 weekRow(now)
                     .padding(.top, 30)
                 if let today = session.latestFromPartner {
-                    featured(today)
+                    TimelineView(.explicit(today.filmDeadline.map { [$0] } ?? [])) { context in featured(today, now: context.date) }
                         .padding(.top, 26)
                 } else {
                     empty.padding(.top, 26)
@@ -93,8 +93,9 @@ struct AlmanacView: View {
         }
     }
 
-    private func featured(_ m: Message) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
+    private func featured(_ m: Message, now: Date) -> some View {
+        let making = m.isMakingFilm(at: now)
+        return VStack(alignment: .leading, spacing: 0) {
             Button { open(m.id) } label: {
                 VStack(alignment: .leading, spacing: -2) {
                     Text(Almanac.titleEn(m))
@@ -115,12 +116,21 @@ struct AlmanacView: View {
                 .font(.serif(17))
                 .foregroundStyle(Color.soft)
                 .padding(.top, 6)
+            if making {
+                Breathing {
+                    Text("Making the film")
+                        .font(.serif(19))
+                        .foregroundStyle(Color.sub)
+                }
+                .padding(.top, 10)
+            }
             HStack(spacing: 18) {
                 Button("Listen") { open(m.id) }
                     .accessibilityIdentifier("almanac.listen")
                     .font(.serif(19))
-                    .foregroundStyle(Color.ink)
-                    .dottedUnderline(.ink)
+                    .foregroundStyle(making ? Color.later : Color.ink)
+                    .dottedUnderline(making ? .later : .ink)
+                    .disabled(making)
                 let key = "o-\(m.id)"
                 let playing = session.player.isPlaying && session.player.currentKey == key
                 Button(playing ? "Stop her voice" : "Hear her original") {

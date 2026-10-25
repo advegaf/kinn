@@ -1,19 +1,21 @@
 # Hearth story worker
 
-Turns grandma's spoken memories into short Dream Recorder style films: 5 scenes that change as the story is told. The Hearth (`../hearth-web/`) plays the scenes in time with her voice, and the iOS app shows them too.
+Turns each voice message into a short Dream Recorder style film: 3 scenes (`SCENES`) that change as the message is told. The Hearth (`../hearth-web/`) and the iOS app play the scenes in time with the translated voice.
 
-It polls Supabase every 5 s for elder messages with `status = 'ready'`, a transcript and `story is null`. For each one it:
+It polls Supabase every 5 s for messages from either side with `status = 'ready'`, a transcript and `story` that is null or has `status = 'pending'`. For each one it:
 
 1. Claims the row by writing `story = {"status": "generating", "claimed_at": ...}` only where `story is null`, so two workers never take the same message. Claims older than 10 min are taken over.
-2. Makes one LLM call that splits the story into 5 beats. Each beat gets a verbatim excerpt of the English translation (`text_en`), the matching excerpt of the Spanish transcript (`text_es`) and a 21:9 cinematic prompt. Every prompt restates one shared `world` line (characters, place, era, palette) so the clips feel like one film. If the excerpts do not match the text, the worker splits the text into 5 roughly equal sentence groups and keeps the prompts.
-3. Computes each scene's `start` and `end` as 0..1 fractions of the narration from the character offset of `text_en` in the translation.
-4. Sends the 5 prompts to Luma in parallel (Luma Agents API, `ray-3.2`, 21:9, 540p, 5s), at most `LUMA_CONCURRENCY` (default 4) at once because the account allows 4 concurrent generations. Each clip is polled for up to 4 min and downloaded.
+2. Makes one LLM call that splits the message into `SCENES` beats. The prompt depends on the sender role: a grandmother's memory, or a grandson's note about his day. Each beat gets a verbatim excerpt of the English text (`text_en`), the matching excerpt of the Spanish text (`text_es`) and a 21:9 cinematic prompt. Every prompt restates one shared `world` line (characters, place, era, palette) so the clips feel like one film. If the excerpts do not match the text, the worker splits the text into roughly equal sentence groups and keeps the prompts.
+3. Computes each scene's `start` and `end` as 0..1 fractions of the translation, which is the text the receiver hears: English for an elder message, Spanish for a family note.
+4. Sends the prompts to Luma in parallel (Luma Agents API, `ray-3.2`, 21:9, 540p, 5s), at most `LUMA_CONCURRENCY` (default 4) at once because the account allows 4 concurrent generations. Each clip is polled for up to 4 min and downloaded.
 5. Applies the Dream Recorder ffmpeg look, slows each clip down by `LUMA_SLOWDOWN` (default 2.0, so about 10 s) and cuts a 21:9 jpg thumbnail at 1 s.
 6. Uploads `videos/{thread_id}/{message_id}-{n}.mp4` and `.jpg` (`n` from 1), then writes `story = {title, title_es, world, scenes: [{start, end, text_es, text_en, prompt, video_path, thumb_path}], video_path, thumb_path}`. The top-level paths are the first scene. Existing `image_paths` are kept.
 
 A beat whose clip fails after `LUMA_RETRIES` retries reuses the previous scene's clip. If every clip fails, `story` becomes `{"status": "error", "error": "..."}`, unless `STORY_FALLBACK=images`, which calls the `make-story` edge function (3 images) and adds `video_error`. The message `status` column is never touched, so a failed story never hides a ready voice message.
 
-Cost: about 5 Luma clips per story, roughly $2 to 3.50. Set `SCENES` lower to save money while testing.
+Cost: one Luma clip per scene, about 50 credits each, so about 150 credits per message at the default `SCENES=3`.
+
+Each poll also converts `ready` messages whose `original_path` ends in `.webm` (the Hearth browser records WebM, which iOS cannot play) to AAC `.m4a` next to the original in the `audio` bucket, and points `original_path` at the `.m4a`.
 
 Clients should treat a story with `status` of `generating` or `error` as "no story yet".
 
