@@ -3,9 +3,11 @@ import Foundation
 /// Canned, offline backend so the UI can be built and screenshotted with no network.
 @MainActor
 final class DemoBackend: Backend {
-    static let elder = Profile(id: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!, name: "Margaret", role: .elder, lang: "es", voiceId: "demo")
-    static let family = Profile(id: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!, name: "Angel", role: .family, lang: "en", voiceId: "demo")
-    static let thread = ChatThread(id: UUID(uuidString: "a1b2c3d4-0000-4000-8000-000000000001")!, elderId: elder.id, familyId: family.id)
+    static let elder = Profile(id: fixedID("11111111-1111-1111-1111-111111111111"), name: "Margaret", role: .elder, lang: "es", voiceId: "demo")
+    static let family = Profile(id: fixedID("22222222-2222-2222-2222-222222222222"), name: "Angel", role: .family, lang: "en", voiceId: "demo")
+    static let thread = ChatThread(id: fixedID("a1b2c3d4-0000-4000-8000-000000000001"), elderId: elder.id, familyId: family.id)
+
+    private static func fixedID(_ text: String) -> UUID { UUID(uuidString: text) ?? UUID() }
 
     private var messages: [Message]
     private var continuation: AsyncStream<Void>.Continuation?
@@ -161,7 +163,7 @@ final class DemoBackend: Backend {
         // audio names the bundled ElevenLabs narration, Resources/DemoAudio/{audio}-{es|en}.mp3.
         // AppSession resolves the demo-audio/ paths from the bundle and falls back to speech.
         func msg(_ n: Int, from: Profile, at date: Date, transcript: String, translation: String, ask: [String] = [], story: Story? = nil, audio: String) -> Message {
-            let id = UUID(uuidString: String(format: "00000000-0000-4000-8000-%012d", n))!
+            let id = fixedID(String(format: "00000000-0000-4000-8000-%012d", n))
             let to = from.role == .elder ? family : elder
             return Message(id: id, threadId: t, senderId: from.id, sourceLang: from.lang, targetLang: to.lang,
                            originalPath: "\(Self.audioPrefix)\(audio)-\(from.lang)", transcript: transcript, translation: translation,
