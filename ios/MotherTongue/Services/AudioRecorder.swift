@@ -6,7 +6,6 @@ import Observation
 final class AudioRecorder {
     private(set) var isRecording = false
     private(set) var level: Float = 0
-    private(set) var levels: [Float] = Array(repeating: 0, count: 48)
     private(set) var elapsed: TimeInterval = 0
 
     private var recorder: AVAudioRecorder?
@@ -49,7 +48,6 @@ final class AudioRecorder {
         isRecording = true
         startDate = .now
         elapsed = 0
-        levels = Array(repeating: 0, count: levels.count)
         startMetering()
     }
 
@@ -104,8 +102,6 @@ final class AudioRecorder {
         }
         value = level * 0.4 + value * 0.6
         level = value
-        levels.removeFirst()
-        levels.append(value)
         if let startDate { elapsed = Date.now.timeIntervalSince(startDate) }
     }
 }
