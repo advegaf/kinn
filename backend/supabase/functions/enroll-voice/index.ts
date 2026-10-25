@@ -4,15 +4,9 @@ import { adminClient, corsHeaders, env, errorText, json, stripBucket, timer } fr
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  let profileId = "";
-  let samplePath = "";
-  try {
-    const body = await req.json();
-    profileId = body?.profile_id ?? "";
-    samplePath = body?.sample_path ?? "";
-  } catch {
-    // fall through to the check below
-  }
+  const body = await req.json().catch(() => null);
+  const profileId: string = body?.profile_id ?? "";
+  let samplePath: string = body?.sample_path ?? "";
   if (!profileId) return json({ error: "profile_id is required" }, 400);
   if (!samplePath) samplePath = `voices/${profileId}.m4a`;
 

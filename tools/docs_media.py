@@ -144,21 +144,18 @@ def phone(outdir, height, bg, shots):
     bgcol = (0, 0, 0, 0) if bg == "none" else tuple(int(bg[i:i + 2], 16) for i in (0, 2, 4)) + (255,)
 
     base = Image.new("RGBA", (W, H), bgcol)
-    # soft shadow
     sh_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     ImageDraw.Draw(sh_layer).rounded_rectangle([pad, pad + round(24 * k), pad + bw, pad + bh + round(24 * k)],
                                                body_r, fill=(40, 30, 20, 70))
     sh_layer = sh_layer.filter(ImageFilter.GaussianBlur(round(36 * k)))
     base = Image.alpha_composite(base, sh_layer)
     d = ImageDraw.Draw(base)
-    # side buttons (left: action, volume up, volume down; right: power, camera control)
     ti, ti_dark = (168, 162, 154, 255), (120, 115, 108, 255)
     bt = round(10 * k)
     for y0, y1 in ((520, 640), (760, 960), (1010, 1210)):
         d.rounded_rectangle([pad - bt, pad + y0 * k, pad + rim, pad + y1 * k], bt, fill=ti_dark)
     for y0, y1 in ((860, 1160), (1640, 1840)):
         d.rounded_rectangle([pad + bw - rim, pad + y0 * k, pad + bw + bt, pad + y1 * k], bt, fill=ti_dark)
-    # titanium rim, then black glass
     d.rounded_rectangle([pad, pad, pad + bw - 1, pad + bh - 1], body_r, fill=ti)
     d.rounded_rectangle([pad + round(3 * k), pad + round(3 * k), pad + bw - 1 - round(3 * k), pad + bh - 1 - round(3 * k)],
                         body_r - round(3 * k), fill=(196, 191, 184, 255))

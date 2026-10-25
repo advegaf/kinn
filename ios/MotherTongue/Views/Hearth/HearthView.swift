@@ -65,8 +65,6 @@ struct HearthView: View {
         }
     }
 
-    // MARK: Pieces
-
     @ViewBuilder
     private var background: some View {
         ZStack {
@@ -254,8 +252,6 @@ struct HearthView: View {
         default: Color(UIColor(hex: 0xFFF6EA))
         }
     }
-
-    // MARK: Interaction
 
     private func pressDown() {
         pressActive = true

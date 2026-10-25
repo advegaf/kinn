@@ -11,12 +11,7 @@ Respond with only a JSON object: {"title": "...", "prompts": ["...", "...", "...
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  let messageId = "";
-  try {
-    messageId = (await req.json())?.message_id ?? "";
-  } catch {
-    // fall through to the check below
-  }
+  const messageId: string = (await req.json().catch(() => null))?.message_id ?? "";
   if (!messageId) return json({ error: "message_id is required" }, 400);
 
   const db = adminClient();

@@ -33,7 +33,7 @@ async function post(url: string, headers: Record<string, string>, body: unknown,
   return await res.json();
 }
 
-// One LLM call that returns parsed JSON. The system prompt must ask for JSON.
+// The system prompt must ask for JSON.
 export async function callLLM(system: string, user: string): Promise<Record<string, unknown>> {
   const provider = env("LLM_PROVIDER", "meta").toLowerCase();
   const model = env("LLM_MODEL", DEFAULT_MODELS[provider] ?? DEFAULT_MODELS.meta);

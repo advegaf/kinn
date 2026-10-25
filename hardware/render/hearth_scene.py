@@ -100,7 +100,6 @@ btn_m = mat("terracotta_pla", (0.62, 0.24, 0.14), rough=0.5)
 tab_m = mat("fire_black", (0.02, 0.02, 0.022), rough=0.35)
 remote_m = mat("remote", (0.05, 0.05, 0.06), rough=0.4)
 
-# Shell: one rounded slab, split into a front plate and a back body.
 front_y = -SHELL_D / 2
 slab = box("slab", (SHELL_W, SHELL_D, SHELL_H), (0, 0, 0), bevel=14 * mm, segments=10)
 cut_front = box("cut_front", (SHELL_W * 2, SHELL_D, SHELL_H * 2), (0, front_y + FRONT_T + SHELL_D / 2, 0))
@@ -127,7 +126,6 @@ tab_y = front_y + FRONT_T + TAB_D / 2 + 0.2 * mm
 cavity = box("cavity", (TAB_W + 1 * mm, TAB_D + 1 * mm, TAB_H + 1 * mm), (0, tab_y, 6 * mm))
 boolean(back, cavity)
 
-# Button pocket on top for the shutter remote, then the printed cap.
 btn_x, top_z = 70 * mm, SHELL_H / 2
 pocket = box("pocket", (34 * mm, 16 * mm, 20 * mm), (btn_x, 2 * mm, top_z - 6 * mm))
 boolean(back, pocket)
@@ -177,7 +175,6 @@ else:
     foot = box("foot", (120 * mm, 40 * mm, 14 * mm), (0, 32 * mm, 7 * mm), bevel=6 * mm, material=shell_m)
     smooth(foot)
 
-# Counter, wall, grandkid's phone.
 wood = mat("counter", (0.42, 0.27, 0.16), rough=0.45)
 nt = wood.node_tree
 wave = nt.nodes.new("ShaderNodeTexWave")
@@ -201,7 +198,6 @@ if MODE != "exploded":
     smooth(phone)
     ps = screen_plane("phone_screen", 66 * mm, 143 * mm, (0.17, -0.13, 8.1 * mm), PHONE, rot=(0, 0, phone_rot), strength=1.6)
 
-# Light and camera.
 world = bpy.data.worlds.new("w")
 scene.world = world
 world.use_nodes = True
