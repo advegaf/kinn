@@ -37,20 +37,3 @@ private struct Chevron: Shape {
         }
     }
 }
-
-extension View {
-    /// A drag that starts at the leading edge and moves right goes back, like the system edge swipe.
-    func backSwipe(_ action: (() -> Void)?) -> some View {
-        simultaneousGesture(
-            DragGesture(minimumDistance: 20, coordinateSpace: .global)
-                .onEnded { drag in
-                    guard let action else { return }
-                    let fromEdge = drag.startLocation.x < 28
-                    let across = max(drag.translation.width, drag.predictedEndTranslation.width) > 90
-                    guard fromEdge, across, abs(drag.translation.height) < drag.translation.width else { return }
-                    Haptics.tap()
-                    action()
-                }
-        )
-    }
-}

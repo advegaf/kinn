@@ -1,70 +1,76 @@
 import SwiftUI
 
-/// The grandkid side: the almanac, an entry opened from it, and the page for writing back.
+/// The grandkid side: the almanac, and the pages opened on top of it.
 struct FamilyRoot: View {
     enum Route: Hashable {
-        case week
         case entry(UUID)
         case write(UUID)
         case compose
+        case settings
+        case voice
     }
 
     @Environment(AppSession.self) private var session
     /// Pages opened on top of the week, oldest first. Back drops the last one.
     @State private var history: [Route] = []
-    /// True after Back, so an entry shown again does not start its story again.
-    @State private var cameBack = false
-    @State private var showSettings = false
     #if DEBUG
     @State private var debugApplied = false
     #endif
 
     var body: some View {
-        ZStack {
-            switch route {
-            case .week:
-                AlmanacView(open: { push(.entry($0)) })
-                    .kinnTabBar(home: { history = [] }, compose: { push(.compose) }, settings: { showSettings = true })
-                    .transition(.fade)
-            case .entry(let id):
-                if let m = message(id) {
-                    EntryView(message: m, autoplay: !cameBack, back: back, writeBack: { push(.write(id)) })
-                        .transition(.fade)
-                }
-            case .write(let id):
-                if let m = message(id) {
-                    WriteBackView(message: m, back: back, sent: { history = [] })
-                        .transition(.fade)
-                }
-            case .compose:
-                WriteBackView(message: nil, back: back, sent: { history = [] })
-                    .transition(.fade)
-            }
+        PageStack(path: history, pop: dropTop) {
+            AlmanacView(open: { push(.entry($0)) })
+                .kinnTabBar(home: { history = [] }, compose: { push(.compose) }, settings: { push(.settings) })
+                .background { PaperCanvas() }
+        } page: { route in
+            page(route)
         }
-        .animation(.enter, value: route)
         .preferredColorScheme(isEntry ? .dark : .light)
-        .sheet(isPresented: $showSettings) { SettingsView() }
         #if DEBUG
         .task(id: session.messages.count) { applyDebugRoute() }
         #endif
     }
 
-    private var route: Route { history.last ?? .week }
-
-    private func back() {
-        session.player.stop()
-        session.recorder.cancel()
-        cameBack = true
-        history.popLast()
+    @ViewBuilder private func page(_ route: Route) -> some View {
+        switch route {
+        case .entry(let id):
+            if let m = message(id) {
+                EntryView(message: m, back: back, writeBack: { push(.write(id)) })
+            }
+        case .write(let id):
+            if let m = message(id) {
+                WriteBackView(message: m, back: back, sent: home)
+            }
+        case .compose:
+            WriteBackView(message: nil, back: back, sent: home)
+        case .settings:
+            SettingsView(back: BackButton(action: back), recordVoice: { push(.voice) })
+        case .voice:
+            VoiceEnrollView(onBack: back, onDone: back)
+        }
     }
 
     private func push(_ next: Route) {
-        cameBack = false
-        history.append(next)
+        guard history.last != next else { return }
+        withAnimation(.push) { history.append(next) }
+    }
+
+    private func back() {
+        withAnimation(.pop) { dropTop() }
+    }
+
+    private func dropTop() {
+        session.player.stop()
+        session.recorder.cancel()
+        history.removeLast()
+    }
+
+    private func home() {
+        withAnimation(.pop) { history = [] }
     }
 
     private var isEntry: Bool {
-        if case .entry = route { true } else { false }
+        if case .entry = history.last { true } else { false }
     }
 
     private func message(_ id: UUID) -> Message? {
@@ -81,6 +87,11 @@ struct FamilyRoot: View {
             history = [.compose]
             return
         }
+        if d.bool(forKey: "openSettings") {
+            debugApplied = true
+            history = [.settings]
+            return
+        }
         guard let latest = session.latestFromPartner else { return }
         debugApplied = true
         if d.bool(forKey: "writingBack") || d.bool(forKey: "fakeRecording") {
@@ -88,7 +99,6 @@ struct FamilyRoot: View {
         } else if d.bool(forKey: "openEntry") {
             history = [.entry(latest.id)]
         }
-        if d.bool(forKey: "openSettings") { showSettings = true }
     }
     #endif
 }

@@ -44,7 +44,7 @@ struct WriteBackView: View {
         .padding(.bottom, 12)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .contentShape(.rect)
-        .backSwipe(back)
+        .background { PaperCanvas() }
         .onDisappear { recorder.cancel() }
         #if DEBUG
         .task {

@@ -4,18 +4,17 @@ import SwiftUI
 /// The film and the lit paragraph follow the narration, one scene per beat.
 struct EntryView: View {
     var message: Message
-    var autoplay: Bool
     var back: () -> Void
     var writeBack: () -> Void
     private let scenes: [StoryScene]
 
     @Environment(AppSession.self) private var session
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.isTopPage) private var isTopPage
     @State private var now = Date.now
 
-    init(message: Message, autoplay: Bool, back: @escaping () -> Void, writeBack: @escaping () -> Void) {
+    init(message: Message, back: @escaping () -> Void, writeBack: @escaping () -> Void) {
         self.message = message
-        self.autoplay = autoplay
         self.back = back
         self.writeBack = writeBack
         scenes = message.story?.timedScenes(translation: message.translation) ?? []
@@ -133,10 +132,12 @@ struct EntryView: View {
                 .padding(.horizontal, 30)
                 .padding(.top, 8)
         }
-        .backSwipe(back)
         .task(id: message.id) { session.markHeard(message.id) }
+        .onChange(of: isTopPage) { _, top in
+            if !top { session.player.stop() }
+        }
         .task(id: making) {
-            guard Self.simulated == nil, autoplay, !making else { return }
+            guard Self.simulated == nil, !making, isTopPage else { return }
             if let src = primarySource { session.player.play(src, key: primaryKey) }
         }
         .task(id: message.filmDeadline) {

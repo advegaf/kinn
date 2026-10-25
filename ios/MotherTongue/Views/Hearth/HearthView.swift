@@ -11,6 +11,7 @@ struct HearthView: View {
     @State private var sending = false
     @State private var justSent = false
     @State private var showSettings = false
+    @State private var recordingVoice = false
     @State private var glow = false
     @State private var errorText: String?
 
@@ -58,7 +59,15 @@ struct HearthView: View {
         .onChange(of: mode == .listen, initial: true) { _, listening in
             glow = listening
         }
-        .sheet(isPresented: $showSettings) { SettingsView() }
+        .sheet(isPresented: $showSettings, onDismiss: { recordingVoice = false }) {
+            PageStack(path: recordingVoice ? [true] : [], pop: { recordingVoice = false }) {
+                SettingsView(back: BackButton(title: "Close") { showSettings = false },
+                             recordVoice: { withAnimation(.push) { recordingVoice = true } })
+            } page: { _ in
+                VoiceEnrollView(onBack: closeVoice, onDone: closeVoice)
+            }
+            .presentationBackground(Color.paper)
+        }
         .background {
             if shutterRemote {
                 VolumeButtonTrigger { pressDown(); pressUp(forceTap: true) }
@@ -253,6 +262,10 @@ struct HearthView: View {
         case .listen: Color(UIColor(hex: 0x4A2418))
         default: Color(UIColor(hex: 0xFFF6EA))
         }
+    }
+
+    private func closeVoice() {
+        withAnimation(.pop) { recordingVoice = false }
     }
 
     private func pressDown() {
