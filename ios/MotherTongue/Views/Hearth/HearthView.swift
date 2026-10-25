@@ -313,7 +313,6 @@ struct HearthView: View {
     private func playNext() {
         guard let message = session.unheard.first, let source = session.translatedSource(message) else { return }
         Haptics.tap()
-        session.player.onFinish = { _ in }
         session.player.play(source, key: playKeyPrefix + message.id.uuidString)
         session.markHeard(message.id)
     }

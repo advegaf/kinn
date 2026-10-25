@@ -1,6 +1,7 @@
+"""Procedural materials for the showcase renders."""
 import math
 
-from showcase_kit import L, M, N, bsdf, bsdf_of, bump, mat, maprange, obj_coords
+from showcase_build import L, M, N, bsdf, bsdf_of, bump, maprange, mat, obj_coords
 
 
 def wood_mat():

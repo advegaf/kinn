@@ -1,4 +1,4 @@
-"""Blender helpers for the showcase renders: materials, shader nodes, meshes, lights. Units: metres."""
+"""Blender node and mesh helpers for the showcase renders. Units: metres."""
 import math
 
 import bpy

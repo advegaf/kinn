@@ -9,15 +9,16 @@ import os
 import sys
 
 import bpy
+from mathutils import Matrix
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, HERE)
-sys.path.insert(0, os.path.join(HERE, "..", "cad"))
+CAD = os.path.join(HERE, "..", "cad")
+sys.path[:0] = [HERE, CAD]
 import hearth_parts as hp  # noqa: E402
-from showcase_kit import cube, empty, mat, parent  # noqa: E402
+from showcase_build import L, N, bump, cube, empty, mat, mm, obj_coords, parent, smooth  # noqa: E402
 from showcase_materials import ceramic_mat, plaster_mat  # noqa: E402
-from showcase_props import (area, build_hearth, camera, cup_and_saucer, iphone, morning, napkin, place_hearth,  # noqa: E402
-                            plate_with_conchas, runner, sweep, table, vase_with_flowers, world)
+from showcase_props import (area, camera, cup_and_saucer, iphone, morning, napkin, plate_with_conchas,  # noqa: E402
+                            runner, sweep, table, vase_with_flowers, world)
 
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 SHOT = argv[0] if argv else "breakfast"
@@ -27,12 +28,65 @@ RES_PCT = int(argv[3]) if len(argv) > 3 else 100
 SCREENS = os.path.join(HERE, "..", "..", "docs", "screens")
 HEARTH_IMG = os.environ.get("HEARTH_IMG") or os.path.join(SCREENS, "hearth-v4c-playing.png" if SHOT == "playing" else "hearth-v4c-waiting.png")
 PHONE_IMG = os.path.join(SCREENS, "ios-v4c-entry.png" if SHOT == "phone" else "ios-v4c-week.png")
+CREAM = (0.93, 0.89, 0.80)
+LEAN_DEG = 9.0
 
 hp.FACE_T = hp.GLASS_Z = 1.6
 hp.FOAM_T, hp.CAP_HEAD_T = 3.0, 6.0
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
+
+
+def load(path, material):
+    bpy.ops.wm.stl_import(filepath=path)
+    o = bpy.context.selected_objects[0]
+    o.data.materials.append(material)
+    smooth(o, 50)
+    return o
+
+
+def build_hearth(image):
+    cream = mat("cream_pla", CREAM, rough=0.7, sss=0.15)
+    nt = cream.node_tree
+    nz = N(nt, "ShaderNodeTexNoise", Scale=2500.0, Detail=2.0)
+    L(nt, obj_coords(nt), nz.inputs["Vector"])
+    bump(nt, nz.outputs["Fac"], 0.00002, 0.15)   # faint matte print texture (object coords are mm)
+    black = mat("fire_black", (0.02, 0.02, 0.022), rough=0.35)
+    screen_m = mat("screen", (0, 0, 0), rough=0.15, image=image, strength=1.6)
+    bezel = load(os.path.join(CAD, "stl", "front_bezel.stl"), cream)
+    shell = load(os.path.join(CAD, "stl", "back_shell.stl"), cream)
+    shell.data.transform(Matrix.Translation((0, 0, hp.FACE_T)))
+    tablet = hp.rrect("fire_hd8", hp.TAB_W, hp.TAB_H, hp.FACE_T + 0.1, hp.FACE_T + hp.TAB_T, hp.TAB_CORNER_R)
+    tablet.data.materials.append(black)
+    o = hp.box("screen", -hp.ACT_W / 2, hp.ACT_W / 2, -hp.ACT_H / 2, hp.ACT_H / 2, hp.FACE_T + 0.05, hp.FACE_T + 0.06)
+    o.data.uv_layers.new()
+    for loop in o.data.loops:
+        co = o.data.vertices[loop.vertex_index].co
+        o.data.uv_layers.active.data[loop.index].uv = (-co.x / hp.ACT_W + 0.5, co.y / hp.ACT_H + 0.5)
+    o.data.materials.append(screen_m)
+    parts = [bezel, shell, tablet, o]
+    for p in parts:   # booleans leave an empty slot 0 on hp meshes
+        real = [m for m in p.data.materials if m]
+        if len(real) == 1 and len(p.data.materials) > 1:
+            p.data.materials.clear()
+            p.data.materials.append(real[0])
+    to_scene = Matrix.Scale(mm, 4) @ Matrix(((-1, 0, 0, 0), (0, 0, 1, 0), (0, 1, 0, 0), (0, 0, 0, 1)))
+    rig = empty("hearth")
+    for p in parts:
+        p.matrix_world = to_scene
+        p.parent = rig
+    return rig, parts
+
+
+def place_hearth(rig, parts, x, y, yaw_deg=0.0, floor=0.0):
+    rig.rotation_euler = (-math.radians(LEAN_DEG), 0, math.radians(yaw_deg))
+    rig.location = (x, y, 0)
+    bpy.context.view_layer.update()
+    low = min((p.matrix_world @ v.co).z for p in parts[:2] for v in p.data.vertices)
+    rig.location.z = floor - low
+    bpy.context.view_layer.update()
+
 
 rig, parts = build_hearth(HEARTH_IMG)
 glaze = ceramic_mat("glaze", (0.9, 0.87, 0.8))

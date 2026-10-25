@@ -54,9 +54,6 @@ struct Story: Codable, Hashable, Sendable {
         case titleEs = "title_es"
     }
 
-    var isGenerating: Bool { status == "generating" }
-    var hasMedia: Bool { videoPath != nil || !(imagePaths ?? []).isEmpty }
-
     init(title: String? = nil, imagePaths: [String]? = nil, videoPath: String? = nil, thumbPath: String? = nil,
          titleEs: String? = nil, prompt: String? = nil, status: String? = nil, scenes: [StoryScene]? = nil) {
         self.title = title

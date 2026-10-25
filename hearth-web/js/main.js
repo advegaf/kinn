@@ -6,7 +6,7 @@ import { SupabaseBackend, DemoBackend } from './backend.js';
 import { MicRecorder, FakeRecorder, resumeAudio } from './recorder.js';
 import { loadRect, applyRect, loadStrip, applyStrip, inRect, toPct, startCalibration, startTemplate } from './calibrate.js';
 import { $, setText } from './dom.js';
-import { hm, dayLabel, tickClock, setFamilyCode } from './clock.js';
+import { dayLabel, sentAt, tickClock, setFamilyCode } from './clock.js';
 import { hasStory, storyFor, answeredStory, buildScenes, startScenes, setProgress, teardown } from './scenes.js';
 import { narrate, retryPending, clearTimers, stopAll } from './narration.js';
 import { showToast, hideToast } from './toast.js';
@@ -83,13 +83,12 @@ function renderText() {
   const name = partnerName();
   const latest = unheard().at(-1);
   if (latest) {
-    const d = new Date(latest.created_at);
-    setText('waiting-label', `${dayLabel(d)}, ${hm(d)}`);
+    const [when, whenEn] = sentAt(new Date(latest.created_at));
     setText('waiting-line', `${name} te escribi\u00f3`);
     setText('waiting-line-en', `${name} wrote to you`);
     const [es, en] = titles(latest);
-    setText('waiting-sub', es ? `sobre \u00ab${es}\u00bb` : '');
-    setText('waiting-sub-en', en ? `about \u00ab${en}\u00bb` : '');
+    setText('waiting-sub', es ? `${when}, sobre \u00ab${es}\u00bb` : when);
+    setText('waiting-sub-en', en ? `${whenEn}, about \u00ab${en}\u00bb` : whenEn);
   }
   const [prompt, promptEn] = recPrompt(name);
   setText('rec-prompt', prompt);

@@ -58,17 +58,6 @@ extension Font {
     }
 }
 
-extension View {
-    /// Inter tiny caps, the only sans on the page.
-    func tinyCaps(_ color: Color = .fog, size: CGFloat = 11, medium: Bool = false, tracking: CGFloat = 0.08) -> some View {
-        textCase(.uppercase)
-            .font(.sans(size, medium: medium))
-            .tracking(size * tracking)
-            .foregroundStyle(color)
-            .lineLimit(1)
-    }
-}
-
 struct Hairline: View {
     var color: Color = .rule
     var body: some View {

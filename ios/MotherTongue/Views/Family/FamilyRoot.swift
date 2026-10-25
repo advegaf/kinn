@@ -10,7 +10,10 @@ struct FamilyRoot: View {
     }
 
     @Environment(AppSession.self) private var session
-    @State private var route: Route = .week
+    /// Pages opened on top of the week, oldest first. Back drops the last one.
+    @State private var history: [Route] = []
+    /// True after Back, so an entry shown again does not start its story again.
+    @State private var cameBack = false
     @State private var showSettings = false
     #if DEBUG
     @State private var debugApplied = false
@@ -20,21 +23,21 @@ struct FamilyRoot: View {
         ZStack {
             switch route {
             case .week:
-                AlmanacView(open: { route = .entry($0) })
-                    .kinnTabBar(home: { route = .week }, compose: { route = .compose }, settings: { showSettings = true })
+                AlmanacView(open: { push(.entry($0)) })
+                    .kinnTabBar(home: { history = [] }, compose: { push(.compose) }, settings: { showSettings = true })
                     .transition(.fade)
             case .entry(let id):
                 if let m = message(id) {
-                    EntryView(message: m, close: { route = .week }, writeBack: { route = .write(id) })
+                    EntryView(message: m, autoplay: !cameBack, back: back, writeBack: { push(.write(id)) })
                         .transition(.fade)
                 }
             case .write(let id):
                 if let m = message(id) {
-                    WriteBackView(message: m, close: { route = .week }, sent: { route = .week })
+                    WriteBackView(message: m, back: back, sent: { history = [] })
                         .transition(.fade)
                 }
             case .compose:
-                WriteBackView(message: nil, close: { route = .week }, sent: { route = .week })
+                WriteBackView(message: nil, back: back, sent: { history = [] })
                     .transition(.fade)
             }
         }
@@ -44,6 +47,20 @@ struct FamilyRoot: View {
         #if DEBUG
         .task(id: session.messages.count) { applyDebugRoute() }
         #endif
+    }
+
+    private var route: Route { history.last ?? .week }
+
+    private func back() {
+        session.player.stop()
+        session.recorder.cancel()
+        cameBack = true
+        history.popLast()
+    }
+
+    private func push(_ next: Route) {
+        cameBack = false
+        history.append(next)
     }
 
     private var isEntry: Bool {
@@ -61,15 +78,15 @@ struct FamilyRoot: View {
         let d = UserDefaults.standard
         if d.bool(forKey: "compose") {
             debugApplied = true
-            route = .compose
+            history = [.compose]
             return
         }
         guard let latest = session.latestFromPartner else { return }
         debugApplied = true
         if d.bool(forKey: "writingBack") || d.bool(forKey: "fakeRecording") {
-            route = .write(latest.id)
+            history = [.entry(latest.id), .write(latest.id)]
         } else if d.bool(forKey: "openEntry") {
-            route = .entry(latest.id)
+            history = [.entry(latest.id)]
         }
         if d.bool(forKey: "openSettings") { showSettings = true }
     }

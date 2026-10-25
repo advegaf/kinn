@@ -203,7 +203,6 @@ def build_foot(name="foot", mirror=False):
     top_b = FOOT_H * math.tan(a)
     pts = [(0, 0), (FOOT_DEPTH, 0), (top_b + 6, FOOT_H), (top_b, FOOT_H)]
     f = prism(name, pts, FOOT_W)
-    u = (math.sin(a), math.cos(a))
     bm = bmesh.new()
     bmesh.ops.create_cube(bm, size=1.0)
     bmesh.ops.scale(bm, vec=(2 * FOOT_REBATE_D, FOOT_H * 3, FOOT_REBATE_W + 1), verts=bm.verts)

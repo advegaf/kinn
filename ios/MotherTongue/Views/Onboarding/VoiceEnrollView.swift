@@ -2,6 +2,7 @@ import SwiftUI
 
 struct VoiceEnrollView: View {
     @Environment(AppSession.self) private var session
+    var onBack: () -> Void
     var onDone: () -> Void
 
     @State private var phase: Phase = .ready
@@ -23,7 +24,7 @@ struct VoiceEnrollView: View {
     }
 
     var body: some View {
-        OnbPage(left: "Kinn", right: es ? "Segunda p\u{E1}gina" : "Second page") {
+        OnbPage(back: BackButton(title: es ? "Atr\u{E1}s" : "Back", action: back)) {
             VStack(alignment: .leading, spacing: 0) {
                 OnbHeadline(title: es ? "Tu voz" : "Your voice",
                             note: es ? "Lee esto en voz alta, con calma. Unos 30 segundos." : "Read this aloud, slowly. About thirty seconds.")
@@ -93,16 +94,17 @@ struct VoiceEnrollView: View {
         return HStack(alignment: .bottom) {
             VStack(alignment: .leading, spacing: 6) {
                 if live {
-                    HStack(spacing: 7) {
-                        Circle().fill(Color.rec).frame(width: 7, height: 7)
-                        Text("Rec").tinyCaps(.rec, size: 11, medium: true, tracking: 0.12)
+                    HStack(spacing: 10) {
+                        Text(counter(recorder.elapsed))
+                            .font(.sansLight(44))
+                            .monospacedDigit()
+                            .foregroundStyle(Color.ink)
+                            .contentTransition(.identity)
+                            .accessibilityLabel(es ? "Grabando, \(Int(recorder.elapsed)) segundos" : "Recording, \(Int(recorder.elapsed)) seconds")
+                        Circle().fill(Color.rec).frame(width: 8, height: 8)
+                            .accessibilityHidden(true)
                     }
                     .transition(.fade)
-                    Text(counter(recorder.elapsed))
-                        .font(.sansLight(44))
-                        .monospacedDigit()
-                        .foregroundStyle(Color.ink)
-                        .contentTransition(.identity)
                 }
                 Text(hint)
                     .font(.serifItalic(18))
@@ -122,6 +124,11 @@ struct VoiceEnrollView: View {
             .accessibilityValue(hint)
         }
         .animation(.enter, value: live)
+    }
+
+    private func back() {
+        session.recorder.cancel()
+        onBack()
     }
 
     private func counter(_ t: TimeInterval) -> String {

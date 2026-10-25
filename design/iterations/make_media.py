@@ -1,5 +1,5 @@
 """Painterly 21:9 story stills for the design iterations, finished with Dream Recorder's ffmpeg look."""
-import math, os, random, subprocess, sys
+import os, random, subprocess, sys
 from PIL import Image, ImageDraw, ImageFilter
 
 W, H = 1260, 540
