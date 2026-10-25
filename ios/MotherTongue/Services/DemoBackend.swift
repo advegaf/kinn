@@ -199,6 +199,13 @@ final class DemoBackend: Backend {
             out.append(msg(file.stories.count + i + 1, from: family, at: date, transcript: r.text_en, translation: r.translation_es,
                            story: story, audio: "r\(i + 1)", replyTo: ids[r.after_story]))
         }
+        #if DEBUG
+        // Screenshot aid: `-pendingStory YES` makes today's story a film still being made.
+        if UserDefaults.standard.bool(forKey: "pendingStory"), let i = out.firstIndex(where: { $0.senderId == elder.id && $0.date > day(1) }) {
+            out[i].story?.status = "generating"
+            out[i].createdAt = Message.timestamp()
+        }
+        #endif
         return out.sorted { $0.date < $1.date }
     }
 }

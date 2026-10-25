@@ -149,7 +149,7 @@ async function translate(job: Job, transcript: string, history: Hist[]): Promise
     ...(msg.story ?? {}),
     title: String(out.title_en ?? "").trim() || null,
     title_es: String(out.title_es ?? "").trim() || null,
-    status: job.role === "elder" ? "pending" : "ready",
+    status: "pending",
   };
   job.t.step("llm");
   return {
