@@ -355,7 +355,6 @@ img { -webkit-user-drag: none; }
 
 .kb img, #video { filter: saturate(0.85) brightness(0.82); }
 .kb { transition: opacity 600ms var(--ease-out); }
-/* The outgoing still resets its drift only after it has faded out. */
 .kb img {
   position: absolute;
   inset: 0;

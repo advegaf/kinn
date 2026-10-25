@@ -152,6 +152,7 @@ def phone(outdir, height, bg, shots):
     d = ImageDraw.Draw(base)
     ti, ti_dark = (168, 162, 154, 255), (120, 115, 108, 255)
     bt = round(10 * k)
+    # Left side: Action, volume up, volume down. Right side: power, Camera Control.
     for y0, y1 in ((520, 640), (760, 960), (1010, 1210)):
         d.rounded_rectangle([pad - bt, pad + y0 * k, pad + rim, pad + y1 * k], bt, fill=ti_dark)
     for y0, y1 in ((860, 1160), (1640, 1840)):
