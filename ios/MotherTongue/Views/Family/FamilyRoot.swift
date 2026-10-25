@@ -3,6 +3,7 @@ import SwiftUI
 /// The grandkid side: the almanac, and the pages opened on top of it.
 struct FamilyRoot: View {
     enum Route: Hashable {
+        case archive
         case entry(UUID)
         case write(UUID)
         case compose
@@ -20,7 +21,7 @@ struct FamilyRoot: View {
     var body: some View {
         PageStack(path: history, pop: dropTop) {
             AlmanacView(open: { push(.entry($0)) })
-                .kinnTabBar(home: { history = [] }, compose: { push(.compose) }, settings: { push(.settings) })
+                .kinnTabBar(home: { history = [] }, archive: { push(.archive) }, compose: { push(.compose) }, settings: { push(.settings) })
                 .background { PaperCanvas() }
         } page: { route in
             page(route)
@@ -33,6 +34,8 @@ struct FamilyRoot: View {
 
     @ViewBuilder private func page(_ route: Route) -> some View {
         switch route {
+        case .archive:
+            ArchiveView(open: { push(.entry($0)) }, back: back, compose: { push(.compose) })
         case .entry(let id):
             if let m = message(id) {
                 EntryView(message: m, back: back, writeBack: { push(.write(id)) })
@@ -78,10 +81,15 @@ struct FamilyRoot: View {
     }
 
     #if DEBUG
-    /// Screenshot aids: `-compose YES`, `-openEntry YES`, `-writingBack YES`, `-fakeRecording YES`, `-openSettings YES`.
+    /// Screenshot aids: `-openArchive YES`, `-compose YES`, `-openEntry YES`, `-writingBack YES`, `-fakeRecording YES`, `-openSettings YES`.
     private func applyDebugRoute() {
         guard !debugApplied else { return }
         let d = UserDefaults.standard
+        if d.bool(forKey: "openArchive") {
+            debugApplied = true
+            history = [.archive]
+            return
+        }
         if d.bool(forKey: "compose") {
             debugApplied = true
             history = [.compose]

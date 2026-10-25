@@ -28,14 +28,15 @@ A story with `story.scenes` (`docs/CONTRACT.md`) develops with the narration. Th
 
 | State | A tap on the strip does |
 | --- | --- |
-| clock (idle) | starts recording |
-| recording | stops and sends (a second tap within 650 ms instead cancels and replays the last story) |
+| clock (idle) | a 3 s hold starts recording (a ring fills around the lamp spot). A tap on the "Escuchar otra vez" panel opens past |
+| past | plays the story or reply on the card. "Siguiente" shows the next older one. "Semana anterior" shows the newest one of the previous week (weeks start on Monday). It is hidden at the oldest week. "Volver" goes back. After playback it comes back here, and it leaves on its own after 60 s |
+| recording | stops and sends |
 | sending | nothing, it waits until the row is `ready` |
-| waiting | plays the newest unheard reply |
+| waiting | plays the newest unheard reply, or says the film is still being made |
 | playing | stops playback |
-| error | goes back to clock (it also returns on its own after 3.5 s) |
+| error | a 3 s hold tries again, a short tap goes back to clock (it also returns on its own after 3.5 s) |
 
-A tap anywhere on the visible strip counts (`press('strip')` in `js/main.js`). Enter, Space, Play/Pause and the volume up key count too (`press('key')`), so a Bluetooth shutter remote works. In the optional button build, a touch in the button zone also counts. Taps closer than 250 ms are ignored. A double tap while idle replays the last story; repeating it within a minute steps back through the last 7.
+A tap anywhere on the visible strip counts (`bindInput` in `js/input.js`). Enter, Space, Play/Pause and the volume up key count too (`press('key')`), so a Bluetooth shutter remote works. A key press counts as a full hold, because the kiosk app sends keydown and keyup together. In the optional button build, a touch in the button zone also counts. Taps closer than 250 ms are ignored. In recording, playing and past, a tap less than 650 ms after the state starts is ignored. The panel on the right 25% of the strip shows only when there is at least one ready story or reply. Keys always do the main action of the state. The panel, the card and the side controls are buttons, so Tab and Enter work on them. A tap never leaves focus on a control, so the remote always does the main action.
 
 ## Config
 
@@ -47,7 +48,7 @@ Fill in `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `PROFILE_ID` (grandma's elder profi
 
 Other params:
 
-- `?demo=1` canned data, fake mic, no backend. Add `&state=clock|waiting|recording|sending|playing|error` to jump to a state.
+- `?demo=1` canned data, fake mic, no backend. Add `&state=clock|waiting|recording|sending|playing|past|error` to jump to a state.
   Demo data is `demo/demo-stories.json` (6 stories of Margaret's, 5 scenes each, stills in `demo/scenes/`, plus 2 replies from Angel). Demo narration is pre-generated ElevenLabs audio at `demo/audio/{id}-{es|en}.mp3`. Files exist for `s1` to `s3` (both languages) and `r1-en`; anything missing falls back to `speechSynthesis`. With `&state=playing`, `&msg=<id>` picks the row (`s1` to `s6` her stories, `r1` or `r2` a reply).
 - `&at=0..1` (DEBUG, with `state=playing`) freezes playback at that fraction of the narration with no sound, for screenshots. Without `&msg` it plays her newest story.
 - `?calibrate=1` strip overlay, plus the button zone for the optional button build (below).

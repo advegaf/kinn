@@ -1,0 +1,100 @@
+/* Her way back to older stories: a framed panel on the right of the strip, the same place in the
+   clock and in the past page. Everything left of it keeps the state's main tap. */
+:root { --side: 25%; }
+
+.side {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--side);
+  display: none;
+  flex-direction: column;
+  border-left: 1px solid rgba(142, 138, 132, 0.7);
+  background: #151513;
+}
+[data-past] .clock .side, .past .side { display: flex; }
+.past:not([data-older]) [data-act="older"] { display: none; }
+
+/* Hidden with the layer, so a hidden control never takes focus or reaches a screen reader. */
+.side, .past-main { visibility: hidden; transition: visibility 0s var(--exit); }
+[data-state="clock"] .clock .side, [data-state="past"] .past .side, [data-state="past"] .past-main {
+  visibility: visible;
+  transition-delay: 0s;
+  pointer-events: auto;
+}
+
+.side-btn, .past-main {
+  appearance: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+.side-btn:focus-visible, .past-main:focus-visible { outline: 2px solid var(--cream); outline-offset: calc(-3 * var(--u)); }
+
+.side-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 calc(10 * var(--u));
+  font-family: var(--serif);
+  transition: background-color 120ms var(--ease-out);
+}
+.side-btn + .side-btn { border-top: 1px solid rgba(142, 138, 132, 0.7); }
+.side-btn:active { background: #23221F; }
+.side-line {
+  font-size: calc(12 * var(--u));
+  line-height: 1.05;
+  color: var(--cream);
+  text-wrap: balance;
+}
+.side-sub {
+  margin-top: calc(3 * var(--u));
+  font-size: calc(8 * var(--u));
+  line-height: 1.15;
+  color: var(--fog);
+  font-variant-numeric: tabular-nums;
+}
+[data-subs="en"] .side-btn .en { margin-top: calc(2 * var(--u)); }
+
+[data-past] .clock { padding-right: calc(var(--side) + 20 * var(--u)); }
+[data-past] .clock .hint, [data-past] .family-code, .past .hint { right: calc(var(--side) + 20 * var(--u)); }
+
+[data-state="past"] .past { opacity: 1; transition-duration: var(--enter); }
+.past-img {
+  position: absolute;
+  inset: 0 var(--side) 0 0;
+  width: calc(100% - var(--side));
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.85) brightness(0.32);
+}
+.past-img:not([src]) { display: none; }
+.past-main {
+  position: absolute;
+  inset: calc(22 * var(--u)) calc(var(--side) + 20 * var(--u)) calc(8 * var(--u)) calc(30 * var(--u));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.past .headline {
+  font-size: calc(22 * var(--u));
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+[data-subs="en"] .past .headline { -webkit-line-clamp: 1; line-clamp: 1; }
+.past .sub { display: block; margin-top: calc(5 * var(--u)); color: var(--cream); opacity: 0.8; }
+.past .hint, .past .sub, .past .headline { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 0 18px rgba(0, 0, 0, 0.35); }
+.past .hint { color: rgba(236, 230, 220, 0.85); }
+[data-subs="en"] .past .hint .en { display: inline; }
+[data-subs="en"] .past .hint .en::before { content: " \00b7  "; }
+.past .side-btn { padding: calc(4 * var(--u)) calc(8 * var(--u)); }
+.past .side-line { font-size: calc(10 * var(--u)); }
