@@ -1,0 +1,42 @@
+id,surface,feature,user_story,expected,status,last_tested,evidence,findings
+I01,iOS,Onboarding profile,"As Angel, I enter my name and languages so the app knows who I am","Name, she speaks, you speak fields; Connect enabled once filled",pass,2026-10-25,docs/qa/shots/I01.png,"F2. Minor: disabled Connect gives no reason; name placeholder looks filled; FIRST PAGE eyebrow"
+I02,iOS,This phone is her Hearth,"As a family without a tablet, I set this phone up as Margaret's Hearth","Phone switches to Hearth mode with record, play and Escuchar otra vez",untested,2026-10-25,,
+I03,iOS,Pair with Hearth,"As Angel, I connect my phone to Margaret's Hearth with the family code","Clear instruction for reading the code off the Hearth and typing it here",fail,2026-10-25,docs/qa/shots/I03.png,"F1: copy says enter on her Hearth, primary button skips pairing. F2"
+I04,iOS,Voice enroll,"As Angel, I read a passage so my notes play in my voice","Passage, record disc, skip link",pass,2026-10-25,docs/qa/shots/I04.png,"F2. Minor: SECOND PAGE vs FIRST PAGE inconsistent"
+I05,iOS,Bad family code,"As Angel, I see why a code failed and what to do next","Error plus next step",pass,2026-10-25,docs/qa/shots/I05.png,"F2. Minor: error lacks next step"
+I06,iOS,Demo week,"As Angel in demo mode, I see this week's stories from Margaret","Week strip, latest story, list of past stories",pass,2026-10-25,docs/qa/shots/I06.png,"F2 (uppercase MON..SUN and date line). Minor: tab bar has no selected state"
+I07,iOS,Live week,"As Angel on live keys, I see Margaret's real stories","Each story has its own title",pass,2026-10-25,docs/qa/shots/I07.png,"F5 (every story was Mama's tamales), fixed in #45. F2"
+I08,iOS,Pick a day,"As Angel, I tap a day in the week strip to see that day","Selected day shows its stories",untested,2026-10-25,,
+I09,iOS,Listen to a story,"As Angel, I tap Listen and hear the story in English with the scene","Audio plays, scene photo, transcript, scrubber",pass,2026-10-25,docs/qa/shots/I09.png,"F2 (CLOSE, TO MARGARET). Minor: duration 1:04 vs 1:19 across launches"
+I10,iOS,Transcript follows audio,"As Angel, I read along while the story plays","Transcript stays readable over the scene",pass,2026-10-25,docs/qa/shots/I10.png,"F2. Minor: transcript scrolls over the scene photo"
+I11,iOS,Hear her original,"As Angel, I hear Margaret's own voice in Spanish","Original audio plays",untested,2026-10-25,,
+I12,iOS,Write back,"As Angel, I answer one of the suggested questions in my voice","Prompt list, record, send",pass,2026-10-25,docs/qa/shots/I12.png,"F6 (hold only). F2 (REC, CLOSE). Minor: REC shows while idle; prompt and instruction run together"
+I13,iOS,Write back reaches Hearth,"As Angel, my write-back plays on the Hearth in Spanish","Hearth plays it with Spanish and English captions",pass,2026-10-25,docs/qa/shots/H08.png,F4
+I14,iOS,New note,"As Angel, I send a free note from the New note tab","Prompts, record, send",pass,2026-10-25,docs/qa/shots/I14.png,"F6. F2"
+I15,iOS,New note reaches Hearth,"As Angel, my free note is translated and announced on the Hearth","LLM translation, toast on the Hearth, tap plays",pass,2026-10-25,docs/qa/shots/H09.png,"Minor: toast hides after 5 s; toast can cover playback"
+I16,iOS,Settings,"As Angel, I see my profile, family code, voice and demo toggle","Back of the book with profile and demo sections",pass,2026-10-25,docs/qa/shots/I16.png,"F2 (PROFILE, DEMO, KINN)"
+I17,iOS,Record my voice again,"As Angel, I redo my voice sample from Settings","Voice enroll opens and replaces the clone",untested,2026-10-25,,
+I18,iOS,Start over,"As Angel, I reset the app and go back to onboarding","Confirm, then first page",untested,2026-10-25,,
+I19,iOS,Send failure,"As Angel, I see when a note did not send and can retry","Your note did not send. Try again",untested,2026-10-25,,
+I20,iOS,Live week with my notes,"As Angel, I tell my sent notes apart from Margaret's stories","Sent notes marked as mine",fail,2026-10-25,docs/qa/shots/I20.png,"F7: my notes look like her stories. F5 Title Case, fixed in #45"
+H01,Hearth,Clock idle,"As Margaret, I see the date and time when nothing is new","Large date and clock, family code",pass,2026-10-25,docs/qa/shots/H01.png,"F3 (family code and English subs under 32 px)"
+H02,Hearth,Tap plays,"As Margaret, I press the button to hear a new note","Press plays the newest unheard note",pass,2026-10-25,docs/qa/shots/H08.png,F3 (no line says what a tap does)
+H03,Hearth,Waiting,"As Margaret, I see that Angel wrote and what about","Who wrote, about which story, how to play it",pass,2026-10-25,docs/qa/shots/H03.png,"F3 (DOMINGO 25, 1:08 eyebrow, uppercase subs, italics, no tap line)"
+H04,Hearth,Margaret records live,"As Margaret, I hold the button and tell a story on the real tablet","Recording state, then sending",untested,2026-10-25,,"Demo states pass in browser, see H11, H12"
+H05,Hearth,Live story processed,"As Margaret, my story becomes a titled story in Angel's Almanac","Story with its own sentence case title",untested,2026-10-25,,"Backend side covered by B02"
+H06,Hearth,Too short recording,"As Margaret, a press that is too short does nothing harmful","Back to idle, nothing sent",untested,2026-10-25,,
+H07,Hearth,Replay history,"As Margaret, I press with nothing new and hear an older note","Plays the latest heard note",untested,2026-10-25,,
+H08,Hearth,Playing write-back,"As Margaret, I hear Angel's write-back with captions","Spanish caption, English sub, scene",pass,2026-10-25,docs/qa/shots/H08.png,"F4 (no scrim). F3 italics"
+H09,Hearth,New note toast,"As Margaret, I see a toast when a new note arrives","Toast names sender and title",pass,2026-10-25,docs/qa/shots/H09.png,"F3. F5 Title Case, fixed in #45. Minor: toast hides after 5 s"
+H09b,Hearth,Toast over waiting,"As Margaret, the toast does not collide with the screen under it","Toast replaces the waiting text cleanly",pass,2026-10-25,docs/qa/shots/H09b.png,"Minor: toast text overlaps waiting text in this frame, may be mid crossfade"
+H10,Hearth,Playing free note,"As Margaret, I hear Angel's free note over a scene","Header, Spanish caption, English sub",pass,2026-10-25,docs/qa/shots/H10.png,"F4 (header and caption on bright scene). F3"
+H11,Hearth,Recording (demo),"As Margaret, I see that the Hearth is listening and to which question","te escucho, prompt, REC timer",pass,2026-10-25,docs/qa/shots/H11.png,"F3 (italics, uppercase subs). Minor: no line says press again to stop"
+H12,Hearth,Sending (demo),"As Margaret, I see my story is being saved and sent","guardando tu historia, se la mando a Angel",pass,2026-10-25,docs/qa/shots/H12.png,F3
+H13,Hearth,Saved (demo),"As Margaret, I see my story is saved and its title","tu historia está guardada plus title",pass,2026-10-25,docs/qa/shots/H13.png,F3
+H14,Hearth,Send error (demo),"As Margaret, I know a send failed and can retry","Error line with retry",pass,2026-10-25,docs/qa/shots/H14.png,"F3 (UN MOMENTO eyebrow). Minor: does not say press the button to retry"
+H15,Hearth,Calibrate,"As the builder, I calibrate the strip and button zone","Overlay with zone, hits, reset buttons",pass,2026-10-25,docs/qa/shots/H15.png,
+H16,Hearth,Mat template,"As the builder, I trace the mat cutouts","Strip window and button hole with measurements",pass,2026-10-25,docs/qa/shots/H16.png,
+H17,Hearth,Demo boot,"As the presenter, ?demo=1 boots to the clock, then the demo note","Clock, then waiting with Nuevo mensaje de Angel",pass,2026-10-25,docs/qa/shots/H17.png;docs/qa/shots/H17b.png,"F3 (no tap line). Minor: about 5 s of clock before the note shows"
+H18,Hearth,Unconfigured,"As the builder, a Hearth without thread and profile tells me so","Clock with falta configurar",pass,2026-10-25,docs/qa/shots/H18.png,"Minor: FALTA CONFIGURAR is tiny uppercase, no English, no next step"
+B01,Backend,LLM translation,"As Angel, my free note is translated to Spanish by the LLM","Spanish text and title from the LLM",pass,2026-10-25,docs/qa/shots/H10.png,
+B02,Backend,Title summary,"As Angel, each story gets a short sentence case title of its own","Sentence case, demo story only at 70% word overlap",pass,2026-10-25,,"F5 fixed in #45"
