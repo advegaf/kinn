@@ -1,0 +1,337 @@
+<!doctype html>
+<!--
+  Mother Tongue, take v4a "Diary". The closest evolution of v4 "Field notes".
+  The week is a ledger page: dates left of a faded madder margin line, stories right of it.
+  Today is marked by a fabric ribbon bookmark lying across the pasted print, plus a small dater stamp.
+  No light-up accents on the phone. Recording is a muted red REC dot and a tape counter.
+  The Hearth keeps the taupe shell. A new story shows as the sender line and the button lit
+  from behind like a nightlight through paper.
+-->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#ECE6DC; --paper:#EEE8DE; --taupe:#CFC6B8; --fog:#8E8A84; --ink:#1B1A18; --night:#0B0B0A;
+  --studio:#E2DED8; --rule:rgba(27,26,24,.13); --soft:#6F6B65; --sub:#77726B;
+  --ribbon:#82342C; --madder:rgba(140,59,50,.26); --rec:#B23A2E; --lamp:#F6E7C8;
+  --serif:"Instrument Serif", "New York", Georgia, serif;
+  --sans:"Inter", -apple-system, system-ui, sans-serif;
+  --grain:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--studio)}
+body{font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;padding:64px 80px 80px}
+.title{font:400 12px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#76726C;margin:0 0 40px 6px}
+.title b{font-weight:400;color:var(--ink);margin-right:10px}
+.phones{display:flex;gap:40px}
+.hearths{display:grid;grid-template-columns:repeat(2,max-content);gap:44px 56px;margin-top:72px}
+.label{font:400 12px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#76726C;margin:0 0 16px 6px;white-space:nowrap}
+.label b{font-weight:400;color:var(--ink);margin-right:10px}
+.g{position:relative;isolation:isolate}
+.g::after{content:"";position:absolute;inset:0;background-image:var(--grain);background-size:240px;mix-blend-mode:overlay;opacity:.5;pointer-events:none;border-radius:inherit;z-index:50}
+.mono{font:400 11px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--fog);white-space:nowrap}
+.num{font-variant-numeric:tabular-nums}
+
+/* device */
+.device{width:409px;height:868px;border-radius:64px;padding:8px;background:#2A2927;box-shadow:0 0 0 1px #4A4845,0 40px 80px -40px rgba(40,34,28,.45)}
+.screen{width:393px;height:852px;border-radius:56px;overflow:hidden;position:relative;background:var(--paper)}
+.screen.night{background:var(--night);color:var(--cream)}
+.status{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:center;justify-content:space-between;padding:6px 34px 0 46px;font:400 16px/1 var(--sans);z-index:40}
+.island{position:absolute;top:11px;left:50%;width:124px;height:36px;margin-left:-62px;background:#000;border-radius:20px;z-index:41}
+.batt{display:flex;gap:6px;align-items:center}
+.bars{display:flex;gap:2px;align-items:flex-end;height:11px}
+.bars i{width:3px;background:currentColor;border-radius:1px}
+.cell{width:24px;height:12px;border-radius:4px;border:1px solid currentColor;opacity:.9;padding:1.5px}
+.cell::before{content:"";display:block;height:100%;width:70%;background:currentColor;border-radius:2px}
+.home{position:absolute;bottom:8px;left:50%;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:rgba(27,26,24,.75);z-index:42}
+.night .home{background:rgba(236,230,220,.7)}
+
+/* paper: binding shadow at the spine, page edges at the fore edge */
+.page::before{content:"";position:absolute;top:0;bottom:0;left:0;width:26px;background:linear-gradient(90deg,rgba(70,52,34,.16),rgba(70,52,34,.05) 40%,transparent);z-index:1;pointer-events:none}
+.page::after{content:"";position:absolute;top:0;bottom:0;right:0;width:5px;background:repeating-linear-gradient(90deg,transparent 0 1px,rgba(90,72,52,.12) 1px 2px);z-index:1;pointer-events:none}
+.mline{position:absolute;top:0;bottom:0;width:1px;background:var(--madder);z-index:2}
+
+.print{position:relative;overflow:hidden;background:#2a2420}
+.print img{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(.82) contrast(.96)}
+.print::before{content:"";position:absolute;inset:0;box-shadow:inset 0 0 30px rgba(30,24,18,.3);z-index:2}
+
+/* ribbon bookmark */
+.ribbon{position:absolute;width:17px;z-index:20;filter:drop-shadow(0 3px 2px rgba(40,18,10,.32)) drop-shadow(1px 0 0 rgba(40,18,10,.12))}
+.ribbon i{display:block;height:100%;background:
+  linear-gradient(180deg,rgba(0,0,0,.28),transparent 14px),
+  linear-gradient(90deg,rgba(0,0,0,.14),transparent 25%,transparent 75%,rgba(0,0,0,.14)),
+  linear-gradient(180deg,transparent 9px,rgba(255,235,225,.14) 9px 10px,transparent 10px),
+  repeating-linear-gradient(90deg,rgba(255,236,224,.09) 0 1px,transparent 1px 2.5px),
+  repeating-linear-gradient(0deg,rgba(0,0,0,.11) 0 1px,transparent 1px 2px),
+  var(--ribbon);
+  clip-path:polygon(0 0,100% 0,100% 100%,50% calc(100% - 9px),0 100%)}
+
+/* dater stamp */
+.stamp{display:inline-block;font:500 9.5px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--ribbon);border:1px solid currentColor;border-radius:3px;padding:5px 6px 4px;transform:rotate(-2.5deg);opacity:.78;white-space:nowrap;
+  -webkit-mask-image:var(--grain);-webkit-mask-size:120px;mask-image:var(--grain);mask-size:120px}
+.stamp b{display:block;font-weight:500;font-size:13px;letter-spacing:.06em;margin-top:3px}
+
+/* 01 the week */
+.diary{position:relative;padding:78px 28px 0 30px;height:100%}
+.head{display:flex;justify-content:space-between;align-items:baseline}
+.h1{font:400 40px/1 var(--serif);letter-spacing:-.015em;margin-top:16px}
+.h1 em{display:block;font-size:19px;color:var(--sub);margin-top:8px;letter-spacing:0}
+.days{list-style:none;margin-top:18px;border-top:1px solid var(--rule);position:relative}
+.days .mline{left:96px;top:0;bottom:-400px}
+.day{display:grid;grid-template-columns:96px 1fr;align-items:baseline;padding:11px 0 10px;border-bottom:1px solid var(--rule);position:relative}
+.d{font:400 19px/1 var(--serif);color:var(--soft);white-space:nowrap}
+.d i{font-style:normal;font-variant-numeric:tabular-nums}
+.st{font:400 20px/1.1 var(--serif);padding-left:12px}
+.st em{display:block;font-size:17px;color:var(--sub);margin-top:3px}
+.day.today{align-items:start;padding:14px 0 16px}
+.day.today .d{color:var(--ink);font-size:22px;padding-top:2px}
+.day.today .stamp{margin-top:14px;margin-left:-2px}
+.day.today .st{padding-top:0}
+.day.today .print{height:112px;border-radius:2px;margin-right:12px;box-shadow:0 1px 0 rgba(255,255,255,.6),0 12px 22px -16px rgba(40,30,20,.6),0 0 0 1px rgba(0,0,0,.06)}
+.day.today .print img{object-position:40% 55%}
+.day.today .t{padding-right:24px;font:400 28px/1.05 var(--serif);letter-spacing:-.01em;margin-top:12px}
+.day.today .t em{display:block;font-size:18px;color:var(--sub);margin-top:5px;letter-spacing:0}
+.day.today .ribbon{right:0;top:-10px;bottom:-30px}
+.day.later .d,.day.later .st,.day.later .st em{color:#B2ACA3}
+
+/* 02 the entry */
+.entry .print{height:322px}
+.entry .print img{object-position:38% 58%;filter:saturate(.85) contrast(1.02) brightness(.95)}
+.entry .print::after{content:"";position:absolute;left:0;right:0;bottom:0;height:110px;background:linear-gradient(rgba(11,11,10,0),var(--night));z-index:3}
+.entry .body{padding:2px 30px 0}
+.entry .date{font:400 19px/1 var(--serif);color:var(--fog)}
+.entry h2{font:400 36px/1.02 var(--serif);letter-spacing:-.015em;margin-top:10px;font-weight:400}
+.entry h2 em{display:block;font-size:19px;color:var(--fog);margin-top:6px;letter-spacing:0}
+.entry .words{font:400 21px/1.4 var(--serif);color:#D9D3C9;margin-top:18px;text-wrap:pretty}
+.entry .words em{color:#A39E96}
+.track{position:absolute;left:30px;right:30px;bottom:112px}
+.track .bar{height:1px;background:rgba(236,230,220,.18);position:relative}
+.track .bar i{position:absolute;left:0;top:0;height:1px;width:38%;background:rgba(236,230,220,.75)}
+.track .t2{display:flex;justify-content:space-between;margin-top:10px;font:400 12px/1 var(--sans);color:var(--fog)}
+.foot{position:absolute;left:30px;right:30px;bottom:50px;display:flex;justify-content:space-between;align-items:baseline}
+.link{font:italic 400 20px/1 var(--serif);color:#A39E96;text-decoration:underline dotted 1px;text-underline-offset:5px}
+.wb{font:400 21px/1 var(--serif);color:var(--cream);display:flex;align-items:baseline;gap:8px}
+.wb span{font:400 11px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--fog)}
+.vign{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 40%,transparent 55%,rgba(0,0,0,.5));pointer-events:none;z-index:30}
+
+/* 03 writing back */
+.write{position:relative;padding:78px 30px 0 30px;height:100%}
+.quote{margin-top:22px;padding-left:16px;border-left:1px solid var(--madder);font:italic 400 19px/1.35 var(--serif);color:var(--soft);text-wrap:pretty}
+.margin{margin-top:28px;border-top:1px solid var(--rule)}
+.margin p{font:400 21px/1.25 var(--serif);color:#A39D94;padding:10px 0;border-bottom:1px solid var(--rule);display:grid;grid-template-columns:30px 1fr}
+.margin p i{font-style:italic;color:#B9B3AA}
+.margin p.on{color:var(--ink)}
+.margin p.on i{color:var(--ribbon)}
+.live{position:absolute;left:30px;right:30px;top:356px;height:333px;padding-top:1px;font:400 30px/37px var(--serif);letter-spacing:-.01em;text-wrap:pretty;background:repeating-linear-gradient(180deg,transparent 0 36px,var(--rule) 36px 37px)}
+.live .fade{color:#A9A39A}
+.caret{display:inline-block;width:1.5px;height:26px;background:var(--ink);vertical-align:-4px;margin-left:3px}
+.hold{position:absolute;left:30px;right:30px;bottom:50px;display:flex;align-items:center;gap:20px}
+.disc{width:72px;height:72px;border-radius:50%;background:var(--ink);display:grid;place-items:center;box-shadow:inset 0 -2px 4px rgba(0,0,0,.4),0 10px 18px -10px rgba(30,20,10,.5);flex:none}
+.disc span{width:22px;height:22px;border-radius:50%;background:var(--rec);box-shadow:inset 0 1px 1px rgba(255,220,200,.25)}
+.recrow{display:flex;align-items:center;gap:12px}
+.rec{display:inline-flex;align-items:center;gap:7px;font:500 11px/1 var(--sans);letter-spacing:.12em;color:var(--rec)}
+.rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--rec)}
+.counter{display:inline-flex;align-items:center;gap:2px;font:400 15px/1 var(--sans);font-variant-numeric:tabular-nums;color:var(--ink)}
+.counter i{font-style:normal;display:grid;place-items:center;width:19px;height:26px;border-radius:3px;background:#E2DACD;box-shadow:inset 0 1px 2px rgba(60,44,28,.22),0 1px 0 rgba(255,255,255,.7)}
+.counter s{text-decoration:none;color:var(--soft);padding:0 1px}
+.hint{font:italic 400 18px/1 var(--serif);color:var(--soft);margin-top:10px}
+
+/* 04 onboarding */
+.onb{position:relative;padding:78px 30px 0 30px;height:100%}
+.onb .h1{font-size:38px;line-height:1.02;text-wrap:balance;margin-top:22px}
+.fields{margin-top:26px;border-top:1px solid var(--rule)}
+.f{display:grid;grid-template-columns:96px 1fr;align-items:baseline;padding:13px 0 11px;border-bottom:1px solid var(--rule)}
+.f .k{font:400 17px/1.1 var(--serif);color:var(--soft)}
+.f .k em{display:block;font-size:15px;color:#9C968D}
+.f .v{font:400 26px/1 var(--serif);padding-left:12px}
+.connect{margin-top:26px}
+.mini{margin-top:16px;width:236px;height:74px;border-radius:22px;background:var(--taupe);display:flex;align-items:center;padding-left:12px;gap:14px;box-shadow:inset 0 1px 1px rgba(255,255,255,.55),inset 0 -8px 14px rgba(90,76,58,.18),0 10px 16px -10px rgba(60,50,38,.45)}
+.mini span{width:176px;height:50px;border-radius:6px;background:var(--night);display:flex;align-items:center;justify-content:center;gap:9px;font:400 28px/1 var(--serif);color:var(--cream);font-variant-numeric:tabular-nums;box-shadow:0 0 0 2px #C4BBAC}
+.mini i{width:22px;height:22px;border-radius:50%;background:#C8BFB1;box-shadow:inset 0 2px 4px rgba(70,58,44,.35)}
+.connect h2{font:400 26px/1.05 var(--serif);letter-spacing:-.01em;font-weight:400}
+.connect p{font:italic 400 18px/1.3 var(--serif);color:var(--soft);margin-top:6px;text-wrap:pretty}
+.code{display:flex;gap:10px;margin-top:18px}
+.code span{width:48px;height:56px;display:grid;place-items:center;font:400 36px/1 var(--serif);font-variant-numeric:tabular-nums;border-bottom:1.5px solid var(--ink);background:rgba(255,255,255,.22)}
+.code span.e{border-bottom-color:rgba(27,26,24,.3)}
+.code span.e::after{content:"";width:1.5px;height:30px;background:var(--ink)}
+.cta{position:absolute;left:30px;right:30px;bottom:50px;height:58px;border-radius:4px;background:var(--ink);color:var(--cream);display:flex;align-items:center;justify-content:center;font:400 21px/1 var(--serif)}
+
+/* Hearth */
+.shell{width:832px;height:290px;border-radius:56px;background:var(--taupe);box-shadow:inset 0 2px 1px rgba(255,255,255,.55),inset 0 -26px 46px rgba(90,76,58,.2),0 2px 2px rgba(60,50,38,.12),0 40px 60px -30px rgba(60,50,38,.45);position:relative;display:flex;align-items:center;padding-left:44px}
+.glass{width:640px;height:200px;border-radius:14px;overflow:hidden;background:var(--night);position:relative;z-index:3;box-shadow:0 0 0 5px #C4BBAC,0 0 0 6px rgba(60,50,38,.15)}
+.glass::before{content:"";position:absolute;inset:0;box-shadow:inset 0 6px 16px rgba(0,0,0,.7);z-index:45;border-radius:inherit}
+.strip{width:1280px;height:400px;transform:scale(.5);transform-origin:0 0;position:absolute;left:0;top:0;color:var(--fog)}
+.btn{position:absolute;right:46px;top:50%;margin-top:-32px;width:64px;height:64px;border-radius:50%;background:#C8BFB1;box-shadow:inset 0 6px 12px rgba(70,58,44,.35),inset 0 -2px 2px rgba(255,255,255,.55)}
+.btn.lit{background:radial-gradient(circle at 50% 46%,#FFF8EA 0,#F8EBD0 38%,#EBD9B6 72%,#D9C7A6 100%);box-shadow:inset 0 3px 6px rgba(120,96,60,.22),inset 0 -2px 2px rgba(255,255,255,.6),0 0 0 3px rgba(246,231,200,.35),0 0 16px 2px rgba(246,231,200,.38)}
+.btn.down{box-shadow:inset 0 9px 16px rgba(70,58,44,.45),inset 0 -1px 1px rgba(255,255,255,.4)}
+.cal{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 120px 10px}
+.cal .wd{font:400 150px/1 var(--serif);letter-spacing:-.02em;color:#8A867F}
+.cal .wd em{display:block;font-size:52px;color:#5D5A55;margin-top:18px;letter-spacing:0}
+.cal .clk{font:400 150px/1 var(--serif);color:#5D5A55;font-variant-numeric:tabular-nums}
+.note{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 120px}
+.note .mono{font-size:24px;color:var(--fog)}
+.note h3{font:400 112px/1 var(--serif);color:var(--cream);letter-spacing:-.02em;margin-top:22px;font-weight:400}
+.note p{font:italic 400 46px/1.1 var(--serif);color:var(--fog);margin-top:16px}
+.hrec{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 120px 6px}
+.hrec h3{font:italic 400 116px/1 var(--serif);color:var(--cream);letter-spacing:-.02em;font-weight:400}
+.hrec h3 + p{font:italic 400 44px/1.1 var(--serif);color:var(--fog);margin-top:18px}
+.hrec .side{display:flex;flex-direction:column;align-items:flex-end;gap:26px}
+.hrec .rec{font-size:24px;gap:16px;color:#C9584B}
+.hrec .rec::before{width:22px;height:22px;background:var(--rec)}
+.hrec .counter{font-size:52px;gap:6px;color:var(--cream)}
+.hrec .counter i{width:52px;height:76px;border-radius:8px;background:#1C1B19;box-shadow:inset 0 2px 6px rgba(0,0,0,.7),0 1px 0 rgba(255,255,255,.06)}
+.hrec .counter s{color:var(--fog)}
+.film{position:absolute;inset:0}
+.film img{width:100%;height:100%;object-fit:cover;filter:saturate(.85) brightness(.82)}
+.film .vign{background:radial-gradient(90% 120% at 50% 50%,transparent 45%,rgba(0,0,0,.7))}
+.hstamp{position:absolute;left:90px;top:56px;font:italic 400 44px/1 var(--serif);color:rgba(236,230,220,.82);z-index:35}
+.cap{position:absolute;left:90px;right:160px;bottom:60px;font:400 56px/1.1 var(--serif);color:var(--cream);text-shadow:0 2px 30px rgba(0,0,0,.6);z-index:35;text-wrap:balance}
+</style>
+</head>
+<body>
+<p class="title"><b>v4a</b>Diary</p>
+<div class="phones">
+
+  <!-- 01 the week -->
+  <div>
+    <p class="label"><b>01</b>iPhone, the week</p>
+    <div class="device"><div class="screen page g">
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span class="batt"><span class="bars"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:11px"></i></span><span class="cell"></span></span></div>
+      <div class="diary">
+        <div class="head"><span class="mono">Rosa, Monterrey</span><span class="mono num">6 of 7</span></div>
+        <h1 class="h1">Semana del 19<em>The week of October 19</em></h1>
+        <ul class="days">
+          <span class="mline"></span>
+          <li class="day"><span class="d">lunes <i>19</i></span><span class="st">El pueblo junto al canal<em>The town by the canal</em></span></li>
+          <li class="day"><span class="d">martes <i>20</i></span><span class="st">Aquel verano en el campo<em>That summer in the fields</em></span></li>
+          <li class="day"><span class="d">miércoles <i>21</i></span><span class="st">La banca frente al mar<em>The bench facing the sea</em></span></li>
+          <li class="day"><span class="d">jueves <i>22</i></span><span class="st">Té de la tarde<em>Afternoon tea</em></span></li>
+          <li class="day"><span class="d">viernes <i>23</i></span><span class="st">La bicicleta verde<em>The green bicycle</em></span></li>
+          <li class="day today">
+            <div><span class="d">sábado <i>24</i></span><br><span class="stamp">Recibido<b class="num">24 oct</b></span></div>
+            <div class="st">
+              <div class="print"><img src="../media/1-cocina.jpg" alt=""></div>
+              <p class="t">Los tamales de mamá<em>Mama's tamales</em></p>
+            </div>
+            <span class="ribbon"><i></i></span>
+          </li>
+          <li class="day later"><span class="d">domingo <i>25</i></span><span class="st"><em style="margin:0">mañana, tomorrow</em></span></li>
+        </ul>
+      </div>
+      <div class="home"></div>
+    </div></div>
+  </div>
+
+  <!-- 02 the entry -->
+  <div>
+    <p class="label"><b>02</b>iPhone, the entry</p>
+    <div class="device"><div class="screen night g">
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span class="batt"><span class="bars"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:11px"></i></span><span class="cell"></span></span></div>
+      <div class="entry">
+        <div class="print"><img src="../media/1-cocina.jpg" alt=""></div>
+        <div class="body">
+          <p class="date">sábado 24 de octubre</p>
+          <h2>Mama's tamales<em>Los tamales de mamá</em></h2>
+          <p class="words">Every Christmas my mother woke us at five to spread the masa. We sat on the floor with the husks in our laps, <em>and she sang the whole time, very low, so my father would keep sleeping.</em> The kitchen smelled of anise and smoke.</p>
+        </div>
+        <div class="track"><div class="bar"><i></i></div><div class="t2 num"><span>1:04</span><span>2:48</span></div></div>
+        <div class="foot"><span class="link">Hear her original</span><span class="wb">Write back <span>to Rosa</span></span></div>
+      </div>
+      <div class="vign"></div>
+      <div class="home"></div>
+    </div></div>
+  </div>
+
+  <!-- 03 writing back -->
+  <div>
+    <p class="label"><b>03</b>iPhone, writing back</p>
+    <div class="device"><div class="screen page g">
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span class="batt"><span class="bars"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:11px"></i></span><span class="cell"></span></span></div>
+      <div class="write">
+        <div class="head"><span class="mono">To Rosa</span><span class="mono">sábado 24</span></div>
+        <p class="quote">…and she sang the whole time, very low.</p>
+        <div class="margin">
+          <p><i>i.</i>What song was she singing?</p>
+          <p class="on"><i>ii.</i>Who taught her to make them?</p>
+          <p><i>iii.</i>Tell her about your Christmas.</p>
+        </div>
+        <p class="live">Abuela, who taught your mom to make them? <span class="fade">Was it her mother too</span><span class="caret"></span></p>
+        <div class="hold">
+          <div class="disc"><span></span></div>
+          <div>
+            <div class="recrow"><span class="rec">REC</span><span class="counter"><i>0</i><i>0</i><s>:</s><i>1</i><i>2</i></span></div>
+            <p class="hint">Let go to send</p>
+          </div>
+        </div>
+      </div>
+      <div class="home"></div>
+    </div></div>
+  </div>
+
+  <!-- 04 first run -->
+  <div>
+    <p class="label"><b>04</b>iPhone, first run</p>
+    <div class="device"><div class="screen page g">
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span class="batt"><span class="bars"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:11px"></i></span><span class="cell"></span></span></div>
+      <div class="onb">
+        <div class="head"><span class="mono">Mother Tongue</span><span class="mono">First page</span></div>
+        <h1 class="h1">¿Para quién es este diario?<em>Who is this diary for?</em></h1>
+        <div class="fields">
+          <div class="f"><span class="k">Para<em>For</em></span><span class="v">Abuela Rosa</span></div>
+          <div class="f"><span class="k">De<em>From</em></span><span class="v">Sofía</span></div>
+          <div class="f"><span class="k">Ella habla<em>She speaks</em></span><span class="v">español</span></div>
+        </div>
+        <div class="connect">
+          <h2>Connect to her Hearth</h2>
+          <p>Type the four numbers her Hearth shows.</p>
+          <div class="mini"><span>7 2 4 1</span><i></i></div>
+          <div class="code"><span>7</span><span>2</span><span>4</span><span class="e"></span></div>
+        </div>
+        <div class="cta">Connect to Abuela Rosa's Hearth</div>
+      </div>
+      <div class="home"></div>
+    </div></div>
+  </div>
+</div>
+
+<div class="hearths">
+  <div>
+    <p class="label"><b>05</b>Hearth, idle</p>
+    <div class="shell g">
+      <div class="glass"><div class="strip"><div class="cal"><div class="wd">sábado<em>24 de octubre</em></div><div class="clk">7:42</div></div><div class="vign"></div></div></div>
+      <div class="btn"></div>
+    </div>
+  </div>
+  <div>
+    <p class="label"><b>06</b>Hearth, new story waiting</p>
+    <div class="shell g">
+      <div class="glass"><div class="strip"><div class="note"><span class="mono">sábado 24, 7:42</span><h3>Sofía te escribió</h3><p>sobre «Los tamales de mamá»</p></div><div class="vign"></div></div></div>
+      <div class="btn lit"></div>
+    </div>
+  </div>
+  <div>
+    <p class="label"><b>07</b>Hearth, recording</p>
+    <div class="shell g">
+      <div class="glass"><div class="strip"><div class="hrec"><div><h3>te escucho</h3><p>cuéntale a Sofía quién te enseñó</p></div><div class="side"><span class="rec">REC</span><span class="counter"><i>0</i><i>0</i><s>:</s><i>4</i><i>2</i></span></div></div><div class="vign"></div></div></div>
+      <div class="btn down"></div>
+    </div>
+  </div>
+  <div>
+    <p class="label"><b>08</b>Hearth, playing</p>
+    <div class="shell g">
+      <div class="glass"><div class="strip"><div class="film"><img src="../media/7-atardecer.jpg" alt=""><div class="vign"></div></div><div class="hstamp">de Sofía, sábado 24</div><div class="cap">Abuela, ¿quién le enseñó a tu mamá a hacerlos?</div></div></div>
+      <div class="btn"></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

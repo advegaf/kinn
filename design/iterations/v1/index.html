@@ -1,0 +1,266 @@
+<!doctype html>
+<!--
+  v1 "Polaroid stack". Design rationale.
+  The archive is a table of fogged instant prints: today's story is one large print, the rest of the week sits beneath it as small prints marked by day.
+  Cream is the shell color of the object, so every daylight surface on the phone borrows it; night is reserved for watching, exactly like the Hearth.
+  Instrument Serif carries every name, title and spoken word. Inter appears only as small spaced labels, so the type reads like a caption on the back of a photo.
+  Mint is a signal, never decoration: the dot on tonight's print, the live ring while recording, the button halo when a story is waiting on the Hearth.
+  Grain sits over every surface and the media is softened, so nothing looks sharper than a memory.
+  One hero per screen, no tab bar, no feed, nothing to scroll.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Polaroid Stack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#ECE6DC; --taupe:#CFC6B8; --fog:#8E8A84; --ink:#1B1A18; --night:#0B0B0A; --mint:#A8F0CF;
+  --paper:#F6F2EA; --studio:#D6D2CA;
+  --serif:"Instrument Serif", Georgia, "Times New Roman", serif;
+  --sans:Inter, system-ui, sans-serif;
+  --grain:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:2340px;height:1160px;overflow:hidden;background:var(--studio);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{font-family:var(--sans);color:var(--ink)}
+.grain{position:relative;isolation:isolate}
+.grain::after{content:"";position:absolute;inset:0;background-image:var(--grain);mix-blend-mode:overlay;opacity:.32;pointer-events:none;z-index:50;border-radius:inherit}
+.dark.grain::after{opacity:.5;mix-blend-mode:soft-light}
+
+/* board */
+.board{padding:56px 72px 0}
+.head{display:flex;align-items:baseline;gap:28px;margin-bottom:44px}
+.head h1{font:400 44px/1 var(--serif);letter-spacing:-.02em}
+.head p{font:400 12px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:#6f6b65}
+.row{display:flex;gap:72px;align-items:flex-start}
+.phones{display:flex;gap:48px}
+.hearths{display:flex;flex-direction:column;gap:30px}
+.label{font:400 11px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:#6f6b65;margin:0 0 14px 6px;white-space:nowrap}
+
+/* iPhone */
+.device{width:413px;height:872px;border-radius:62px;background:#1d1c1a;padding:10px;box-shadow:0 40px 70px -30px rgba(27,26,24,.45),0 2px 3px rgba(27,26,24,.2)}
+.screen{width:393px;height:852px;border-radius:52px;overflow:hidden;position:relative;background:var(--cream)}
+.screen.dark{background:var(--night);color:var(--cream)}
+.status{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:center;justify-content:space-between;padding:6px 32px 0 44px;font:400 16px/1 var(--sans);z-index:40}
+.status svg{display:block}
+.island{position:absolute;top:11px;left:50%;width:124px;height:36px;margin-left:-62px;border-radius:20px;background:#000;z-index:41}
+.homebar{position:absolute;bottom:9px;left:50%;width:136px;height:5px;margin-left:-68px;border-radius:3px;background:var(--ink);opacity:.8;z-index:40}
+.dark .homebar{background:var(--cream);opacity:.6}
+
+.tiny{font:400 11px/1.2 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--fog)}
+
+/* archive */
+.archive{padding:78px 28px 0}
+.archive h2{font:400 40px/1.02 var(--serif);letter-spacing:-.02em;margin-top:12px;text-wrap:balance}
+.archive h2 i{font-style:italic;color:#5d5a55}
+.archive .meta{margin-top:10px;font:400 12px/1 var(--sans);color:var(--fog);letter-spacing:.02em}
+
+.print{background:var(--paper);box-shadow:0 1px 1px rgba(27,26,24,.08),0 8px 18px -6px rgba(27,26,24,.22),0 26px 40px -24px rgba(27,26,24,.3);position:relative}
+.print .ph{position:relative;overflow:hidden;background:#cfc8bc}
+.print .ph img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.82) contrast(.9) brightness(1.04) blur(.4px)}
+.print .ph::after{content:"";position:absolute;inset:0;background:rgba(246,242,234,.14);box-shadow:inset 0 0 30px rgba(246,242,234,.35)}
+.hero{width:312px;margin:30px auto 0;padding:12px 12px 0;transform:rotate(-1.8deg)}
+.hero .ph{height:236px}
+.hero .cap{padding:16px 4px 18px}
+.hero .cap b{display:block;font:400 25px/1.05 var(--serif);letter-spacing:-.01em;font-weight:400}
+.hero .cap span{display:block;margin-top:6px;font:italic 400 15px/1.2 var(--serif);color:#77736d}
+.newdot{position:absolute;top:24px;right:24px;z-index:3;width:12px;height:12px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 4px rgba(168,240,207,.28),0 0 22px 4px rgba(168,240,207,.8)}
+.week{margin-top:34px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 16px;margin-top:16px;padding:0 4px}
+.sm{padding:5px 5px 0}
+.sm .ph{height:68px}
+.sm::before{content:"";position:absolute;inset:0;background:#EFEAE1;transform:rotate(-4deg) translate(3px,2px);z-index:-1;box-shadow:0 4px 10px -4px rgba(27,26,24,.25)}
+.sm:nth-child(even)::before{transform:rotate(4.5deg) translate(-2px,3px)}
+.grid{isolation:isolate}
+.sm .d{font:italic 400 15px/1 var(--serif);padding:7px 2px 8px;color:#55524d}
+.sm:nth-child(1){transform:rotate(1.6deg)} .sm:nth-child(2){transform:rotate(-1.2deg)} .sm:nth-child(3){transform:rotate(2deg)}
+.sm:nth-child(4){transform:rotate(-1.8deg)} .sm:nth-child(5){transform:rotate(1deg)} .sm:nth-child(6){transform:rotate(-1.4deg)}
+
+/* playback */
+.play .top{position:absolute;top:66px;left:28px;right:28px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+.play .ttl{position:absolute;top:116px;left:28px;right:28px;z-index:5}
+.play .ttl h3{font:400 36px/1.02 var(--serif);letter-spacing:-.02em;text-wrap:balance}
+.play .ttl p{margin-top:8px;font:italic 400 17px/1.2 var(--serif);color:var(--fog)}
+.film{position:absolute;top:214px;left:0;width:393px;height:380px;overflow:hidden;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 18%,#000 78%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 18%,#000 78%,transparent 100%)}
+.film img{width:100%;height:100%;object-fit:cover;object-position:42% 50%;filter:saturate(.85) contrast(.92) blur(.6px);transform:scale(1.04)}
+.film::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 90px 30px rgba(11,11,10,.85)}
+.words{position:absolute;top:586px;left:28px;right:28px;font:400 25px/1.24 var(--serif);color:var(--cream);text-wrap:pretty}
+.words em{color:var(--fog)}
+.prog{position:absolute;left:28px;right:28px;bottom:86px}
+.bar{height:1px;background:rgba(236,230,220,.18);position:relative}
+.bar i{position:absolute;left:0;top:0;height:1px;width:44%;background:var(--cream)}
+.times{display:flex;justify-content:space-between;margin-top:10px;font:400 11px/1 var(--sans);color:var(--fog);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.links{position:absolute;left:28px;right:28px;bottom:40px;display:flex;justify-content:space-between;font:italic 400 17px/1 var(--serif)}
+.links a{color:var(--cream);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;text-decoration-color:rgba(236,230,220,.35)}
+.links a.q{color:var(--fog);text-decoration:none}
+
+/* reply */
+.reply{padding:78px 28px 0;position:relative;height:100%}
+.ctx{display:flex;gap:16px;align-items:center}
+.ctx .print{width:58px;padding:4px 4px 12px;transform:rotate(-3deg);opacity:.7;flex:none}
+.ctx .print .ph{height:44px}
+.ctx b{display:block;font:400 21px/1.1 var(--serif);font-weight:400}
+.ctx span{display:block;margin-top:5px}
+.asks{margin-top:56px}
+.asks p{font:400 28px/1.18 var(--serif);letter-spacing:-.01em;color:#a39e96;margin-top:18px;text-wrap:balance}
+.asks p.on{color:var(--ink)}
+.rec{position:absolute;left:0;right:0;bottom:70px;display:flex;flex-direction:column;align-items:center}
+.clock{font:400 46px/1 var(--serif);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.btn{width:132px;height:132px;border-radius:50%;background:var(--ink);margin-top:26px;display:grid;place-items:center;
+  box-shadow:0 0 0 10px rgba(168,240,207,.22),0 0 0 22px rgba(168,240,207,.1),0 0 70px 20px rgba(168,240,207,.45)}
+.btn i{width:28px;height:28px;border-radius:50%;background:var(--mint);box-shadow:0 0 24px 6px rgba(168,240,207,.8)}
+.rec .hint{margin-top:34px;font:400 12px/1.5 var(--sans);color:#6f6b65;text-align:center}
+
+/* Hearth */
+.shell{width:780px;height:264px;border-radius:64px;background:var(--cream);position:relative;display:flex;align-items:center;padding:0 0 0 32px;
+  box-shadow:inset 0 2px 1px rgba(255,255,255,.7),inset 0 -10px 24px rgba(27,26,24,.09),inset 0 0 0 1px rgba(27,26,24,.04),0 34px 60px -28px rgba(27,26,24,.4),0 3px 6px rgba(27,26,24,.08)}
+.shell.grain::after{z-index:0}
+.knob{z-index:2}
+.win{z-index:1;width:640px;height:200px;border-radius:22px;overflow:hidden;position:relative;background:var(--night);
+  box-shadow:0 1px 0 rgba(255,255,255,.8),inset 0 0 0 1px rgba(0,0,0,.6)}
+.win .px{width:1280px;height:400px;transform:scale(.5);transform-origin:0 0;position:relative;color:var(--cream);background:var(--night)}
+.win .px.grain::after{opacity:.55;mix-blend-mode:soft-light}
+.win::before{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 4px 14px rgba(0,0,0,.7);z-index:60;pointer-events:none}
+.knob{position:absolute;right:38px;top:50%;width:40px;height:40px;margin-top:-20px;border-radius:50%;background:#E3DCD0;
+  box-shadow:inset 0 2px 4px rgba(27,26,24,.18),0 1px 0 rgba(255,255,255,.9)}
+.knob.lit{background:var(--mint);box-shadow:0 0 0 6px rgba(168,240,207,.3),0 0 40px 10px rgba(168,240,207,.85),inset 0 -2px 3px rgba(27,26,24,.08)}
+
+.idle{display:flex;flex-direction:column;align-items:center;justify-content:center;height:400px}
+.idle .t{font:400 250px/.9 var(--serif);color:var(--fog);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.idle .dt{margin-top:22px;font:400 22px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#6a6660}
+.waiting{height:400px;display:flex;flex-direction:column;justify-content:center;padding-left:120px}
+.waiting .who{font:400 150px/.95 var(--serif);letter-spacing:-.02em;color:var(--cream)}
+.waiting .what{margin-top:16px;font:italic 400 44px/1 var(--serif);color:var(--fog)}
+.hint2{margin-top:40px;font:400 20px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#6a6660}
+.px .tc{position:absolute;top:48px;right:64px;font:400 40px/1 var(--serif);color:#77736d;font-variant-numeric:tabular-nums}
+.playing img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.85) contrast(.92) blur(1px)}
+.playing .vig{position:absolute;inset:0;box-shadow:inset 0 0 160px 60px rgba(11,11,10,.85)}
+.playing .sub{position:absolute;left:0;right:0;bottom:56px;text-align:center;font:400 50px/1.1 var(--serif);color:var(--cream);text-shadow:0 2px 20px rgba(0,0,0,.6)}
+.playing .from{position:absolute;top:48px;left:64px;font:italic 400 34px/1 var(--serif);color:rgba(236,230,220,.75)}
+
+/* solo: index.html#f1 .. #f6 shows one frame at natural size */
+body.solo, html.solo{width:auto;height:auto}
+body.solo .head{display:none}
+body.solo .frame{display:none}
+body.solo .frame.on{display:block}
+</style>
+</head>
+<body>
+<div class="board">
+  <div class="head">
+    <h1>Mother Tongue</h1>
+    <p>v1 Polaroid stack &nbsp;·&nbsp; iPhone for Sofía &nbsp;·&nbsp; the Hearth for Rosa</p>
+  </div>
+  <div class="row">
+    <div class="phones">
+
+      <!-- 1 archive -->
+      <div class="frame" id="f1">
+        <div class="label">01 &nbsp;Archive home</div>
+        <div class="device"><div class="screen grain">
+          <div class="island"></div>
+          <div class="status"><span>9:41</span><svg width="70" height="13" viewBox="0 0 70 13" fill="#1B1A18"><rect x="0" y="8" width="3" height="5" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/><path d="M30 4.5a10 10 0 0 1 13 0l-1.6 1.7a7.6 7.6 0 0 0-9.8 0zM33 7.6a5.6 5.6 0 0 1 7 0L36.5 11z"/><rect x="47" y="1" width="21" height="11" rx="3.2" fill="none" stroke="#1B1A18" stroke-opacity=".4"/><rect x="49" y="3" width="15" height="7" rx="1.6"/></svg></div>
+          <div class="archive">
+            <div class="tiny">This week</div>
+            <h2>Stories from <i>Abuela Rosa</i></h2>
+            <div class="meta">Monterrey &nbsp;·&nbsp; 7 of 7 days</div>
+
+            <div class="print hero">
+              <span class="newdot"></span>
+              <div class="ph"><img src="../media/1-cocina.jpg" alt=""></div>
+              <div class="cap"><b>Los tamales de mamá</b><span>Mama's tamales &nbsp;·&nbsp; tonight</span></div>
+            </div>
+
+            <div class="week">
+              <div class="tiny">Earlier</div>
+              <div class="grid">
+                <div class="print sm"><div class="ph"><img src="../media/2-pueblo.jpg" alt=""></div><div class="d">Fri</div></div>
+                <div class="print sm"><div class="ph"><img src="../media/3-campo.jpg" alt=""></div><div class="d">Thu</div></div>
+                <div class="print sm"><div class="ph"><img src="../media/4-mar.jpg" alt=""></div><div class="d">Wed</div></div>
+                <div class="print sm"><div class="ph"><img src="../media/5-te.jpg" alt=""></div><div class="d">Tue</div></div>
+                <div class="print sm"><div class="ph"><img src="../media/6-bicicleta.jpg" alt=""></div><div class="d">Mon</div></div>
+                <div class="print sm"><div class="ph"><img src="../media/7-atardecer.jpg" alt=""></div><div class="d">Sun</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="homebar"></div>
+        </div></div>
+      </div>
+
+      <!-- 2 playback -->
+      <div class="frame" id="f2">
+        <div class="label">02 &nbsp;Story playback</div>
+        <div class="device"><div class="screen dark grain play">
+          <div class="island"></div>
+          <div class="status"><span>9:41</span><svg width="70" height="13" viewBox="0 0 70 13" fill="#ECE6DC"><rect x="0" y="8" width="3" height="5" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/><path d="M30 4.5a10 10 0 0 1 13 0l-1.6 1.7a7.6 7.6 0 0 0-9.8 0zM33 7.6a5.6 5.6 0 0 1 7 0L36.5 11z"/><rect x="47" y="1" width="21" height="11" rx="3.2" fill="none" stroke="#ECE6DC" stroke-opacity=".4"/><rect x="49" y="3" width="15" height="7" rx="1.6"/></svg></div>
+          <div class="top">
+            <svg width="18" height="18" viewBox="0 0 18 18" stroke="#8E8A84" stroke-width="1.5" stroke-linecap="round"><path d="M3 3l12 12M15 3L3 15"/></svg>
+            <span class="tiny">Saturday &nbsp;·&nbsp; Rosa</span>
+          </div>
+          <div class="ttl">
+            <h3>Los tamales de mamá</h3>
+            <p>Mama's tamales</p>
+          </div>
+          <div class="film"><img src="../media/1-cocina.jpg" alt=""></div>
+          <p class="words">Every Christmas my mother woke us at five to spread the masa. <em>The whole house smelled of corn and smoke.</em></p>
+          <div class="prog"><div class="bar"><i></i></div><div class="times"><span>1:12</span><span>2:40</span></div></div>
+          <div class="links"><a>Hear her original</a><a class="q">Answer her</a></div>
+          <div class="homebar"></div>
+        </div></div>
+      </div>
+
+      <!-- 3 reply -->
+      <div class="frame" id="f3">
+        <div class="label">03 &nbsp;Reply, recording</div>
+        <div class="device"><div class="screen grain">
+          <div class="island"></div>
+          <div class="status"><span>9:41</span><svg width="70" height="13" viewBox="0 0 70 13" fill="#1B1A18"><rect x="0" y="8" width="3" height="5" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/><path d="M30 4.5a10 10 0 0 1 13 0l-1.6 1.7a7.6 7.6 0 0 0-9.8 0zM33 7.6a5.6 5.6 0 0 1 7 0L36.5 11z"/><rect x="47" y="1" width="21" height="11" rx="3.2" fill="none" stroke="#1B1A18" stroke-opacity=".4"/><rect x="49" y="3" width="15" height="7" rx="1.6"/></svg></div>
+          <div class="reply">
+            <div class="ctx">
+              <div class="print"><div class="ph"><img src="../media/1-cocina.jpg" alt=""></div></div>
+              <div><b>Los tamales de mamá</b><span class="tiny">Answering Rosa</span></div>
+            </div>
+            <div class="asks">
+              <div class="tiny">Ask her</div>
+              <p class="on">Who taught your mother to make them?</p>
+              <p>What did the kitchen sound like?</p>
+              <p>Do you still have the recipe?</p>
+            </div>
+            <div class="rec">
+              <div class="clock">0:14</div>
+              <div class="btn"><i></i></div>
+              <p class="hint">Recording. Let go to send.<br>She will hear you in Spanish, in your own voice.</p>
+            </div>
+          </div>
+          <div class="homebar"></div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="hearths">
+      <div class="frame" id="f4">
+        <div class="label">04 &nbsp;Hearth, idle</div>
+        <div class="shell grain"><div class="win"><div class="px grain"><div class="idle"><div class="t">7:12</div><div class="dt">Sábado 24 de octubre</div></div></div></div><span class="knob"></span></div>
+      </div>
+      <div class="frame" id="f5">
+        <div class="label">05 &nbsp;Hearth, new story waiting</div>
+        <div class="shell grain"><div class="win"><div class="px grain"><div class="waiting"><div class="who">Sofía</div><div class="what">te mandó una respuesta</div><div class="hint2">Toca el botón para escuchar</div></div><div class="tc">7:40</div></div></div><span class="knob lit"></span></div>
+      </div>
+      <div class="frame" id="f6">
+        <div class="label">05b &nbsp;Hearth, playing</div>
+        <div class="shell grain"><div class="win"><div class="px grain playing"><img src="../media/5-te.jpg" alt=""><div class="vig"></div><div class="from">Sofía</div><div class="sub">Abuela, ¿quién le enseñó a tu mamá?</div></div></div><span class="knob"></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  var h = location.hash.slice(1);
+  if (h) { document.documentElement.classList.add('solo'); document.body.classList.add('solo'); var el = document.getElementById(h); if (el) el.classList.add('on'); }
+</script>
+</body>
+</html>

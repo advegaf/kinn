@@ -1,0 +1,4 @@
+// Defaults so a fresh clone builds. Real values live in Secrets.xcconfig (gitignored).
+SUPABASE_URL =
+SUPABASE_ANON_KEY =
+#include? "Secrets.xcconfig"

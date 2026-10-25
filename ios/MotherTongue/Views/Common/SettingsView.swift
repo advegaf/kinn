@@ -1,0 +1,125 @@
+import SwiftUI
+
+struct SettingsView: View {
+    @Environment(AppSession.self) private var session
+    @Environment(\.dismiss) private var dismiss
+    @AppStorage(StorageKeys.onboarded) private var onboarded = false
+    @AppStorage(StorageKeys.demoMode) private var demoMode = false
+    @AppStorage(StorageKeys.shutterRemote) private var shutterRemote = false
+    @AppStorage(StorageKeys.role) private var role: Role = .family
+    @State private var reenroll = false
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Kinn").tinyCaps()
+                    Spacer()
+                    Button("Done") { dismiss() }
+                        .font(.serif(19))
+                        .foregroundStyle(Color.ink)
+                        .buttonStyle(PressStyle())
+                }
+                OnbHeadline(title: "Settings", note: "The back of the book")
+
+                section("Profile") {
+                    row("Name", session.profile?.name ?? "")
+                    row("Role", role == .elder ? "Hearth" : "Family")
+                    if let code = session.thread?.code {
+                        row("Family code", code.map(String.init).joined(separator: " "))
+                    }
+                    row("Voice", session.profile?.voiceId == nil ? "Not recorded" : "Cloned")
+                    link("Record my voice again") { reenroll = true }
+                }
+
+                if role == .elder {
+                    section("Hearth") {
+                        toggle("Shutter remote as button", isOn: $shutterRemote)
+                        note("Pair a Bluetooth camera remote. Its press (volume up) works like tapping the big button.")
+                    }
+                }
+
+                section("Demo") {
+                    toggle("Demo mode", isOn: $demoMode)
+                    note("Canned sample stories with no network.")
+                }
+
+                Button("Start over") {
+                    session.reset()
+                    onboarded = false
+                    dismiss()
+                }
+                .font(.serif(21))
+                .foregroundStyle(Color.ribbon)
+                .buttonStyle(PressStyle())
+                .padding(.top, 40)
+            }
+            .padding(.horizontal, 30)
+            .padding(.top, 28)
+            .padding(.bottom, 40)
+            .frame(maxWidth: 560)
+            .frame(maxWidth: .infinity)
+        }
+        .background { PaperCanvas() }
+        .presentationBackground(Color.paper)
+        .sheet(isPresented: $reenroll) {
+            VoiceEnrollView { reenroll = false }
+                .presentationBackground(Color.paper)
+        }
+    }
+
+    private func section<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(title).tinyCaps()
+                .padding(.bottom, 10)
+                .accessibilityAddTraits(.isHeader)
+            Hairline()
+            content()
+        }
+        .padding(.top, 34)
+    }
+
+    private func row(_ label: String, _ value: String) -> some View {
+        VStack(spacing: 0) {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                Text(label).font(.serif(17)).foregroundStyle(Color.soft)
+                    .frame(width: 110, alignment: .leading)
+                Text(value).font(.serif(22)).foregroundStyle(Color.ink)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(.vertical, 12)
+            Hairline()
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private func toggle(_ label: String, isOn: Binding<Bool>) -> some View {
+        VStack(spacing: 0) {
+            Toggle(isOn: isOn) {
+                Text(label).font(.serif(19)).foregroundStyle(Color.ink)
+            }
+            .tint(.ink)
+            .padding(.vertical, 10)
+            Hairline()
+        }
+    }
+
+    private func link(_ label: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(label)
+                .font(.serifItalic(18))
+                .foregroundStyle(Color.soft)
+                .underline(color: .faint)
+        }
+        .buttonStyle(PressStyle())
+        .padding(.top, 14)
+    }
+
+    private func note(_ text: String) -> some View {
+        Text(text)
+            .font(.serifItalic(16))
+            .foregroundStyle(Color.sub)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.top, 10)
+    }
+}

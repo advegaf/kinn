@@ -1,0 +1,2 @@
+Scene stills: Lorem Picsum (https://picsum.photos, Unsplash license). Story 1: 42 292 326 365 225. Story 2: 76 57 22 110 65. Story 3: 225 312 429 365 152. Story 4: 129 10 211 110 306. Story 5: 65 177 375 102 110. Story 6: 164 188 342 76 211. Processed with the Dream Recorder ffmpeg chain (Modem, MIT), softened.
+Stories: 1 Los tamales de mama, 2 La bicicleta verde, 3 Te de la tarde, 4 La banca frente al mar, 5 Aquel verano en el campo, 6 El pueblo junto al canal.
