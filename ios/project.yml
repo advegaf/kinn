@@ -59,7 +59,6 @@ targets:
           - audio
         UIAppFonts:
           - InstrumentSerif-Regular.ttf
-          - InstrumentSerif-Italic.ttf
           - Inter-Regular.ttf
           - Inter-Medium.ttf
           - Inter-Light.ttf

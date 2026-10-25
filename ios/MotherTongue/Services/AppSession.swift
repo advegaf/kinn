@@ -11,6 +11,8 @@ final class AppSession {
     var partner: Profile?
     private(set) var messages: [Message] = []
     var lastError: String?
+    /// False until the first fetch of the thread ends, so the week can show a loading line.
+    private(set) var hasLoaded = false
     /// Increments when a new ready message from the partner arrives.
     private(set) var arrivals = 0
     var askPrompt: String?
@@ -39,6 +41,7 @@ final class AppSession {
         backend = isDemo ? DemoBackend() : SupabaseService()
         messages = []
         localOnly = []
+        hasLoaded = false
     }
 
     var role: Role { profile?.role ?? Role(rawValue: defaults.string(forKey: StorageKeys.role) ?? "") ?? .family }
@@ -67,6 +70,7 @@ final class AppSession {
             }
             await loadPartner()
             await refresh()
+            if thread == nil { hasLoaded = true }
             startSync()
         } catch {
             lastError = error.localizedDescription
@@ -139,6 +143,7 @@ final class AppSession {
         partner = nil
         messages = []
         heardIds = []
+        hasLoaded = false
     }
 
     // MARK: Messages
@@ -231,6 +236,7 @@ final class AppSession {
         do {
             server = try await backend.fetchMessages(threadId: thread.id)
             lastError = nil
+            hasLoaded = true
         } catch {
             lastError = "Sync failed: \(error.localizedDescription)"
             return

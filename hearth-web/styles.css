@@ -14,13 +14,6 @@
   font-display: swap;
 }
 @font-face {
-  font-family: 'MT Serif';
-  src: url('fonts/InstrumentSerif-Italic.ttf') format('truetype');
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
   font-family: 'MT Sans';
   src: url('fonts/Inter-Variable.ttf') format('truetype');
   font-style: normal;
@@ -179,14 +172,15 @@ img { -webkit-user-drag: none; }
   color: var(--cream);
   text-wrap: balance;
 }
-.italic { font-style: italic; }
 .sub {
   margin: 0;
-  font: italic 400 calc(11.5 * var(--u))/1.1 var(--serif);
+  font: 400 calc(11.5 * var(--u))/1.1 var(--serif);
   color: var(--fog);
   text-wrap: balance;
 }
 .sub:empty { display: none; }
+/* Sentence case for lines that main.js and the demo data write in lower case. */
+.headline::first-letter, .sub::first-letter, .play-stamp::first-letter, .status::first-letter { text-transform: uppercase; }
 
 /* Left aligned column, vertically centered: waiting, sending, error. */
 .col {
@@ -218,20 +212,21 @@ img { -webkit-user-drag: none; }
   padding-top: calc(3 * var(--u));
   font-size: calc(16 * var(--u));
   line-height: 1;
-  color: #6E6A64;
+  color: #85817A;
   white-space: nowrap;
+  text-transform: capitalize;
 }
-.day-wd em {
+.day-mo {
   display: block;
   margin-top: calc(3 * var(--u));
   font-size: calc(11.5 * var(--u));
-  color: #57544F;
+  color: #7F7B74;
 }
 .clk {
   margin-left: auto;
   font-size: calc(27.5 * var(--u));
   line-height: 1;
-  color: #57544F;
+  color: #7F7B74;
   white-space: nowrap;
 }
 .colon { transition: opacity 300ms ease; }
@@ -346,14 +341,14 @@ img { -webkit-user-drag: none; }
 
 .play-stamp, .play-cap { z-index: 35; inset: auto; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 0 18px rgba(0, 0, 0, 0.35); }
 .play-stamp {
-  left: calc(22.5 * var(--u));
+  left: calc(30 * var(--u));
   top: calc(14 * var(--u));
-  font: italic 400 calc(11 * var(--u))/1 var(--serif);
+  font: 400 calc(11 * var(--u))/1 var(--serif);
   color: rgba(236, 230, 220, 0.82);
   white-space: nowrap;
 }
 .play-cap {
-  left: calc(22.5 * var(--u));
+  left: calc(30 * var(--u));
   right: calc(40 * var(--u));
   bottom: calc(15 * var(--u));
   font: 400 calc(14 * var(--u))/1.1 var(--serif);
@@ -379,16 +374,14 @@ img { -webkit-user-drag: none; }
   left: calc(30 * var(--u));
   bottom: calc(8 * var(--u));
   margin: 0;
-  font: 400 calc(4.5 * var(--u))/1 var(--sans);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font: 400 calc(8 * var(--u))/1 var(--serif);
   white-space: nowrap;
   color: var(--fog);
   opacity: 0;
   transition: opacity var(--enter) var(--ease-out);
   z-index: 40;
 }
-.status:not(:empty) { opacity: 0.8; }
+.status:not(:empty) { opacity: 1; }
 
 /* Calibration overlay (?calibrate=1): cream outlines with a dark shadow so they read on black. */
 .calibrating, .calibrating * { cursor: crosshair; }

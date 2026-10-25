@@ -18,11 +18,10 @@ extension Color {
     static let fog = Color(hex: 0x8E8A84)
     static let ink = Color(hex: 0x1B1A18)
     static let night = Color(hex: 0x0B0B0A)
-    static let soft = Color(hex: 0x6F6B65)
-    static let sub = Color(hex: 0x77726B)
-    static let muted = Color(hex: 0xA39D94)
+    static let soft = Color(hex: 0x66625C)
+    static let sub = Color(hex: 0x6D6862)
     static let faint = Color(hex: 0xB9B3AA)
-    static let later = Color(hex: 0xBDB7AE)
+    static let later = Color(hex: 0x857F77)
     static let rule = Color(hex: 0x1B1A18, opacity: 0.13)
     static let ribbon = Color(hex: 0x82342C)
     static let madder = Color(hex: 0x8C3B32, opacity: 0.26)
@@ -42,21 +41,12 @@ extension Font {
         .custom("InstrumentSerif-Regular", size: size, relativeTo: style)
     }
 
-    static func serifItalic(_ size: CGFloat, relativeTo style: TextStyle = .body) -> Font {
-        .custom("InstrumentSerif-Italic", size: size, relativeTo: style)
-    }
-
     static func sans(_ size: CGFloat, medium: Bool = false) -> Font {
         .custom(medium ? "Inter-Medium" : "Inter-Regular", size: size, relativeTo: .caption)
     }
 
     static func sansLight(_ size: CGFloat) -> Font {
         .custom("Inter-Light", fixedSize: size)
-    }
-
-    /// Hearth fallback shim.
-    static func display(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
-        .custom("InstrumentSerif-Regular", fixedSize: size)
     }
 }
 
@@ -69,6 +59,11 @@ extension View {
             .foregroundStyle(color)
             .lineLimit(1)
     }
+
+    /// A 44 pt hit area for a text control.
+    func tapTarget() -> some View {
+        frame(minHeight: 44).contentShape(.rect)
+    }
 }
 
 /// A one pixel ruled line.
@@ -80,12 +75,11 @@ struct Hairline: View {
     }
 }
 
-/// Italic emphasis from `*marked*` spans, set in the italic cut.
+/// Emphasis from `*marked*` spans, set in a second color. Kinn uses no italic.
 func emphasized(_ text: String, size: CGFloat, color: Color, emColor: Color) -> Text {
     var out = Text("")
     for (i, part) in text.split(separator: "*", omittingEmptySubsequences: false).enumerated() where !part.isEmpty {
-        let em = i % 2 == 1
-        out = out + Text(String(part)).font(em ? .serifItalic(size) : .serif(size)).foregroundColor(em ? emColor : color)
+        out = out + Text(String(part)).font(.serif(size)).foregroundColor(i % 2 == 1 ? emColor : color)
     }
     return out
 }
@@ -121,10 +115,11 @@ enum PaperGrain {
             let a = Int(rng.next() % 256), b = Int(rng.next() % 256)
             pixels[i] = UInt8(clamping: (a + b) / 2)
         }
-        let provider = CGDataProvider(data: Data(pixels) as CFData)!
-        let cg = CGImage(width: side, height: side, bitsPerComponent: 8, bitsPerPixel: 8, bytesPerRow: side,
-                         space: CGColorSpaceCreateDeviceGray(), bitmapInfo: CGBitmapInfo(rawValue: 0),
-                         provider: provider, decode: nil, shouldInterpolate: false, intent: .defaultIntent)!
+        guard let provider = CGDataProvider(data: Data(pixels) as CFData),
+              let cg = CGImage(width: side, height: side, bitsPerComponent: 8, bitsPerPixel: 8, bytesPerRow: side,
+                               space: CGColorSpaceCreateDeviceGray(), bitmapInfo: CGBitmapInfo(rawValue: 0),
+                               provider: provider, decode: nil, shouldInterpolate: false, intent: .defaultIntent)
+        else { return UIImage() }
         return UIImage(cgImage: cg, scale: 2, orientation: .up)
     }()
 }

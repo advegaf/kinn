@@ -31,7 +31,6 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>InstrumentSerif-Regular.ttf</string>
-		<string>InstrumentSerif-Italic.ttf</string>
 		<string>Inter-Regular.ttf</string>
 		<string>Inter-Medium.ttf</string>
 		<string>Inter-Light.ttf</string>

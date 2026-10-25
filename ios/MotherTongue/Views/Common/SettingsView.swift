@@ -19,6 +19,7 @@ struct SettingsView: View {
                         .font(.serif(19))
                         .foregroundStyle(Color.ink)
                         .buttonStyle(PressStyle())
+                        .tapTarget()
                 }
                 OnbHeadline(title: "Settings", note: "The back of the book")
 
@@ -107,17 +108,18 @@ struct SettingsView: View {
     private func link(_ label: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(label)
-                .font(.serifItalic(18))
+                .font(.serif(18))
                 .foregroundStyle(Color.soft)
                 .underline(color: .faint)
         }
         .buttonStyle(PressStyle())
-        .padding(.top, 14)
+        .tapTarget()
+        .padding(.top, 4)
     }
 
     private func note(_ text: String) -> some View {
         Text(text)
-            .font(.serifItalic(16))
+            .font(.serif(16))
             .foregroundStyle(Color.sub)
             .fixedSize(horizontal: false, vertical: true)
             .padding(.top, 10)

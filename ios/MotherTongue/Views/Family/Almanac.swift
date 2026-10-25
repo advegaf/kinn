@@ -29,7 +29,7 @@ enum Almanac {
     }()
 
     private static func format(_ key: String, _ date: Date) -> String {
-        formatters[key]!.string(from: date)
+        formatters[key]?.string(from: date) ?? ""
     }
 
     /// "octubre"
@@ -76,7 +76,7 @@ enum Almanac {
         return max(4, Double(words) / 2.5)
     }
 
-    /// The line quoted at the top of a reply: the italic run if there is one, else the last sentence,
+    /// The line quoted at the top of a reply: the marked run if there is one, else the last sentence,
     /// cut at a comma so it stays short.
     static func quote(_ m: Message) -> String {
         let text = m.translation ?? ""

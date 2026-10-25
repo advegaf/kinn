@@ -72,16 +72,17 @@ struct OnboardingFlow: View {
                 .padding(.top, 26)
 
                 Button(isElder ? "This phone is for family" : "This phone is her Hearth") { switchRole() }
-                    .font(.serifItalic(18))
+                    .font(.serif(18))
                     .foregroundStyle(Color.soft)
                     .underline(color: .faint)
                     .buttonStyle(PressStyle())
-                    .padding(.top, 22)
+                    .tapTarget()
+                    .padding(.top, 12)
 
                 Toggle(isOn: $demoMode) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Demo mode").font(.serif(19)).foregroundStyle(Color.ink)
-                        Text("Canned data, no network").font(.serifItalic(15)).foregroundStyle(Color.sub)
+                        Text("Canned data, no network").font(.serif(15)).foregroundStyle(Color.sub)
                     }
                 }
                 .tint(.ink)
@@ -185,7 +186,7 @@ struct OnbHeadline: View {
                 .minimumScaleFactor(0.7)
                 .fixedSize(horizontal: false, vertical: true)
             Text(note)
-                .font(.serifItalic(19))
+                .font(.serif(19))
                 .foregroundStyle(Color.sub)
         }
         .padding(.top, 22)
@@ -205,7 +206,7 @@ struct DiaryFormRow<Value: View>: View {
             HStack(alignment: .firstTextBaseline, spacing: 12) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(key).font(.serif(17)).foregroundStyle(Color.soft)
-                    Text(note).font(.serifItalic(15)).foregroundStyle(Color(hex: 0x9C968D))
+                    Text(note).font(.serif(15)).foregroundStyle(Color.sub)
                 }
                 .frame(width: 96, alignment: .leading)
                 value.frame(maxWidth: .infinity, alignment: .leading)
@@ -244,7 +245,7 @@ struct OnbNotice: View {
     var text: String
     var body: some View {
         Text(text)
-            .font(.serifItalic(17))
+            .font(.serif(17))
             .foregroundStyle(Color.ribbon)
             .fixedSize(horizontal: false, vertical: true)
             .transition(.fade)

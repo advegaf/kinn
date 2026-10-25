@@ -39,7 +39,7 @@ struct PairView: View {
                 }
 
                 Text("Once she types them, her Hearth will hold your stories.")
-                    .font(.serifItalic(18))
+                    .font(.serif(18))
                     .foregroundStyle(Color.soft)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.top, 30)
@@ -90,13 +90,14 @@ struct PairView: View {
 
                 Button { Task { await load() } } label: {
                     Text(openThreads.isEmpty && !busy ? "Nadie esperando todav\u{ED}a. Buscar otra vez" : "Buscar otra vez")
-                        .font(.serifItalic(18))
+                        .font(.serif(18))
                         .foregroundStyle(Color.soft)
                         .underline(color: .faint)
                         .multilineTextAlignment(.leading)
                 }
                 .buttonStyle(PressStyle())
-                .padding(.top, 18)
+                .tapTarget()
+                .padding(.top, 8)
 
                 if let error { OnbNotice(text: error).padding(.top, 20) }
             }
