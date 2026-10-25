@@ -2,7 +2,17 @@ import SwiftUI
 
 @main
 struct MotherTongueApp: App {
-    @State private var session = AppSession()
+    @State private var session: AppSession
+
+    init() {
+        #if DEBUG
+        // UI tests: `-uiTestReset` starts each launch from a fresh install.
+        if CommandLine.arguments.contains("-uiTestReset"), let id = Bundle.main.bundleIdentifier {
+            UserDefaults.standard.removePersistentDomain(forName: id)
+        }
+        #endif
+        _session = State(initialValue: AppSession())
+    }
 
     var body: some Scene {
         WindowGroup {
