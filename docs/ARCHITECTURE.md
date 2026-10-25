@@ -34,9 +34,9 @@ flowchart LR
   pm -- "translate, notes, questions" --> muse
   pm -- "transcript, translation, -tr.mp3" --> storage
   pm --> db
-  worker -- "poll ready elder messages" --> db
-  worker -- "five beats, prompts" --> muse
-  worker -- "five clips" --> luma
+  worker -- "poll ready messages" --> db
+  worker -- "three beats, prompts" --> muse
+  worker -- "three clips" --> luma
   worker -- "clips and thumbnails" --> storage
   worker -- "write story" --> db
   db --> rt
@@ -60,12 +60,13 @@ flowchart LR
    can already be played as audio.
 6. The story worker, polling every 5 seconds, claims the message by writing
    `story = {status: "generating"}`. It asks GPT-6 Luna to split the story into
-   five beats, each with an English excerpt, the matching Spanish excerpt and a
-   cinematic prompt that shares one world line.
-7. It sends the five prompts to Luma `ray-3.2`, runs each clip through the
+   three beats (`SCENES`), each with an English excerpt, the matching Spanish
+   excerpt and a cinematic prompt that shares one world line. The grandson's
+   notes take the same path, with a prompt for his day as a young man.
+7. It sends the prompts to Luma `ray-3.2`, runs each clip through the
    film grain chain adapted from Dream Recorder, uploads the clips and
-   thumbnails to `videos/`, and writes the five scenes with their start and end
-   fractions into `story`.
+   thumbnails to `videos/`, and writes the scenes with their start and end
+   fractions of the translation into `story`.
 8. Realtime tells both clients. The story now plays as a film on the iPhone and
    on the Hearth, the scene changing as the narration reaches each beat.
 

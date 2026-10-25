@@ -1,6 +1,6 @@
 """Kinn story worker.
 
-Watches Supabase for ready elder messages, splits each story into SCENES beats
+Watches Supabase for ready messages from either side, splits each story into SCENES beats
 with one LLM call, renders one Dream Recorder style Luma clip per beat (ffmpeg
 look plus a gentle slow-down), uploads them and writes messages.story with
 story.scenes. Retries Luma on failure; the make-story images fallback is off
@@ -27,13 +27,14 @@ from datetime import datetime, timedelta, timezone
 import ffmpeg
 import requests
 
-from llm import env, require_env
+from audio import fix_webm
+from llm import env
 from luma import LUMA_API_STYLE, LUMA_ASPECT_RATIO, LUMA_DURATION, LUMA_MODEL, LUMA_RESOLUTION, generate_with_retry
 from scenes import make_scenes
+from supa import SUPABASE_URL, headers, rest, upload
 
 log = logging.getLogger("story-worker")
 
-SUPABASE_URL = env("SUPABASE_URL", "http://127.0.0.1:54321").rstrip("/")
 POLL_SECONDS = float(env("POLL_SECONDS", "5"))
 STALE_MINUTES = float(env("CLAIM_STALE_MINUTES", "10"))
 WORKER_ID = f"{socket.gethostname()}:{os.getpid()}"
@@ -68,32 +69,8 @@ def now_iso():
     return datetime.now(timezone.utc).isoformat()
 
 
-
-
-def headers(extra=None):
-    key = require_env("SUPABASE_SERVICE_ROLE_KEY")
-    h = {"apikey": key, "Authorization": f"Bearer {key}"}
-    h.update(extra or {})
-    return h
-
-
-def rest(method, params, body=None):
-    res = requests.request(
-        method,
-        f"{SUPABASE_URL}/rest/v1/messages",
-        params=params,
-        json=body,
-        headers=headers({"Prefer": "return=representation"}),
-        timeout=30,
-    )
-    if not res.ok:
-        raise RuntimeError(f"Supabase {method} failed ({res.status_code}): {res.text[:300]}")
-    return res.json()
-
-
-ELDER_READY = [
-    ("select", "*,sender:profiles!inner(role)"),
-    ("sender.role", "eq.elder"),
+READY = [
+    ("select", "*,sender:profiles(role)"),
     ("status", "eq.ready"),
     ("transcript", "not.is.null"),
     ("order", "created_at.asc"),
@@ -102,11 +79,11 @@ ELDER_READY = [
 
 
 def find_work():
-    fresh = rest("GET", ELDER_READY + [("story", "is.null")]) + rest("GET", ELDER_READY + [("story->>status", "eq.pending")])
+    fresh = rest("GET", READY + [("story", "is.null")]) + rest("GET", READY + [("story->>status", "eq.pending")])
     stale_before = (datetime.now(timezone.utc) - timedelta(minutes=STALE_MINUTES)).isoformat()
     stale = rest(
         "GET",
-        ELDER_READY + [("story->>status", "eq.generating"), ("story->>claimed_at", "lt." + stale_before)],
+        READY + [("story->>status", "eq.generating"), ("story->>claimed_at", "lt." + stale_before)],
     )
     return fresh + stale
 
@@ -120,7 +97,7 @@ def get_message(message_id):
 
 def claim(msg, force=False):
     """Atomically mark a row as generating. Returns the row, or None if another worker won."""
-    params = [("id", "eq." + msg["id"])]
+    params = [READY[0], ("id", "eq." + msg["id"])]
     story = msg.get("story")
     if not force:
         if story is None:
@@ -139,19 +116,6 @@ def write_story(message_id, story, only_if_generating=False):
     if only_if_generating:
         params.append(("story->>status", "eq.generating"))
     return rest("PATCH", params, {"story": story})
-
-
-def upload(path, file_path, content_type):
-    with open(file_path, "rb") as f:
-        res = requests.post(
-            f"{SUPABASE_URL}/storage/v1/object/videos/{path}",
-            data=f,
-            headers=headers({"Content-Type": content_type, "x-upsert": "true"}),
-            timeout=120,
-        )
-    if not res.ok:
-        raise RuntimeError(f"Upload {path} failed ({res.status_code}): {res.text[:300]}")
-    return f"videos/{path}"
 
 
 # ffmpeg look, ported from Dream Recorder functions/video.py (Copyright 2025 Modem, MIT)
@@ -276,8 +240,9 @@ def process(msg, prior_story=None):
     t = Timer(mid)
     meta = {}
     try:
-        plan = make_scenes(msg)
-        meta = {k: plan[k] for k in ("title", "title_es", "world")}
+        plan = make_scenes(msg, (msg.get("sender") or {}).get("role", "elder"))
+        meta = {k: (prior_story or {}).get(k) or plan[k] for k in ("title", "title_es")}
+        meta["world"] = plan["world"]
         t.step("llm")
         log.info("[%s] world: %s", mid, plan["world"])
         with tempfile.TemporaryDirectory() as tmp:
@@ -318,6 +283,7 @@ def run_forever():
     log.info("Worker %s polling %s every %.0f s", WORKER_ID, SUPABASE_URL, POLL_SECONDS)
     while True:
         try:
+            fix_webm()
             for msg in find_work():
                 prior = msg.get("story")
                 row = claim(msg)
@@ -408,7 +374,7 @@ SAMPLE_STORY = {
 def run_scenes_check():
     """make_scenes plus SCENES real Luma clips on the sample story, no Supabase. Costs SCENES clips."""
     t = Timer("scenes-check")
-    plan = make_scenes(SAMPLE_STORY)
+    plan = make_scenes(SAMPLE_STORY, "elder")
     t.step("llm")
     print(json.dumps(plan, indent=2, ensure_ascii=False))
     out_dir = os.path.abspath("luma-check")

@@ -320,9 +320,8 @@ final class AppSession {
     func originalSource(_ m: Message) -> PlaybackSource? {
         if let local = localFiles[m.id] { return .url(local) }
         if isDemo, let url = DemoBackend.bundledAudio(m.originalPath) { return .url(url) }
-        let speech = m.transcript.map { PlaybackSource.speech(text: $0, lang: m.sourceLang) }
-        if !isDemo, !m.originalPath.isEmpty, let url = AppConfig.publicURL(bucket: "audio", path: m.originalPath) { return .url(url, fallback: speech) }
-        return speech
+        if !isDemo, !m.originalPath.isEmpty, let url = AppConfig.publicURL(bucket: "audio", path: m.originalPath) { return .url(url) }
+        return m.transcript.map { PlaybackSource.speech(text: $0, lang: m.sourceLang) }
     }
 
     func imageURL(_ path: String) -> URL? {

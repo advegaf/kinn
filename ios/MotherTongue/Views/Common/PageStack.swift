@@ -51,6 +51,7 @@ struct PageStack<Route: Hashable, Root: View, Page: View>: View {
             .opacity(depth > 1 ? 0 : 1)
             .allowsHitTesting(top && !settling)
             .accessibilityHidden(!top)
+            .environment(\.isTopPage, top)
     }
 
     /// Velocity decides first, so a short flick goes back and a slow drag held past half the page also goes back.
@@ -71,6 +72,11 @@ struct PageStack<Route: Hashable, Root: View, Page: View>: View {
             }
         }
     }
+}
+
+extension EnvironmentValues {
+    /// False on a page that another page covers. The page stays alive there, so it must not start sound.
+    @Entry var isTopPage = true
 }
 
 private struct EdgePan: UIGestureRecognizerRepresentable {

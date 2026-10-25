@@ -10,6 +10,8 @@ struct EntryView: View {
 
     @Environment(AppSession.self) private var session
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.isTopPage) private var isTopPage
+    @State private var now = Date.now
 
     init(message: Message, back: @escaping () -> Void, writeBack: @escaping () -> Void) {
         self.message = message
@@ -21,6 +23,7 @@ struct EntryView: View {
     private var translatedKey: String { "t-\(message.id)" }
     private var originalKey: String { "o-\(message.id)" }
     private var mine: Bool { session.isMine(message) }
+    private var making: Bool { message.isMakingFilm(at: now) }
 
     /// The voice the page follows: her translation, or my own recording on a note I sent.
     private var primaryKey: String { mine ? originalKey : translatedKey }
@@ -129,10 +132,15 @@ struct EntryView: View {
                 .padding(.horizontal, 30)
                 .padding(.top, 8)
         }
-        .task(id: message.id) {
-            session.markHeard(message.id)
-            guard Self.simulated == nil else { return }
+        .task(id: message.id) { session.markHeard(message.id) }
+        .task(id: making) {
+            guard Self.simulated == nil, !making, isTopPage else { return }
             if let src = primarySource { session.player.play(src, key: primaryKey) }
+        }
+        .task(id: message.filmDeadline) {
+            guard let deadline = message.filmDeadline, deadline > .now else { return }
+            try? await Task.sleep(for: .seconds(deadline.timeIntervalSinceNow))
+            now = .now
         }
         .task(id: sceneIndex) {
             let next = sceneIndex + 1
@@ -146,11 +154,13 @@ struct EntryView: View {
     @ViewBuilder private var film: some View {
         ZStack {
             Color.night
-            Push(seconds: pushSeconds) { filmMedia }
-                .id(sceneIndex)
-                // Dream Recorder dissolve: the next scene surfaces, the last one lets go a little sooner.
-                .transition(.asymmetric(insertion: .opacity.animation(.easeOut(duration: 0.7)),
-                                        removal: .opacity.animation(.easeOut(duration: 0.5))))
+            Push(seconds: pushSeconds) {
+                if making { Breathing { filmMedia } } else { filmMedia }
+            }
+            .id(sceneIndex)
+            // Dream Recorder dissolve: the next scene surfaces, the last one lets go a little sooner.
+            .transition(.asymmetric(insertion: .opacity.animation(.easeOut(duration: 0.7)),
+                                    removal: .opacity.animation(.easeOut(duration: 0.5))))
         }
         .animation(.easeOut(duration: 0.7), value: sceneIndex)
         .saturation(0.85)
@@ -163,8 +173,16 @@ struct EntryView: View {
                                    .init(color: .clear, location: 1)], startPoint: .top, endPoint: .bottom)
         }
         .overlay { GrainOverlay(opacity: 0.2) }
-        .ignoresSafeArea(edges: .top)
         .accessibilityHidden(true)
+        .overlay {
+            if making {
+                Text("Making the film")
+                    .font(.serif(21))
+                    .foregroundStyle(Color.cream)
+                    .shadow(color: .black.opacity(0.6), radius: 8)
+            }
+        }
+        .ignoresSafeArea(edges: .top)
     }
 
     @ViewBuilder private var filmMedia: some View {
@@ -236,7 +254,7 @@ struct EntryView: View {
     }
 
     private func play(from i: Int) {
-        guard Self.simulated == nil, scenes.indices.contains(i) else { return }
+        guard Self.simulated == nil, !making, scenes.indices.contains(i) else { return }
         let start = scenes[i].start ?? 0
         if !playingPrimary {
             guard let src = primarySource else { return }
@@ -294,20 +312,28 @@ struct EntryView: View {
         let playingOther = session.player.isPlaying && session.player.currentKey == (mine ? translatedKey : originalKey)
         let label = mine ? (playingOther ? "Back to my voice" : "Hear it in Spanish")
             : (playingOther ? "Back to English" : "Hear her original")
-        return HStack(alignment: .firstTextBaseline) {
-            Button(label) {
-                if playingOther, let src = primarySource {
-                    session.player.play(src, key: primaryKey)
-                } else if let src = mine ? session.translatedSource(message) : session.originalSource(message) {
-                    session.player.play(src, key: mine ? translatedKey : originalKey)
+        let failed = session.player.failedKey == originalKey
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
+                Button(label) {
+                    if playingOther, let src = primarySource {
+                        session.player.play(src, key: primaryKey)
+                    } else if let src = mine ? session.translatedSource(message) : session.originalSource(message) {
+                        session.player.play(src, key: mine ? translatedKey : originalKey)
+                    }
+                }
+                .font(.serif(20))
+                .foregroundStyle(Color.wordsEm)
+                .dottedUnderline(.wordsEm)
+                Spacer()
+                Button(action: writeBack) {
+                    Text("Write back to \(session.partnerName)").font(.serif(21)).foregroundStyle(Color.cream)
                 }
             }
-            .font(.serif(20))
-            .foregroundStyle(Color.wordsEm)
-            .dottedUnderline(.wordsEm)
-            Spacer()
-            Button(action: writeBack) {
-                Text("Write back to \(session.partnerName)").font(.serif(21)).foregroundStyle(Color.cream)
+            if failed {
+                Text(mine ? "Your recording could not play" : "Her recording could not play")
+                    .font(.serif(17))
+                    .foregroundStyle(Color.fog)
             }
         }
         .buttonStyle(PressStyle())
