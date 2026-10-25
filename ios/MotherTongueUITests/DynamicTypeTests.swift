@@ -1,13 +1,7 @@
 import XCTest
 
-/// Each screen at the largest accessibility text size: nothing runs off the screen, every control stays usable.
+/// The family screens at the largest accessibility text size (onboarding: OnboardingTests): nothing runs off the screen, every control stays usable.
 final class DynamicTypeTests: KinnUITestCase {
-    func testOnboardingAtLargestText() {
-        launch(onboarded: false, textSize: Self.largestText)
-        element("onboarding.begin")
-        checkScreen("onboarding welcome, largest text")
-    }
-
     func testFamilyScreensAtLargestText() {
         launch(textSize: Self.largestText)
         element("almanac.featured")
@@ -21,6 +15,7 @@ final class DynamicTypeTests: KinnUITestCase {
         element("writeBack.back")
         checkScreen("write back, largest text")
         element("writeBack.back").tap()
+        element("entry.back").tap()
 
         element("tabBar.settings").tap()
         element("settings.done")

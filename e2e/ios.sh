@@ -6,7 +6,8 @@
 # Builds first, then runs every UI test with the simulator in light mode, then the color scheme
 # test in dark mode, then shuts the simulator down. When simq is installed, the simulator part runs
 # in its queue (one simulator session at a time on a shared Mac). Each simctl call has a 60 s limit
-# and each test run its own limit, so a stuck simulator cannot hold the queue.
+# (the boot 3 min), each test run has its own limit, and the whole session stops before 5 min, so a
+# stuck simulator cannot hold the queue.
 # Screenshots go to e2e/out/ios/<run>/. Exit code 1 when a test fails.
 set -uo pipefail
 
@@ -27,7 +28,17 @@ if [ "${1:-}" != "--session" ]; then
   exec "$0" --session
 fi
 
-limit() { local s=$1; shift; perl -e 'alarm shift; exec @ARGV' "$s" "$@"; }
+# The whole session stays under 5 min (simq rule). The last 30 s are kept for the shutdown.
+WORK_END=255
+left() { echo $((WORK_END - SECONDS)); }
+limit() {
+  local s=$1 l
+  shift
+  l=$(left)
+  [ "$l" -lt "$s" ] && s=$l
+  [ "$s" -gt 0 ] || { echo "Session time is used up: $*" >&2; return 124; }
+  perl -e 'alarm shift; exec @ARGV' "$s" "$@"
+}
 sim() { limit 60 xcrun simctl "$@"; }
 
 udid=$(sim list devices available | grep -F "    $SIM_NAME (" | head -1 | grep -oE '[0-9A-F-]{36}')
@@ -36,12 +47,10 @@ if [ -z "$udid" ]; then
   udid=$(sim create "$SIM_NAME" "$type")
 fi
 [ -n "$udid" ] || { echo "No simulator"; exit 1; }
-trap 'sim shutdown "$udid" 2>/dev/null' EXIT
-sim boot "$udid" 2>/dev/null
-# A cold boot on a busy Mac can take more than one 60 s limit.
-booted=0
-for _ in 1 2 3; do sim bootstatus "$udid" >/dev/null && { booted=1; break; }; done
-[ "$booted" -eq 1 ] || { echo "Simulator did not boot"; exit 1; }
+trap 'perl -e "alarm 30; exec @ARGV" xcrun simctl shutdown "$udid" 2>/dev/null' EXIT
+# Boot and wait in one call. A cold boot on a busy Mac can take more than 60 s, and a boot call
+# that is stopped early cancels the boot. The driver allows 3 min.
+limit 180 xcrun simctl bootstatus "$udid" -b >/dev/null || { echo "Simulator did not boot in 3 min"; exit 1; }
 sim privacy "$udid" grant microphone "$BUNDLE" 2>/dev/null
 sim status_bar "$udid" override --time 9:41 --batteryState charged --batteryLevel 100
 
@@ -51,9 +60,10 @@ run() {
   shift 3
   sim ui "$udid" appearance "$appearance"
   limit "$seconds" xcodebuild test-without-building "${project[@]}" -destination "id=$udid" -resultBundlePath "$OUT/$name.xcresult" \
-    -test-timeouts-enabled YES -maximum-test-execution-time-allowance 60 "$@" 2>&1 \
-    | grep -E "Test Case .*(passed|failed)|error:|Executed" || true
-  [ "${PIPESTATUS[0]}" -eq 0 ] || failed=1
+    -test-timeouts-enabled YES -maximum-test-execution-time-allowance 60 "$@" > "$OUT/$name.log" 2>&1
+  local status=$?
+  grep -E "Test Case .*(passed|failed)|error:|Executed" "$OUT/$name.log"
+  [ "$status" -eq 0 ] || { echo "$name run ended with status $status"; failed=1; }
   xcrun xcresulttool export attachments --path "$OUT/$name.xcresult" --output-path "$OUT/$name" >/dev/null 2>&1
 }
 

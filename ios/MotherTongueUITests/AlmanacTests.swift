@@ -50,9 +50,9 @@ final class AlmanacTests: KinnUITestCase {
         }
         checkScreen("write back")
 
+        // Back from write back returns to the story it answers.
         element("writeBack.back").tap()
         waitGone("writeBack.back")
-        element("almanac.featured").tap()
         element("entry.writeBack").tap()
         // A hold records while held, and letting go sends.
         element("writeBack.record").press(forDuration: 2.5)

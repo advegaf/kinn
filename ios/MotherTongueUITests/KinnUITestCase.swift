@@ -42,7 +42,7 @@ class KinnUITestCase: XCTestCase {
         element(id).coordinate(withNormalizedOffset: CGVector(dx: 0.95, dy: 0.5)).tap()
     }
 
-    /// Saves a screenshot, then checks touch targets, safe areas and text that runs off the screen.
+    /// Saves a screenshot, then checks touch targets, safe areas, text that runs off the screen, and clipped text.
     func checkScreen(_ name: String) {
         // Let the screen's enter animation settle before the frames are read.
         _ = app.wait(for: .runningForeground, timeout: 1)
@@ -66,6 +66,16 @@ class KinnUITestCase: XCTestCase {
             let f = text.frame
             XCTAssertGreaterThanOrEqual(f.minX, window.minX - 1, "\(name): \"\(text.label)\" runs off the left edge")
             XCTAssertLessThanOrEqual(f.maxX, window.maxX + 1, "\(name): \"\(text.label)\" runs off the right edge")
+        }
+        // The frame checks above cannot see text cut off by its container or truncated to "...".
+        do {
+            try app.performAccessibilityAudit(for: [.textClipped, .dynamicType]) { issue in
+                let id = issue.element.map { $0.identifier.isEmpty ? $0.label : $0.identifier } ?? "?"
+                XCTFail("\(name): \(id): \(issue.compactDescription)")
+                return true
+            }
+        } catch {
+            XCTFail("\(name): accessibility audit did not run: \(error)")
         }
     }
 

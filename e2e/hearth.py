@@ -33,7 +33,11 @@ LAYERS = {
 CHECK_JS = """
 ((layer, texts, all) => {
   const bad = [];
-  const shown = (el) => el && parseFloat(getComputedStyle(el).opacity) > 0.95;
+  const shown = (el) => {
+    if (!el) return false;
+    const s = getComputedStyle(el), r = el.getBoundingClientRect();
+    return s.display !== 'none' && s.visibility === 'visible' && parseFloat(s.opacity) > 0.95 && r.width > 0 && r.height > 0;
+  };
   const active = document.querySelector(layer);
   if (!shown(active)) bad.push(`${layer} is not shown`);
   for (const sel of all) {
@@ -44,6 +48,7 @@ CHECK_JS = """
   for (const sel of texts) {
     const el = document.querySelector(sel);
     if (!el || !el.textContent.trim()) bad.push(`${sel} has no text`);
+    else if (!shown(el)) bad.push(`${sel} is not shown`);
   }
   const scope = active.matches('.play-cap') ? [active, document.querySelector('#play-stamp')] : [active];
   for (const box of scope) {
@@ -120,14 +125,15 @@ def press_key():
     ab("press", "Enter")
 
 
-def button_down():
-    x, y = js("(() => { const r = document.querySelector('#spot').getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()")
+def button_down(target="#spot"):
+    """Presses the button zone (#spot) or the visible strip (#strip) at its centre."""
+    x, y = js(f"(() => {{ const r = document.querySelector('{target}').getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; }})()")
     ab("mouse", "move", str(round(x)), str(round(y)))
     ab("mouse", "down")
 
 
-def press_button():
-    button_down()
+def press_button(target="#spot"):
+    button_down(target)
     ab("mouse", "up")
 
 
@@ -136,8 +142,8 @@ def holding():
 
 
 def hold_to_record():
-    """The button records only after a 3 s hold, and the ring shows while the hold runs."""
-    button_down()
+    """A hold on the strip records only after 3 s, and the ring shows while the hold runs."""
+    button_down("#strip")
     time.sleep(1)
     if not holding():
         raise Fail("no hold ring while the button is held")
@@ -208,7 +214,7 @@ def demo_path(base):
     check_screen("waiting")
     shot("waiting")
 
-    press_button()
+    press_button("#strip")
     wait_state("playing", 3)
     check_screen("playing", timeout=6)
     media_shows_scene()
@@ -226,7 +232,7 @@ def demo_path(base):
         raise Fail(f"recording counter does not run: {counter}")
     shot("recording")
 
-    press_button()
+    press_button("#strip")
     wait_state("sending", 3)
     check_screen("sending")
     shot("sending")
