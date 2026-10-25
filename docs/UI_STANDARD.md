@@ -265,8 +265,12 @@ middle of the screen) is visible.
 
 ## 13. Current Kinn screens that break a rule
 
-Found on 2026-10-25 with hearth-web in demo mode at 1340x800 (agent-browser)
-and the iOS app in demo mode on the simulator, plus a read of the code.
+Found on 2026-10-25. Hearth web: run in demo mode at 1340x800 with
+agent-browser, a screenshot of each state, and a read of the code. iOS: a
+read of the current code, checked against the screenshots in docs/screens
+(ios-v4c-week.png for the Almanac, ios-v2-hearth.png for the elder
+Hearth). New simulator screenshots are still to do, because the simulator
+service on the build Mac is down.
 
 ### Hearth web (hearth-web)
 
