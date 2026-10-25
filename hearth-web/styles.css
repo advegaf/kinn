@@ -120,12 +120,16 @@ img { -webkit-user-drag: none; }
 [data-state="error"] .spot > .glow,
 [data-state="saved"] .spot > .glow { opacity: 0.12; transition-duration: var(--enter); }
 
-/* Hold to record: the ring fills over the 3 s hold (input.js HOLD_MS) and snaps back on release. */
+/* Hold to record: the ring sits in the middle of the strip, fills over the 3 s hold (input.js HOLD_MS) and snaps back on release. */
 .ring {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  left: 50%;
+  top: 50%;
+  width: calc(60 * var(--u));
+  height: calc(60 * var(--u));
+  margin: calc(-30 * var(--u)) 0 0 calc(-30 * var(--u));
+  z-index: 45;
+  pointer-events: none;
   transform: rotate(-90deg);
   opacity: 0;
   transition: opacity 200ms var(--ease-out);
