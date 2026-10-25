@@ -11,6 +11,7 @@ unless STORY_FALLBACK=images.
   python main.py --look <input.mp4>  apply the ffmpeg look to a local file
   python main.py --luma-check        one real Luma clip, no Supabase
   python main.py --scenes-check      LLM beats plus SCENES real Luma clips on a sample story, no Supabase
+  python main.py --demo-clips s1 r1  Luma clips for canned demo scenes, uploaded to videos/demo/<id>-<n>
 """
 
 import argparse
@@ -387,6 +388,23 @@ def run_scenes_check():
         print(video if ok else f"{video} (reused)")
 
 
+def run_demo_clips(ids):
+    """Renders and uploads one clip per scene of the given canned stories (s1) or replies (r1)."""
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "docs", "demo-stories.json")) as f:
+        data = json.load(f)
+    canned = {st["id"]: st["scenes"] for st in data["stories"]}
+    canned.update({f"r{i + 1}": r["scenes"] for i, r in enumerate(data["replies"])})
+    # Reply scenes have no prompt; each one shows a story scene's image, so it takes that scene's prompt.
+    by_image = {sc["image"]: sc["prompt"] for scenes in canned.values() for sc in scenes if sc.get("prompt")}
+    jobs = [(f"{cid}-{n}", sc.get("prompt") or by_image[sc["image"]]) for cid in ids for n, sc in enumerate(canned[cid], 1)]
+    with tempfile.TemporaryDirectory() as tmp:
+        media = render_scenes("demo-clips", [{"prompt": p} for _, p in jobs], tmp, tmp)
+        if not all(ok for _, _, ok in media):
+            raise SystemExit("Some clips failed, nothing uploaded")
+        for (name, _), (video, thumb, _) in zip(jobs, media):
+            print(upload(f"demo/{name}.mp4", video, "video/mp4"), upload(f"demo/{name}.jpg", thumb, "image/jpeg"))
+
+
 def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s", stream=sys.stdout)
     parser = argparse.ArgumentParser(description="Kinn story worker")
@@ -395,8 +413,11 @@ def main():
     group.add_argument("--look", metavar="INPUT_MP4", help="apply the Dream Recorder look to a local video")
     group.add_argument("--luma-check", action="store_true", help="one real Luma generation plus the look, to verify the key and settings")
     group.add_argument("--scenes-check", action="store_true", help="LLM beats plus SCENES real Luma clips on a sample story, no Supabase")
+    group.add_argument("--demo-clips", nargs="+", metavar="ID", help="Luma clips for canned demo scenes (s1, r1), uploaded to videos/demo/")
     args = parser.parse_args()
-    if args.scenes_check:
+    if args.demo_clips:
+        run_demo_clips(args.demo_clips)
+    elif args.scenes_check:
         run_scenes_check()
     elif args.luma_check:
         run_luma_check()
