@@ -34,22 +34,23 @@
         <p class="hint hint-reply">mant&eacute;n presionado para responder<span class="en">hold to reply</span></p>
         <p class="family-code"><span id="fam-code-es"></span><span class="family-code-en" id="fam-code-en"></span></p>
         <div class="side">
-          <div class="side-btn" data-act="past"><span class="side-line">Escuchar otra vez</span><span class="en">Listen again</span></div>
+          <button type="button" class="side-btn" data-act="past"><span class="side-line">Escuchar otra vez</span><span class="en">Listen again</span></button>
         </div>
       </div>
 
       <div class="layer past" id="past">
         <img class="past-img" id="past-img" alt="">
-        <div class="past-main">
-          <h1 class="headline" id="past-title"></h1>
-          <p class="en" id="past-title-en"></p>
-          <p class="sub" id="past-stamp"></p>
-          <p class="en" id="past-stamp-en"></p>
-        </div>
+        <button type="button" class="past-main" data-act="play">
+          <span class="headline" id="past-title"></span>
+          <span class="en" id="past-title-en"></span>
+          <span class="sub" id="past-stamp"></span>
+          <span class="en" id="past-stamp-en"></span>
+        </button>
         <p class="hint">toca para escuchar<span class="en">tap to listen</span></p>
         <div class="side">
-          <div class="side-btn" data-act="next"><span class="side-line">Siguiente</span><span class="side-sub" id="past-count"></span><span class="en" id="past-count-en"></span></div>
-          <div class="side-btn" data-act="back"><span class="side-line">Volver</span><span class="en">Back</span></div>
+          <button type="button" class="side-btn" data-act="next"><span class="side-line">Siguiente</span><span class="side-sub" id="past-count"></span></button>
+          <button type="button" class="side-btn" data-act="older"><span class="side-line">Semana anterior</span><span class="en">Earlier week</span></button>
+          <button type="button" class="side-btn" data-act="back"><span class="side-line">Volver</span><span class="en">Back</span></button>
         </div>
       </div>
 

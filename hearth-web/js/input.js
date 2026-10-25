@@ -44,10 +44,18 @@ export function bindInput(press, release, zone, strip) {
   addEventListener('keydown', (e) => {
     if (e.repeat || !PRESS_KEYS.has(e.key)) return;
     e.preventDefault();
-    press('key');
+    press('key', e.target.matches?.(':focus-visible') ? e.target.closest('[data-act]')?.dataset.act : undefined);
+  });
+  // A screen reader activates a button with a click that has no pointer before it (detail 0).
+  addEventListener('click', (e) => {
+    const act = e.target.closest?.('[data-act]')?.dataset.act;
+    if (act && e.detail === 0) press('key', act);
   });
   addEventListener('pointerdown', (e) => {
     if (config.calibrate || !e.isPrimary) return;
+    // A tapped control must not keep focus, or the remote's next Enter would press it again.
+    if (e.target.closest?.('[data-act]')) e.preventDefault();
+    document.activeElement?.blur?.();
     const p = toPct(e);
     if (inRect(zone, p.x, p.y)) press('button');
     else if (inRect(strip, p.x, p.y)) press('strip', e.target.closest?.('[data-act]')?.dataset.act);

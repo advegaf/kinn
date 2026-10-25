@@ -80,8 +80,8 @@ struct HearthView: View {
         ZStack {
             LinearGradient(colors: [Color(UIColor(hex: 0x3A1D14)), Color(UIColor(hex: 0x7A3622)), Color(UIColor(hex: 0xB9643A))],
                            startPoint: .top, endPoint: .bottom)
-            if let path = session.latestStoryImage {
-                KenBurns { StoryImage(path: path) }
+            if let cover = session.latestStoryImage {
+                KenBurns { StoryImage(path: cover.path, video: cover.video) }
                     .opacity(0.85)
                     .transition(.opacity)
                 LinearGradient(colors: [.black.opacity(0.45), .black.opacity(0.15), .black.opacity(0.55)],

@@ -14,7 +14,27 @@
   background: #151513;
 }
 [data-past] .clock .side, .past .side { display: flex; }
-[data-state="clock"] .clock .side-btn, [data-state="past"] .past .side-btn { pointer-events: auto; }
+.past:not([data-older]) [data-act="older"] { display: none; }
+
+/* Hidden with the layer, so a hidden control never takes focus or reaches a screen reader. */
+.side, .past-main { visibility: hidden; transition: visibility 0s var(--exit); }
+[data-state="clock"] .clock .side, [data-state="past"] .past .side, [data-state="past"] .past-main {
+  visibility: visible;
+  transition-delay: 0s;
+  pointer-events: auto;
+}
+
+.side-btn, .past-main {
+  appearance: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+.side-btn:focus-visible, .past-main:focus-visible { outline: 2px solid var(--cream); outline-offset: calc(-3 * var(--u)); }
 
 .side-btn {
   flex: 1;
@@ -57,7 +77,7 @@
 .past-img:not([src]) { display: none; }
 .past-main {
   position: absolute;
-  inset: 0 calc(var(--side) + 20 * var(--u)) 0 calc(30 * var(--u));
+  inset: calc(22 * var(--u)) calc(var(--side) + 20 * var(--u)) calc(8 * var(--u)) calc(30 * var(--u));
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -70,6 +90,11 @@
   line-clamp: 2;
   overflow: hidden;
 }
-.past .sub { margin-top: calc(5 * var(--u)); color: var(--cream); opacity: 0.8; }
+[data-subs="en"] .past .headline { -webkit-line-clamp: 1; line-clamp: 1; }
+.past .sub { display: block; margin-top: calc(5 * var(--u)); color: var(--cream); opacity: 0.8; }
 .past .hint, .past .sub, .past .headline { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 0 18px rgba(0, 0, 0, 0.35); }
 .past .hint { color: rgba(236, 230, 220, 0.85); }
+[data-subs="en"] .past .hint .en { display: inline; }
+[data-subs="en"] .past .hint .en::before { content: " \00b7  "; }
+.past .side-btn { padding: calc(4 * var(--u)) calc(8 * var(--u)); }
+.past .side-line { font-size: calc(10 * var(--u)); }

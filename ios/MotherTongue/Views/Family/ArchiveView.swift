@@ -135,8 +135,8 @@ struct ArchiveView: View {
                     }
                     .multilineTextAlignment(.leading)
                     Spacer(minLength: 16)
-                    if let path = thread.root.story?.coverPath {
-                        StoryImage(path: path)
+                    if let cover = thread.root.story?.cover {
+                        StoryImage(path: cover.path, video: cover.video)
                             .frame(width: 64, height: 64)
                             .clipShape(.rect(cornerRadius: 3))
                             .overlay { RoundedRectangle(cornerRadius: 3).strokeBorder(.black.opacity(0.1), lineWidth: 1) }

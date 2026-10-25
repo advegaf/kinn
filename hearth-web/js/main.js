@@ -12,7 +12,7 @@ import { hasStory, filmPending, storyFor, buildScenes, startScenes, setProgress,
 import { narrate, clearTimers, stopAll } from './narration.js';
 import { showToast, hideToast } from './toast.js';
 import { bindInput, startHold, cancelHold, unlock } from './input.js';
-import { inPast, pastItem, openPast, nextPast, closePast, renderPast } from './past.js';
+import { inPast, pastItem, openPast, nextPast, olderWeekPast, closePast, renderPast } from './past.js';
 
 const S = { CLOCK: 'clock', WAITING: 'waiting', RECORDING: 'recording', SENDING: 'sending', SAVED: 'saved', PLAYING: 'playing', ERROR: 'error', PAST: 'past' };
 
@@ -122,6 +122,7 @@ async function refresh() {
     refreshing = false;
   }
   renderText();
+  if (inPast()) syncPast();
   if (state === S.CLOCK || state === S.WAITING) setState(idleState());
   if (refreshAgain) { refreshAgain = false; refresh(); }
 }
@@ -144,6 +145,7 @@ function press(source, act) {
       if (age < BOUNCE_MS) return;
       if (act === 'back') return leavePast();
       if (act === 'next') { nextPast(); return showPast(); }
+      if (act === 'older') { olderWeekPast(); return showPast(); }
       return listen(pastItem(), !unheard().some((m) => m.id === pastItem().id));
     case S.WAITING:
       return listen(unheard().at(-1));
@@ -319,11 +321,22 @@ let lingerTimer = 0;
 let cleanupTimer = 0;
 let pastTimer = 0;
 
-function showPast() {
-  if (!inPast()) openPast(past());
+function renderCard() {
   const msg = pastItem();
   const m = backend.media(storyFor(msg, messages));
   renderPast({ mine: isMine(msg), name: partnerName(), titles: titles(msg, messages, isMine), image: m.scenes[0]?.image || m.images[0] });
+}
+
+function syncPast() {
+  openPast(past(), pastItem().id);
+  if (state !== S.PAST) return;
+  if (inPast()) renderCard();
+  else leavePast();
+}
+
+function showPast() {
+  if (!inPast()) openPast(past());
+  renderCard();
   setState(S.PAST);
   clearTimeout(pastTimer);
   pastTimer = setTimeout(() => state === S.PAST && leavePast(), PAST_IDLE_MS);

@@ -29,14 +29,14 @@ A story with `story.scenes` (`docs/CONTRACT.md`) develops with the narration. Th
 | State | A tap on the strip does |
 | --- | --- |
 | clock (idle) | a 3 s hold starts recording (a ring fills around the lamp spot). A tap on the "Escuchar otra vez" panel opens past |
-| past | plays the story or reply on the card. "Siguiente" shows the next older one, "Volver" goes back. After playback it comes back here, and it leaves on its own after 60 s |
+| past | plays the story or reply on the card. "Siguiente" shows the next older one. "Semana anterior" shows the newest one of the previous week (weeks start on Monday). It is hidden at the oldest week. "Volver" goes back. After playback it comes back here, and it leaves on its own after 60 s |
 | recording | stops and sends |
 | sending | nothing, it waits until the row is `ready` |
 | waiting | plays the newest unheard reply, or says the film is still being made |
 | playing | stops playback |
 | error | a 3 s hold tries again, a short tap goes back to clock (it also returns on its own after 3.5 s) |
 
-A tap anywhere on the visible strip counts (`bindInput` in `js/input.js`). Enter, Space, Play/Pause and the volume up key count too (`press('key')`), so a Bluetooth shutter remote works. A key press counts as a full hold, because the kiosk app sends keydown and keyup together. In the optional button build, a touch in the button zone also counts. Taps closer than 250 ms are ignored. In recording, playing and past, a tap less than 650 ms after the state starts is ignored. The panel on the right 25% of the strip shows only when there is at least one ready story or reply. Keys always do the main action of the state.
+A tap anywhere on the visible strip counts (`bindInput` in `js/input.js`). Enter, Space, Play/Pause and the volume up key count too (`press('key')`), so a Bluetooth shutter remote works. A key press counts as a full hold, because the kiosk app sends keydown and keyup together. In the optional button build, a touch in the button zone also counts. Taps closer than 250 ms are ignored. In recording, playing and past, a tap less than 650 ms after the state starts is ignored. The panel on the right 25% of the strip shows only when there is at least one ready story or reply. Keys always do the main action of the state. The panel, the card and the side controls are buttons, so Tab and Enter work on them. A tap never leaves focus on a control, so the remote always does the main action.
 
 ## Config
 

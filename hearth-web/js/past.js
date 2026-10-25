@@ -3,19 +3,36 @@
 import { $, setText } from './dom.js';
 import { dayLabel } from './clock.js';
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 let list = [];
 let at = 0;
 
 export const inPast = () => list.length > 0;
 export const pastItem = () => list[at];
 
-export function openPast(items) {
+// Weeks start on Monday, as on a Spanish calendar.
+function weekStart(msg) {
+  const d = new Date(msg.created_at);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime() - ((d.getDay() + 6) % 7) * DAY_MS;
+}
+
+// Also called after each fetch with the fresh rows, so the card never shows an old film state.
+export function openPast(items, keepId) {
   list = items;
-  at = 0;
+  at = Math.max(0, list.findIndex((m) => m.id === keepId));
 }
 
 export function nextPast() {
   at = (at + 1) % list.length;
+}
+
+const olderWeek = () => list.findIndex((m, i) => i > at && weekStart(m) < weekStart(list[at]));
+
+export function olderWeekPast() {
+  const i = olderWeek();
+  if (i >= 0) at = i;
 }
 
 export function closePast() {
@@ -29,7 +46,7 @@ export function renderPast({ mine, name, titles: [es, en], image }) {
   setText('past-stamp', mine ? `tu historia, ${day}` : `de ${name}, ${day}`);
   setText('past-stamp-en', mine ? 'your story' : `from ${name}`);
   setText('past-count', `${at + 1} de ${list.length}`);
-  setText('past-count-en', `${at + 1} of ${list.length}`);
+  $('past').toggleAttribute('data-older', olderWeek() >= 0);
   const img = $('past-img');
   if (image) img.src = image;
   else img.removeAttribute('src');
