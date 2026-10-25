@@ -4,7 +4,7 @@ Grandma's side of Hearth. A single static page that runs full screen on an Alexa
 
 Hosted on Netlify: https://mothertongue-hearth.netlify.app (add `?demo=1` for the demo, `?template=1` for the mat template, `?calibrate=1` to fit the strip).
 
-Every state sits on night with grain and a soft vignette, in the v4c "Almanac" design (`../design/DESIGN.md`): Instrument Serif for the day numeral, headlines and captions, Inter for tiny caps labels and the tape counter, lamp white for the optional button light, muted red only for REC. Fonts are bundled in `fonts/` (OFL), with Google Fonts as a fallback. Playing keeps the dark cinematic strip. That strip and the state machine are adapted from [Dream Recorder](https://github.com/modem-works/dream-recorder) by Modem (MIT): the black strip, the vignette and the fades.
+Every state sits on night with grain and a soft vignette, in the v4c "Almanac" design (`../design/DESIGN.md`): Instrument Serif for the day numeral, headlines and captions, Inter for the tape counter and the REC status, lamp white for the optional button light, muted red only for REC. Fonts are bundled in `fonts/` (OFL), with Google Fonts as a fallback. Playing keeps the dark cinematic strip. That strip and the state machine are adapted from [Dream Recorder](https://github.com/modem-works/dream-recorder) by Modem (MIT): the black strip, the vignette and the fades.
 
 Plain HTML, CSS and ES modules. No build step. supabase-js loads from a pinned jsDelivr URL, and only when not in demo mode.
 
