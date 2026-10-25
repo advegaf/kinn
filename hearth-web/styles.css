@@ -124,7 +124,8 @@ img { -webkit-user-drag: none; }
 [data-state="recording"] .spot > .glow { opacity: calc(0.05 + var(--level) * 0.12); transition: opacity 90ms linear; }
 [data-state="sending"] .spot > .glow,
 [data-state="playing"] .spot > .glow { opacity: 0.05; transition-duration: var(--enter); }
-[data-state="error"] .spot > .glow { opacity: 0.12; transition-duration: var(--enter); }
+[data-state="error"] .spot > .glow,
+[data-state="saved"] .spot > .glow { opacity: 0.12; transition-duration: var(--enter); }
 
 /* Visible strip, sized to the shell window. */
 .strip {
@@ -163,6 +164,7 @@ img { -webkit-user-drag: none; }
 [data-state="clock"] .clock,
 [data-state="waiting"] .waiting,
 [data-state="recording"] .rec,
+[data-state="saved"] .saved,
 [data-state="error"] .err { opacity: 1; transition-duration: var(--enter); }
 
 .label {
@@ -188,7 +190,21 @@ img { -webkit-user-drag: none; }
 }
 .sub:empty { display: none; }
 
-/* Left aligned column, vertically centered: waiting, sending, error. */
+/* English under each Spanish line (?subs=en): tiny caps, quieter than the Spanish it follows. */
+.en { display: none; }
+[data-subs="en"] .en {
+  display: block;
+  margin: calc(2.5 * var(--u)) 0 0;
+  font: 400 calc(4.75 * var(--u))/1.25 var(--sans);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(142, 138, 132, 0.85);
+  text-wrap: balance;
+}
+[data-subs="en"] .en:empty { display: none; }
+[data-subs="en"] .label .en { display: inline; margin: 0; font: inherit; letter-spacing: inherit; color: rgba(142, 138, 132, 0.7); }
+
+/* Left aligned column, vertically centered: waiting, sending, saved, error. */
 .col {
   display: flex;
   flex-direction: column;
@@ -227,6 +243,7 @@ img { -webkit-user-drag: none; }
   font-size: calc(11.5 * var(--u));
   color: #57544F;
 }
+[data-subs="en"] .day-wd .en { margin-top: calc(4.5 * var(--u)); font-size: calc(4.25 * var(--u)); color: #4E4B47; }
 .clk {
   margin-left: auto;
   font-size: calc(27.5 * var(--u));
@@ -236,6 +253,16 @@ img { -webkit-user-drag: none; }
 }
 .colon { transition: opacity 300ms ease; }
 .colon.off { opacity: 0.4; }
+.family-code {
+  position: absolute;
+  right: calc(30 * var(--u));
+  bottom: calc(8 * var(--u));
+  margin: 0;
+  font: 400 calc(5.5 * var(--u))/1 var(--serif);
+  color: #57544F;
+}
+.family-code span:empty, .family-code-en { display: none; }
+[data-subs="en"] .family-code-en:not(:empty) { display: inline; margin-left: calc(3 * var(--u)); color: #4E4B47; }
 
 /* Recording: headline column left, REC and the counter on the right. */
 .rec {
@@ -299,6 +326,21 @@ img { -webkit-user-drag: none; }
   to { opacity: 0.55; }
 }
 
+/* Saved: her story is in. The oxblood ribbon marks the new entry, as it does on paper. */
+.saved .headline { font-size: calc(24 * var(--u)); }
+.ribbon {
+  position: absolute;
+  top: 0;
+  left: calc(30 * var(--u));
+  width: calc(4.25 * var(--u));
+  height: calc(16 * var(--u));
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.28), transparent calc(3.5 * var(--u))),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.14), transparent 25%, transparent 75%, rgba(0, 0, 0, 0.14)),
+    #82342C;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 2.25 * var(--u)), 0 100%);
+}
+
 /* Error: calm, brief, returns on its own. */
 .err .headline { font-size: calc(22 * var(--u)); max-width: 100%; }
 
@@ -320,7 +362,7 @@ img { -webkit-user-drag: none; }
 
 .kb img, #video { filter: saturate(0.85) brightness(0.82); }
 .kb { transition: opacity 600ms var(--ease-out); }
-/* Scene crossfade: the outgoing still fades out in 1.2s, then its drift resets out of sight. */
+/* Scene crossfade: the outgoing still fades out in 500ms, then its drift resets out of sight. */
 .kb img {
   position: absolute;
   inset: 0;
@@ -328,14 +370,14 @@ img { -webkit-user-drag: none; }
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transform: scale(1.04);
-  transition: opacity 1200ms var(--ease-out), transform 0s linear 1200ms;
+  transform: scale(1.03);
+  transition: opacity 500ms var(--ease-out), transform 0s linear 500ms;
 }
-/* The incoming still fades in over 2s and drifts slowly for as long as its beat lasts. */
+/* The incoming still fades in over 700ms and drifts slowly for as long as its beat lasts. */
 .kb img.on {
   opacity: 1;
-  transform: scale(1.16) translate(var(--kx, -2%), var(--ky, -1%));
-  transition: opacity 2s var(--ease-out), transform 20s linear;
+  transform: scale(1.10) translate(var(--kx), var(--ky));
+  transition: opacity 700ms var(--ease-out), transform 14s linear;
 }
 
 #video { object-fit: cover; opacity: 0; transition: opacity 600ms var(--ease-out); }
@@ -367,11 +409,35 @@ img { -webkit-user-drag: none; }
   line-clamp: 3;
   overflow: hidden;
 }
+/* With an English line, each language clamps on its own, Spanish on top. */
+.play-cap[data-two] { display: block; -webkit-line-clamp: none; line-clamp: none; overflow: visible; }
+.play-cap[data-two] > * {
+  text-wrap: balance;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+.play-cap[data-two] > :empty { display: none; }
+/* English caption: the same serif, italic, smaller and dimmer so the Spanish leads. */
+.play-cap[data-two] .cap-en {
+  margin-top: 0.3em;
+  font: italic 400 max(0.62em, calc(5.5 * var(--u)))/1.15 var(--serif);
+  letter-spacing: 0;
+  text-transform: none;
+  color: rgba(236, 230, 220, 0.74);
+}
+.play-cap[data-two] .cap-en:empty { display: none; }
+[data-subs="en"] .play-stamp .en { display: inline; margin: 0 0 0 calc(4 * var(--u)); vertical-align: 0.15em; color: rgba(236, 230, 220, 0.6); }
 .play-cap[data-size="m"] { font-size: calc(11 * var(--u)); }
 .play-cap[data-size="s"] { font-size: calc(9.5 * var(--u)); }
 .play-cap[data-size="xs"] { font-size: calc(8.5 * var(--u)); text-wrap: pretty; }
-[data-state="playing"] .play-stamp:not(:empty),
-[data-state="playing"] .play-cap:not(:empty) { opacity: 1; transition: opacity 1200ms ease-out 900ms; }
+.play-cap[data-size="xxs"] { font-size: calc(7.5 * var(--u)); text-wrap: pretty; }
+.play-cap[data-two][data-size="xs"] > *, .play-cap[data-two][data-size="xxs"] > * { text-wrap: pretty; }
+[data-state="playing"] .play-stamp:not(:empty) { opacity: 1; transition: opacity 1200ms ease-out 900ms; }
+[data-state="playing"] .play-cap:not(:empty) { opacity: 1; transition: opacity 1200ms ease-out 200ms; }
+.play-cap[data-pending] .cap-en { display: block; }
 
 /* Small status note (offline, not configured), bottom left. */
 .status {
@@ -389,96 +455,31 @@ img { -webkit-user-drag: none; }
   z-index: 40;
 }
 .status:not(:empty) { opacity: 0.8; }
+[data-state="saved"] .status { opacity: 0; }
 
-/* Calibration overlay (?calibrate=1): cream outlines with a dark shadow so they read on black. */
-.calibrating, .calibrating * { cursor: crosshair; }
-.calib { position: fixed; inset: 0; z-index: 100; touch-action: none; font-family: var(--sans); }
-.calib-rect, .calib-strip {
-  position: absolute;
-  outline: 1px solid var(--cream);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(0, 0, 0, 0.8);
-}
-.calib-rect { background: rgba(246, 231, 200, 0.1); }
-.calib-circle {
+/* Arrival note at the top of the strip, over every layer. */
+.toast {
   position: absolute;
   inset: 0;
-  margin: auto;
-  border: 1px solid var(--cream);
-  border-radius: 50%;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.8);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 calc(30 * var(--u));
+  background: var(--night);
+  font-family: var(--serif);
+  color: var(--cream);
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
   pointer-events: none;
 }
-.calib-handle {
-  position: absolute;
-  right: -2.5vh;
-  bottom: -2.5vh;
-  width: 5vh;
-  height: 5vh;
-  border-radius: 50%;
-  background: var(--lamp);
-  border: 1px solid #000;
-}
-.calib-tag {
-  position: absolute;
-  padding: 0.6vh 1.2vh;
-  border: 1px solid var(--fog);
-  border-radius: 0.5vh;
-  background: rgba(11, 11, 10, 0.9);
-  color: var(--cream);
-  font: 400 2vh/1 var(--sans);
-  letter-spacing: 0.03em;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  pointer-events: none;
-}
-.calib-strip .calib-tag { left: 1vh; bottom: 1vh; }
-.calib-strip .calib-handle { right: 1vh; bottom: 1vh; }
-.calib-rect .calib-tag { right: 0; bottom: calc(100% + 1vh); }
-.calib-dot {
-  position: absolute;
-  width: 3vh;
-  height: 3vh;
-  margin: -1.5vh 0 0 -1.5vh;
-  border-radius: 50%;
-  background: rgba(201, 88, 75, 0.9);
-  transition: opacity 2s ease-out;
-}
-.calib-dot.hit { background: rgba(255, 248, 234, 0.95); }
-.calib-dot.fade { opacity: 0; }
-.calib-panel {
-  position: absolute;
-  left: 2%;
-  top: 3%;
-  padding: 1.5vh 2vh;
-  border-radius: 1vh;
-  background: rgba(20, 19, 17, 0.9);
-  color: var(--cream);
-  font: 400 2.2vh/1.45 var(--sans);
-  font-variant-numeric: tabular-nums;
-  user-select: text;
-  z-index: 2;
-}
-.calib-panel button {
-  margin: 1vh 1vh 0 0;
-  padding: 0.8vh 1.6vh;
-  border: 0;
-  border-radius: 0.6vh;
-  background: var(--lamp);
-  color: #1B1A18;
-  font: inherit;
-}
-.calib-line { position: absolute; left: 0; right: 0; height: 0; border-top: 0.2vh dashed rgba(236, 230, 220, 0.35); }
-
-/* Shell cutting template (?template=1): white on black, traced onto the shell. */
-.template { position: fixed; inset: 0; z-index: 200; background: #000; color: #fff; font: 400 2.4vh/1.3 var(--sans); font-variant-numeric: tabular-nums; }
-.template * { position: absolute; }
-.t-strip { outline: 2px solid #fff; outline-offset: -1px; }
-.t-hole { border: 2px solid #fff; border-radius: 50%; box-sizing: border-box; }
-.t-h { height: 0; border-top: 1px solid #fff; }
-.t-v { width: 0; border-left: 1px solid #fff; }
-.t-label { white-space: nowrap; transform: translate(-50%, -50%); background: #000; padding: 0.4vh 1vh; }
-.t-end { transform: translate(-100%, -50%); }
-.t-title { left: 2%; top: 2%; color: #aaa; background: #000; padding-right: 1vh; z-index: 1; }
+.toast.on { opacity: 1; transform: translateY(0); transition-duration: 300ms; pointer-events: auto; }
+.toast p:empty, .toast-en { display: none; }
+[data-subs="en"] .toast-en:not(:empty) { display: block; }
+.toast-line { font-size: calc(16 * var(--u)); line-height: 1.05; }
+.toast-sum { margin-top: calc(3 * var(--u)); font-size: calc(9 * var(--u)); line-height: 1.2; color: var(--fog); }
+.toast-en { margin-top: calc(1 * var(--u)); font-size: calc(6 * var(--u)); color: rgba(142, 138, 132, 0.85); }
 
 @media (prefers-reduced-motion: reduce) {
   .glow-breathe > .glow { animation: none; opacity: 0.7; }

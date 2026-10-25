@@ -10,6 +10,7 @@
   <meta name="theme-color" content="#000000">
   <title>Hearth</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="calibrate.css">
   <!-- Fallback only: the bundled fonts in fonts/ come first in the stack. Non-blocking so an offline Hearth still renders. -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&display=swap" media="print" onload="this.media='all'">
 </head>
@@ -25,20 +26,25 @@
 
       <div class="layer clock" id="clock" aria-live="off">
         <b class="day-num" id="day-num"></b>
-        <div class="day-wd"><span id="day-wd"></span><em id="day-mo"></em></div>
+        <div class="day-wd"><span id="day-wd"></span><em id="day-mo"></em><span class="en" id="day-en"></span></div>
         <div class="clk"><span id="clock-h">0</span><span class="colon" id="clock-colon">:</span><span id="clock-m">00</span></div>
+        <p class="family-code"><span id="fam-code-es"></span><span class="family-code-en" id="fam-code-en"></span></p>
       </div>
 
       <div class="layer col waiting">
         <span class="label" id="waiting-label"></span>
         <h1 class="headline" id="waiting-line"></h1>
+        <p class="en" id="waiting-line-en"></p>
         <p class="sub" id="waiting-sub"></p>
+        <p class="en" id="waiting-sub-en"></p>
       </div>
 
       <div class="layer rec" id="rec">
         <div class="rec-text">
           <h1 class="headline italic">te escucho</h1>
+          <p class="en">I'm listening</p>
           <p class="sub" id="rec-prompt"></p>
+          <p class="en" id="rec-prompt-en"></p>
         </div>
         <div class="rec-side">
           <span class="rec-label">REC</span>
@@ -48,18 +54,36 @@
 
       <div class="layer col send" id="send">
         <h1 class="headline italic" id="send-line"></h1>
+        <p class="en">saving your story</p>
         <p class="sub" id="send-sub"></p>
+        <p class="en" id="send-sub-en"></p>
+      </div>
+
+      <div class="layer col saved" id="saved">
+        <i class="ribbon" aria-hidden="true"></i>
+        <h1 class="headline italic">tu historia está guardada</h1>
+        <p class="en">your story is saved</p>
+        <p class="sub" id="saved-sub"></p>
+        <p class="en" id="saved-sub-en"></p>
       </div>
 
       <p class="layer play-stamp" id="play-stamp"></p>
-      <p class="layer play-cap" id="play-cap"></p>
+      <p class="layer play-cap" id="play-cap"><span class="cap-es" id="cap-es"></span><span class="en cap-en" id="cap-en"></span></p>
 
       <div class="layer col err">
-        <span class="label">un momento</span>
+        <span class="label">un momento<span class="en"> · one moment</span></span>
         <h1 class="headline" id="err-line"></h1>
+        <p class="en" id="err-line-en"></p>
       </div>
 
-      <p class="status" id="status"></p>
+      <div id="toast" class="toast" aria-live="polite">
+        <p class="toast-line" id="toast-es"></p>
+        <p class="toast-sum" id="toast-sum-es"></p>
+        <p class="toast-line toast-en" id="toast-en"></p>
+        <p class="toast-sum toast-en" id="toast-sum-en"></p>
+      </div>
+
+      <p class="status" id="status" aria-live="polite"></p>
 
       <div class="vignette" aria-hidden="true"></div>
       <div class="grain" aria-hidden="true"></div>

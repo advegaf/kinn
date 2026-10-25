@@ -161,8 +161,8 @@ function paintStill(seed, palette) {
 export class DemoBackend {
   constructor(config) {
     this.config = config;
-    this.profile = { id: 'demo-elder', name: 'Rosa', role: 'elder', lang: 'es' };
-    this.partner = { id: 'demo-family', name: 'Sofía', role: 'family', lang: 'en' };
+    this.profile = { id: 'demo-elder', name: 'Margaret', role: 'elder', lang: 'es' };
+    this.partner = { id: 'demo-family', name: 'Angel', role: 'family', lang: 'en' };
     this.thread = { id: 'demo-thread', elder_id: 'demo-elder', family_id: 'demo-family' };
     this.messages = [];
     this.listeners = [];
@@ -170,8 +170,9 @@ export class DemoBackend {
   }
 
   // Canned thread from demo/demo-stories.json (the same 6 stories as the iPhone demo).
-  // Rosa's stories carry story.scenes with stills in demo/scenes/. Family replies carry what
-  // Rosa hears (translation_es) and reply_to, the story they answer (demo only, not in the contract).
+  // Margaret's stories carry story.scenes with stills in demo/scenes/. Family replies carry what
+  // Margaret hears (translation_es), reply_to, the story they answer (demo only, not in the contract),
+  // and story.scenes for the reply's own beats when the JSON has them.
   // Audio is pre-generated ElevenLabs narration in demo/audio/{id}-{es|en}.mp3. A missing file
   // fails to load and main.js falls back to speechSynthesis.
   async init() {
@@ -187,7 +188,7 @@ export class DemoBackend {
       const ago = st.days_ago * 1440 + 60;
       storyAgo[st.id] = ago;
       const scenes = st.scenes.map((sc) => ({
-        text_es: sc.text_es, text_en: sc.text_en, prompt: sc.prompt,
+        text_es: sc.text_es, text_en: sc.text_en, t_es: sc.t_es, t_en: sc.t_en, prompt: sc.prompt,
         image_path: `demo/scenes/${sc.image}.jpg`,
         ...(sc.start != null ? { start: sc.start, end: sc.end } : {}),
         ...(sc.video_path ? { video_path: sc.video_path } : {}),
@@ -201,6 +202,14 @@ export class DemoBackend {
     this.pending = data.replies.map((r, i) => this.row(`r${i + 1}`, 'demo-family', iso(storyAgo[r.after_story] - r.minutes_after), {
       transcript: r.text_en, translation: r.translation_es, reply_to: r.after_story,
       original_path: `demo/audio/r${i + 1}-en.mp3`, translated_path: `demo/audio/r${i + 1}-es.mp3`,
+      // Beats of the reply itself, so each frame matches what she hears. scenes.js times them by
+      // t_es span, else by text_es offset within translation_es.
+      story: {
+        title: r.title, title_es: r.title_es,
+        ...(r.scenes?.length ? { scenes: r.scenes.map((sc) => ({
+          text_es: sc.text_es, text_en: sc.text_en, t_es: sc.t_es, t_en: sc.t_en, image_path: `demo/scenes/${sc.image}.jpg`,
+        })) } : {}),
+      },
     }));
     // The newest reply (r1, after today's story) is the one that arrives. The rest are already heard.
     const [fresh, ...older] = this.pending;
