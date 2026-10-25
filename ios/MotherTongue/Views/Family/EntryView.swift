@@ -320,20 +320,21 @@ struct EntryView: View {
         let failed = session.player.failedKey == originalKey
         return VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline) {
-                Button(label) {
+                Button {
                     if playingOther, let src = primarySource {
                         session.player.play(src, key: primaryKey)
                     } else if let src = mine ? session.translatedSource(message) : session.originalSource(message) {
                         session.player.play(src, key: mine ? translatedKey : originalKey)
                     }
+                } label: {
+                    Text(label).dottedUnderline(.wordsEm).tapTarget()
                 }
                 .accessibilityIdentifier("entry.original")
                 .font(.serif(20))
                 .foregroundStyle(Color.wordsEm)
-                .dottedUnderline(.wordsEm)
                 Spacer()
                 Button(action: writeBack) {
-                    Text("Write back to \(session.partnerName)").font(.serif(21)).foregroundStyle(Color.cream)
+                    Text("Write back to \(session.partnerName)").font(.serif(21)).foregroundStyle(Color.cream).tapTarget()
                 }
                 .accessibilityIdentifier("entry.writeBack")
             }
@@ -344,7 +345,6 @@ struct EntryView: View {
             }
         }
         .buttonStyle(PressStyle())
-        .frame(minHeight: 44)
     }
 }
 

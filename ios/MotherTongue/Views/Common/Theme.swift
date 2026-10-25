@@ -49,7 +49,7 @@ extension Font {
 }
 
 extension View {
-    /// A 44 pt hit area for a text control.
+    /// A 44 pt hit area for a text control. Put it inside the Button label: a frame outside the Button does not make the hit area bigger.
     func tapTarget() -> some View {
         frame(minHeight: 44).contentShape(.rect)
     }

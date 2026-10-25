@@ -105,9 +105,9 @@ struct SettingsView: View {
                 .font(.serif(18))
                 .foregroundStyle(Color.soft)
                 .underline(color: .faint)
+                .tapTarget()
         }
         .buttonStyle(PressStyle())
-        .tapTarget()
         .padding(.top, 4)
     }
 
