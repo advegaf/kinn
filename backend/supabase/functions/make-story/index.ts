@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
     );
     t.step("upload");
 
-    const story = { title: String(out.title ?? "A memory"), image_paths: imagePaths };
+    const story = { ...(msg.story ?? {}), title: String(out.title ?? "A memory"), image_paths: imagePaths };
     const { data: done, error } = await db.from("messages").update({ story }).eq("id", messageId).select().single();
     if (error) throw new Error(`Saving story failed: ${error.message}`);
     return json(done);

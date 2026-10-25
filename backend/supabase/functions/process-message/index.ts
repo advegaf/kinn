@@ -1,13 +1,16 @@
+import { elderFields, freeFields, pickReply, pickStory, REPLIES, replyFields, replyTarget } from "../_shared/demo.ts";
 import { callLLM } from "../_shared/llm.ts";
 import { speak, transcribe } from "../_shared/providers.ts";
 import { adminClient, corsHeaders, env, errorText, json, langName, stripBucket, timer } from "../_shared/util.ts";
+
+const LLM_KEY: Record<string, string> = { meta: "META_API_KEY", anthropic: "ANTHROPIC_API_KEY", openai: "OPENAI_API_KEY" };
 
 function systemPrompt(sourceLang: string, targetLang: string, wantAsk: boolean): string {
   const src = langName(sourceLang);
   const tgt = langName(targetLang);
   return `You translate voice messages between a grandmother and her grandchild in one family.
 Translate from ${src} to ${tgt} the way a loving bilingual grandchild would: keep the warmth, the endearments, the humor and the idioms. Do not translate word for word. Keep the speaker's voice and rhythm so it sounds natural when spoken aloud.
-Keep endearments like "mija", "mijo", "corazón", "abuelita" in place when that sounds natural in ${tgt}, and explain each one you keep in cultural_notes. Also add a cultural note for any idiom, dish, saint, place or tradition a ${tgt} speaker might not know. Keep notes to one short sentence each. Use an empty list if there is nothing worth explaining.
+Keep endearments like "mija", "mijo", "coraz\u00f3n", "abuelita" in place when that sounds natural in ${tgt}, and explain each one you keep in cultural_notes. Also add a cultural note for any idiom, dish, saint, place or tradition a ${tgt} speaker might not know. Keep notes to one short sentence each. Use an empty list if there is nothing worth explaining.
 ${
     wantAsk
       ? `Also write exactly 3 short follow-up prompts for the grandchild, each starting with "Ask her about", drawn from this message and the earlier conversation. Make them specific and warm, things that invite a story.`
@@ -15,7 +18,25 @@ ${
   }
 The translation will be read aloud by text to speech, so do not add brackets, notes or stage directions inside it.
 Respond with only a JSON object in this exact shape:
-{"translation": "...", "cultural_notes": [{"term": "...", "note": "..."}], "ask_about": ["Ask her about ...", "Ask her about ...", "Ask her about ..."]}`;
+{"translation": "...", "title_en": "...", "title_es": "...", "cultural_notes": [{"term": "...", "note": "..."}], "ask_about": ["Ask her about ...", "Ask her about ...", "Ask her about ..."]}
+title_en and title_es summarize the message in English and in Spanish, at most 6 words each.`;
+}
+
+type Row = { id: string; sender_id: string; transcript: string | null };
+type Msg = { id: string; sender_id: string; source_lang: string };
+
+function demoFields(msg: Msg, role: string, heard: string, existing: Row[]): Record<string, unknown> {
+  const tag = `[process-message ${msg.id}] demo heard "${heard.slice(0, 80)}"`;
+  if (role === "elder") {
+    const story = pickStory(heard, existing);
+    console.log(`${tag} -> ${story.id}`);
+    return elderFields(story);
+  }
+  const { index, score, heard: words } = pickReply(heard, existing);
+  console.log(`${tag} score ${score}/${words} -> index ${index}`);
+  if (index < 0) return freeFields(heard, msg.source_lang);
+  const others = existing.filter((m) => m.sender_id !== msg.sender_id);
+  return { ...replyFields(REPLIES[index], index), reply_to: replyTarget(REPLIES[index], others) };
 }
 
 Deno.serve(async (req) => {
@@ -39,7 +60,7 @@ Deno.serve(async (req) => {
     await db.from("messages").update({ status: "processing", error: null }).eq("id", messageId);
 
     const originalPath = stripBucket("audio", msg.original_path);
-    const [sender, audio, history] = await Promise.all([
+    const [sender, audio, history, thread] = await Promise.all([
       db.from("profiles").select("*").eq("id", msg.sender_id).single(),
       db.storage.from("audio").download(originalPath),
       db.from("messages")
@@ -49,12 +70,36 @@ Deno.serve(async (req) => {
         .not("transcript", "is", null)
         .order("created_at", { ascending: false })
         .limit(10),
+      db.from("threads").select("demo").eq("id", msg.thread_id).single(),
     ]);
     if (sender.error || !sender.data) throw new Error(`Sender profile not found: ${sender.error?.message}`);
     if (audio.error || !audio.data) throw new Error(`Could not download audio ${originalPath}: ${audio.error?.message}`);
     t.step("load");
 
     const filename = originalPath.split("/").pop() || "audio.m4a";
+    const provider = env("LLM_PROVIDER", "meta").toLowerCase();
+    const demo = thread.data?.demo === true || !env(LLM_KEY[provider] ?? "META_API_KEY");
+    if (demo) {
+      // Presenter mode: real Scribe for the logs, then map onto the canned stories. No LLM, no TTS.
+      let heard = "";
+      try {
+        heard = await transcribe(audio.data, filename, msg.source_lang);
+      } catch (e) {
+        console.error(`[process-message ${messageId}] demo stt failed, continuing: ${errorText(e)}`);
+      }
+      t.step("stt");
+      const { data: rows } = await db.from("messages")
+        .select("id, sender_id, transcript")
+        .eq("thread_id", msg.thread_id)
+        .neq("id", messageId)
+        .order("created_at", { ascending: false });
+      const fields = demoFields(msg, sender.data.role, heard, rows ?? []);
+      const { data: done, error: doneErr } = await db.from("messages").update(fields).eq("id", messageId).select()
+        .single();
+      if (doneErr) throw new Error(`Final update failed: ${doneErr.message}`);
+      t.step("ready");
+      return json(done);
+    }
     const transcript = await transcribe(audio.data, filename, msg.source_lang);
     if (!transcript) throw new Error("Transcription was empty. Was anything said?");
     await db.from("messages").update({ transcript }).eq("id", messageId);
@@ -72,6 +117,12 @@ Deno.serve(async (req) => {
     if (!translation) throw new Error("LLM returned an empty translation");
     const culturalNotes = Array.isArray(out.cultural_notes) ? out.cultural_notes : [];
     const askAbout = wantAsk && Array.isArray(out.ask_about) ? out.ask_about.slice(0, 3) : [];
+    const story = {
+      ...(msg.story ?? {}),
+      title: String(out.title_en ?? "").trim() || null,
+      title_es: String(out.title_es ?? "").trim() || null,
+      status: "ready",
+    };
     t.step("llm");
 
     const voiceId = sender.data.voice_id || env("FALLBACK_VOICE_ID");
@@ -95,6 +146,7 @@ Deno.serve(async (req) => {
         translated_path: translatedPath,
         cultural_notes: culturalNotes,
         ask_about: askAbout,
+        story,
         status: "ready",
         error: null,
       })
