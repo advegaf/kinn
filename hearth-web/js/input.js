@@ -11,7 +11,7 @@ const PRESS_KEYS = new Set(['Enter', 'NumpadEnter', ' ', 'Spacebar', 'MediaPlayP
 const root = $('hearth');
 let holdTimer = 0;
 
-// The ring around the lamp spot fills while the hold runs (styles.css, [data-hold]).
+// The ring in the middle of the strip fills while the hold runs (styles.css, [data-hold]).
 export function startHold(onDone) {
   cancelHold();
   root.toggleAttribute('data-hold', true);
