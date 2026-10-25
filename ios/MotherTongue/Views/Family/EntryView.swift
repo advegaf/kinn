@@ -133,6 +133,9 @@ struct EntryView: View {
                 .padding(.top, 8)
         }
         .task(id: message.id) { session.markHeard(message.id) }
+        .onChange(of: isTopPage) { _, top in
+            if !top { session.player.stop() }
+        }
         .task(id: making) {
             guard Self.simulated == nil, !making, isTopPage else { return }
             if let src = primarySource { session.player.play(src, key: primaryKey) }

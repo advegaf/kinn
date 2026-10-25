@@ -115,9 +115,10 @@ struct Story: Codable, Hashable, Sendable {
             starts.append(Double(r.location) / total)
             cursor = r.location + r.length
         }
-        let even = starts.contains(nil) || starts.first! != 0
+        let found = starts.compactMap { $0 }
+        let even = found.count != out.count || found.first != 0
         for i in out.indices {
-            let start = even ? Double(i) / Double(out.count) : starts[i]!
+            let start = even ? Double(i) / Double(out.count) : found[i]
             out[i].start = out[i].start ?? start
         }
         for i in out.indices {
