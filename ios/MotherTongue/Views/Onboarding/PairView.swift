@@ -143,6 +143,7 @@ struct PairView: View {
     }
 
     private func run(joinedByCode: Bool = false, _ work: @escaping () async throws -> Void) {
+        guard !busy else { return }
         busy = true
         error = nil
         pending = Task {
