@@ -16,7 +16,6 @@ enum Almanac {
             ("month", "en_US", "LLLL"),
             ("day", "en_US", "EEEE d"),
             ("weekdayMonth", "en_US", "EEEE, MMMM"),
-            ("monthYearEn", "en_US", "MMMM yyyy"),
             ("time", "en_US", "h:mm a")
         ] {
             let f = DateFormatter()
@@ -39,11 +38,6 @@ enum Almanac {
     static func weekdayMonth(_ d: Date) -> String { format("weekdayMonth", d) }
     /// "2:48 PM"
     static func time(_ d: Date) -> String { format("time", d) }
-    /// "October 2026, week 43"
-    static func monthLine(_ d: Date) -> String {
-        "\(format("monthYearEn", d)), week \(calendar.component(.weekOfYear, from: d))"
-    }
-
     static func dayNumber(_ d: Date) -> Int { calendar.component(.day, from: d) }
 
     /// Monday through Sunday of the week holding `d`.
