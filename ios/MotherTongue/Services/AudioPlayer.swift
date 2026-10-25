@@ -28,7 +28,6 @@ final class AudioPlayer: NSObject {
     private var speechOffset = 0
     private var utteranceID: ObjectIdentifier?
     private var pendingSeek: Double?
-    var onFinish: ((String) -> Void)?
 
     override init() {
         super.init()
@@ -148,10 +147,8 @@ final class AudioPlayer: NSObject {
     }
 
     private func finish() {
-        let key = currentKey
         progress = 1
         stop()
-        if let key { onFinish?(key) }
     }
 
     fileprivate func speechProgress(_ location: Int, id: ObjectIdentifier) {
