@@ -24,10 +24,6 @@ struct AlmanacView: View {
                     .tracking(-1.65)
                     .foregroundStyle(Color.ink)
                     .padding(.top, 14)
-                Text(Almanac.monthLine(now))
-                    .font(.serif(20))
-                    .foregroundStyle(Color.sub)
-                    .padding(.top, -5)
                 weekRow(now)
                     .padding(.top, 30)
                 if let today = session.latestFromPartner {
