@@ -6,7 +6,6 @@ struct KinnTabBar: View {
     var compose: () -> Void
     var settings: () -> Void
 
-    @State private var bottomInset: CGFloat = 0
     /// Instrument Serif's descender is 0.04 em deeper than the space over its cap height, so the ink sits centered with 0.04 em more on top.
     @ScaledMetric(relativeTo: .body) private var nudge: CGFloat = 0.76
 
@@ -25,11 +24,10 @@ struct KinnTabBar: View {
         .padding(.horizontal, 8)
         .overlay(alignment: .top) { Hairline() }
         .background { Color.paper.ignoresSafeArea(edges: .bottom) }
-        .onGeometryChange(for: CGFloat.self) { $0.safeAreaInsets.bottom } action: { bottomInset = $0 }
     }
 
     /// The bar only shows on the week, so Home is always the selected item.
-    /// The text sits on the top of the safe area, so the space over it equals the space under it down to the screen edge.
+    /// Fixed padding: measuring the bar's own safe area inset and padding by it changed the inset again, a layout loop that froze the app.
     private func item(_ label: String, id: String, selected: Bool = false, action: @escaping () -> Void) -> some View {
         Button {
             Haptics.tap()
@@ -41,8 +39,8 @@ struct KinnTabBar: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
                 .padding(.horizontal, 8)
-                .padding(.top, max(bottomInset, 20) + nudge)
-                .padding(.bottom, max(20 - bottomInset, 0))
+                .padding(.top, 14 + nudge)
+                .padding(.bottom, 6)
                 .frame(minHeight: 44)
                 .contentShape(.rect)
         }
