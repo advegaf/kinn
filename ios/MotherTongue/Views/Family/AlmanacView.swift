@@ -113,6 +113,7 @@ struct AlmanacView: View {
                 .contentShape(.rect)
             }
             .buttonStyle(PressStyle())
+            .accessibilityIdentifier("almanac.featured")
             Text("\(Almanac.day(m.date)) at \(Almanac.time(m.date))")
                 .font(.serif(17))
                 .foregroundStyle(Color.soft)
@@ -129,6 +130,7 @@ struct AlmanacView: View {
                 Button { open(m.id) } label: {
                     Text("Listen").dottedUnderline(making ? .later : .ink).tapTarget()
                 }
+                .accessibilityIdentifier("almanac.listen")
                 .font(.serif(19))
                 .foregroundStyle(making ? Color.later : Color.ink)
                 .disabled(making)
@@ -141,6 +143,7 @@ struct AlmanacView: View {
                 }
                 .font(.serif(19))
                 .foregroundStyle(Color.soft)
+                .accessibilityIdentifier("almanac.original")
             }
             .buttonStyle(PressStyle())
             .padding(.top, 2)
@@ -163,6 +166,7 @@ struct AlmanacView: View {
             .font(.serif(18))
             .foregroundStyle(Color.rec)
             .buttonStyle(PressStyle())
+            .accessibilityIdentifier("almanac.retry")
             .padding(.top, 14)
         } else if session.hasPending {
             Breathing {
@@ -170,6 +174,7 @@ struct AlmanacView: View {
                     .font(.serif(18))
                     .foregroundStyle(Color.soft)
             }
+            .accessibilityIdentifier("almanac.pending")
             .padding(.top, 14)
         }
     }
@@ -207,6 +212,7 @@ struct AlmanacView: View {
                     .contentShape(.rect)
                 }
                 .buttonStyle(PressStyle())
+                .accessibilityIdentifier("almanac.row")
                 .overlay(alignment: .bottom) { Hairline() }
             }
         }

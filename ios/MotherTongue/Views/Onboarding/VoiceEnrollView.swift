@@ -59,6 +59,7 @@ struct VoiceEnrollView: View {
                     .foregroundStyle(Color.sub)
                     .underline(color: .faint)
                     .buttonStyle(PressStyle())
+                    .accessibilityIdentifier("onboarding.skip")
                 }
             }
             .animation(.enter, value: phase)

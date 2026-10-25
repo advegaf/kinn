@@ -36,6 +36,7 @@ struct SettingsView: View {
 
                 section("Demo") {
                     toggle("Demo mode", isOn: $demoMode)
+                        .accessibilityIdentifier("settings.demoMode")
                     note("Canned sample stories with no network.")
                 }
 
@@ -47,6 +48,7 @@ struct SettingsView: View {
                 .font(.serif(21))
                 .foregroundStyle(Color.ribbon)
                 .buttonStyle(PressStyle())
+                .accessibilityIdentifier("settings.startOver")
                 .padding(.top, 40)
             }
             .padding(.horizontal, 30)

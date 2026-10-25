@@ -22,6 +22,7 @@ struct WriteBackView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             BackButton(action: back)
+                .accessibilityIdentifier("writeBack.back")
             head
                 .padding(.top, 8)
             if let message {
@@ -91,6 +92,7 @@ struct WriteBackView: View {
                 .buttonStyle(PressStyle())
                 .overlay(alignment: .bottom) { Hairline() }
                 .accessibilityAddTraits(on ? .isSelected : [])
+                .accessibilityIdentifier("writeBack.prompt")
             }
         }
         .overlay(alignment: .top) { Hairline() }
@@ -133,6 +135,7 @@ struct WriteBackView: View {
                 .accessibilityElement()
                 .accessibilityLabel(recorder.isRecording ? "Recording. Tap to send" : "Record")
                 .accessibilityAddTraits(.isButton)
+                .accessibilityIdentifier("writeBack.record")
                 .accessibilityAction {
                     if recorder.isRecording {
                         latched = false

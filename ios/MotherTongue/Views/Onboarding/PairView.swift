@@ -45,6 +45,7 @@ struct PairView: View {
                 .font(.serif(17))
                 .foregroundStyle(Color.soft)
                 .buttonStyle(PressStyle())
+                .accessibilityIdentifier("onboarding.skipPairing")
                 .disabled(busy)
             }
         }
