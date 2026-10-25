@@ -1,5 +1,5 @@
 // Loads config.local.js when present, then lets URL params override it.
-// Params: ?thread= ?profile= ?demo=1 ?calibrate=1 ?template=1 ?state= ?msg= (demo only) ?at=0..1 ?debug=1
+// Params: ?thread= ?profile= ?demo=1 ?calibrate=1 ?template=1 ?state= ?msg= (demo only) ?at=0..1 ?debug=1 ?subs=en
 
 const params = new URLSearchParams(location.search);
 const flag = (name) => params.has(name) && params.get(name) !== '0';
@@ -23,6 +23,8 @@ const config = {
   calibrate: flag('calibrate'),
   template: flag('template'),
   debug: flag('debug'),
+  // English line under every Spanish line, for people who do not read Spanish.
+  subs: params.get('subs') === 'en',
   startState: params.get('state') || '',
   startMsg: params.get('msg') || '',
   // DEBUG: freeze playback at this fraction of the narration (0..1), with no audio. For screenshots.

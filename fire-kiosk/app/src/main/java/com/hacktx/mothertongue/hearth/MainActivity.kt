@@ -73,6 +73,9 @@ class MainActivity : Activity() {
         s.domStorageEnabled = true
         s.mediaPlaybackRequiresUserGesture = false
         s.mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
+        webView.isVerticalScrollBarEnabled = false
+        webView.isHorizontalScrollBarEnabled = false
+        webView.overScrollMode = View.OVER_SCROLL_NEVER
 
         webView.webViewClient = object : WebViewClient() {
             override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
