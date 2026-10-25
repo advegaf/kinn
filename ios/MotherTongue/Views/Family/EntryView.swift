@@ -4,16 +4,18 @@ import SwiftUI
 /// The film and the lit paragraph follow the narration, one scene per beat.
 struct EntryView: View {
     var message: Message
-    var close: () -> Void
+    var autoplay: Bool
+    var back: () -> Void
     var writeBack: () -> Void
     private let scenes: [StoryScene]
 
     @Environment(AppSession.self) private var session
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    init(message: Message, close: @escaping () -> Void, writeBack: @escaping () -> Void) {
+    init(message: Message, autoplay: Bool, back: @escaping () -> Void, writeBack: @escaping () -> Void) {
         self.message = message
-        self.close = close
+        self.autoplay = autoplay
+        self.back = back
         self.writeBack = writeBack
         scenes = message.story?.timedScenes(translation: message.translation) ?? []
     }
@@ -123,22 +125,16 @@ struct EntryView: View {
                     .padding(.bottom, 12)
             }
             Vignette()
-            Button("Close") {
-                session.player.stop()
-                close()
-            }
-            .tinyCaps(.cream.opacity(0.85))
-            .shadow(color: .black.opacity(0.6), radius: 8)
-            .buttonStyle(PressStyle())
-            .frame(minWidth: 44, minHeight: 44)
-            .contentShape(.rect)
-            .frame(maxWidth: .infinity, alignment: .trailing)
-            .padding(.trailing, 22)
-            .padding(.top, 6)
+            BackButton(color: .cream, action: back)
+                .shadow(color: .black.opacity(0.6), radius: 8)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 30)
+                .padding(.top, 8)
         }
+        .backSwipe(back)
         .task(id: message.id) {
             session.markHeard(message.id)
-            guard Self.simulated == nil else { return }
+            guard Self.simulated == nil, autoplay else { return }
             if let src = primarySource { session.player.play(src, key: primaryKey) }
         }
         .task(id: sceneIndex) {

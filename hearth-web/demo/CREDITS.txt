@@ -1,1 +1,0 @@
-Story stills: photos from Lorem Picsum (https://picsum.photos, Unsplash license), ids 292 164 65 129 365 76 110, processed with the Dream Recorder ffmpeg chain (Modem, MIT).

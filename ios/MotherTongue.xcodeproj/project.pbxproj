@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		00ABE7050576014F3D62B3FE /* Backend.swift in Sources */ = {isa = PBXBuildFile; fileRef = A148432D16A5F5C99A059F3D /* Backend.swift */; };
+		BAC0C0B5D1A7E3F20C4B6A01 /* BackControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAC0C0B5D1A7E3F20C4B6A02 /* BackControl.swift */; };
 		030BACB98B263B0DB5469EDC /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8075A1030F44F75C7ECFA1A /* AppConfig.swift */; };
 		042F278D646CBDDEECA76B77 /* AppSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB0DA76E6FD005010B422A29 /* AppSession.swift */; };
 		076BBD297C5304FAACE04E05 /* KinnTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED65A0420DC62B765E45507D /* KinnTabBar.swift */; };
@@ -69,6 +70,7 @@
 		2FC33BB7EA86B1E5033BC092 /* MotherTongue.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MotherTongue.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		32EAE09EDBA7272E4DD22340 /* Icon */ = {isa = PBXFileReference; path = "Icon"; sourceTree = "<group>"; };
 		439825CAD9721DF7B232594E /* s1-es.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "s1-es.mp3"; sourceTree = "<group>"; };
+		BAC0C0B5D1A7E3F20C4B6A02 /* BackControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackControl.swift; sourceTree = "<group>"; };
 		49A886B4B7B7E0DBDF8BD78C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		4A34DD8E099CF939016424F1 /* StoryVideo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryVideo.swift; sourceTree = "<group>"; };
 		4B8461CD8C2627BC579C73C5 /* Icon */ = {isa = PBXFileReference; path = "Icon"; sourceTree = "<group>"; };
@@ -282,6 +284,7 @@
 			isa = PBXGroup;
 			children = (
 				BDCB273091465F05CD61FB5B /* Icon */,
+				BAC0C0B5D1A7E3F20C4B6A02 /* BackControl.swift */,
 				49A886B4B7B7E0DBDF8BD78C /* SettingsView.swift */,
 				5B0FF920894F05B6F826F084 /* StoryImage.swift */,
 				4A34DD8E099CF939016424F1 /* StoryVideo.swift */,
@@ -410,6 +413,7 @@
 				2AE14B927C8E8450423B1A9A /* AudioPlayer.swift in Sources */,
 				EF625CC874B79CBF29C15F52 /* AudioRecorder.swift in Sources */,
 				00ABE7050576014F3D62B3FE /* Backend.swift in Sources */,
+				BAC0C0B5D1A7E3F20C4B6A01 /* BackControl.swift in Sources */,
 				8C04BB362F0013AE3DC1CB75 /* DemoBackend.swift in Sources */,
 				64F3D35CF116765566AEF8F5 /* EntryView.swift in Sources */,
 				C0002611A70804F436AF5AEE /* FamilyRoot.swift in Sources */,

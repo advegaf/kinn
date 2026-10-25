@@ -15,7 +15,6 @@ final class AppSession {
     private(set) var hasLoaded = false
     /// Increments when a new ready message from the partner arrives.
     private(set) var arrivals = 0
-    var askPrompt: String?
     private(set) var heardIds: Set<UUID> = []
 
     let recorder = AudioRecorder()
@@ -37,7 +36,12 @@ final class AppSession {
 
     func configureBackend() {
         stopSync()
-        isDemo = defaults.bool(forKey: StorageKeys.demoMode)
+        let demo = defaults.bool(forKey: StorageKeys.demoMode)
+        if demo != isDemo {
+            profile = nil
+            thread = nil
+        }
+        isDemo = demo
         backend = isDemo ? DemoBackend() : SupabaseService()
         messages = []
         localOnly = []
@@ -88,9 +92,12 @@ final class AppSession {
 
     func createProfile(name: String, role: Role, lang: String) async throws {
         guard let backend else { throw SessionError.notConfigured }
+        if let profile, profile.name == name, profile.role == role, profile.lang == lang { return }
         let p = try await backend.createProfile(name: name, role: role, lang: lang)
         profile = p
         defaults.set(p.id.uuidString, forKey: StorageKeys.profileId)
+        thread = nil
+        defaults.removeObject(forKey: StorageKeys.threadId)
     }
 
     func createThread() async throws {
@@ -200,7 +207,6 @@ final class AppSession {
                             originalPath: path, status: .uploaded, createdAt: Message.timestamp(), replyTo: replyTo)
         messages.append(draft)
         localOnly.insert(id)
-        askPrompt = nil
         do {
             try await backend.uploadAudio(path: path, fileURL: url)
             let row = NewMessage(id: id, threadId: thread.id, senderId: profile.id, sourceLang: profile.lang,

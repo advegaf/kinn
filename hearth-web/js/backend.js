@@ -125,39 +125,6 @@ export class SupabaseBackend {
   }
 }
 
-// Painterly warm stills drawn on a canvas so demo mode needs no network or assets.
-function paintStill(seed, palette) {
-  const c = document.createElement('canvas');
-  c.width = 960;
-  c.height = 300;
-  const g = c.getContext('2d');
-  let s = seed;
-  const rand = () => ((s = (s * 16807) % 2147483647) / 2147483647);
-  const bg = g.createLinearGradient(0, 0, c.width, c.height);
-  bg.addColorStop(0, palette[0]);
-  bg.addColorStop(1, palette[1]);
-  g.fillStyle = bg;
-  g.fillRect(0, 0, c.width, c.height);
-  g.filter = 'blur(22px)';
-  for (let i = 0; i < 26; i++) {
-    const r = 30 + rand() * 120;
-    const grad = g.createRadialGradient(0, 0, 0, 0, 0, r);
-    const col = palette[2 + Math.floor(rand() * (palette.length - 2))];
-    grad.addColorStop(0, col);
-    grad.addColorStop(1, 'rgba(0,0,0,0)');
-    g.save();
-    g.translate(rand() * c.width, c.height * (0.2 + rand() * 0.8));
-    g.scale(1 + rand() * 1.5, 1);
-    g.fillStyle = grad;
-    g.globalAlpha = 0.5 + rand() * 0.5;
-    g.beginPath();
-    g.arc(0, 0, r, 0, Math.PI * 2);
-    g.fill();
-    g.restore();
-  }
-  return c.toDataURL('image/jpeg', 0.85);
-}
-
 export class DemoBackend {
   constructor(config) {
     this.config = config;
