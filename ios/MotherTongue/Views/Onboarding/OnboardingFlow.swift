@@ -162,8 +162,6 @@ struct OnboardingFlow: View {
     }
 }
 
-// MARK: Diary page parts shared by the onboarding pages and settings
-
 /// A diary page: content, and one action held at the foot.
 struct OnbPage<Content: View, Footer: View>: View {
     var back: BackButton? = nil

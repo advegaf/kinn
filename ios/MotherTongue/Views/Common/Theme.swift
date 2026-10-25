@@ -34,8 +34,6 @@ extension Color {
     static let ember = lamp
 }
 
-// MARK: Type
-
 extension Font {
     static func serif(_ size: CGFloat, relativeTo style: TextStyle = .body) -> Font {
         .custom("InstrumentSerif-Regular", size: size, relativeTo: style)
@@ -57,7 +55,6 @@ extension View {
     }
 }
 
-/// A one pixel ruled line.
 struct Hairline: View {
     var color: Color = .rule
     var body: some View {
@@ -79,7 +76,7 @@ extension String {
     var unmarked: String { replacingOccurrences(of: "*", with: "") }
 }
 
-// MARK: Motion. Slow fades in, quicker fades out, ease-out only.
+// Use ease-out curves only.
 
 extension Animation {
     static let enter = Animation.timingCurve(0.23, 1, 0.32, 1, duration: 0.6)
@@ -93,8 +90,6 @@ extension AnyTransition {
         .asymmetric(insertion: .opacity.animation(.enter), removal: .opacity.animation(.exit))
     }
 }
-
-// MARK: Grain and paper
 
 @MainActor
 enum PaperGrain {
@@ -167,7 +162,6 @@ struct NightCanvas: View {
     }
 }
 
-/// Soft dark edges on the night stage.
 struct Vignette: View {
     var body: some View {
         RadialGradient(stops: [.init(color: .clear, location: 0.55), .init(color: .black.opacity(0.5), location: 1)],
@@ -186,8 +180,6 @@ struct SeededRandom {
         return state >> 33
     }
 }
-
-// MARK: Pressables
 
 struct PressStyle: ButtonStyle {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -213,7 +205,6 @@ struct SlabButtonStyle: ButtonStyle {
     }
 }
 
-/// The round dark record disc with a red core.
 struct RecordDisc: View {
     var live: Bool
     var body: some View {
@@ -267,8 +258,6 @@ struct KenBurns<Content: View>: View {
         .ignoresSafeArea()
     }
 }
-
-// MARK: Formatting
 
 func formatDuration(_ t: TimeInterval) -> String {
     let s = max(0, Int(t.rounded(.down)))

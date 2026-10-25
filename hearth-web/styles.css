@@ -143,7 +143,6 @@ img { -webkit-user-drag: none; }
 .vignette { z-index: 30; background: radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(0, 0, 0, 0.5)); }
 .grain { z-index: 50; background-image: var(--grain); background-size: 240px; mix-blend-mode: overlay; opacity: 0.5; }
 
-/* Layers fade only. Enter 500ms, exit 250ms. */
 .layer {
   position: absolute;
   inset: 0;
@@ -177,7 +176,6 @@ img { -webkit-user-drag: none; }
 /* Sentence case for lines that the scripts and the demo data write in lower case. */
 .headline::first-letter, .sub::first-letter, .play-stamp::first-letter, .status::first-letter { text-transform: uppercase; }
 
-/* English under each Spanish line (?subs=en): plain serif, dimmer than the Spanish it follows. */
 .en { display: none; }
 [data-subs="en"] .en {
   display: block;
@@ -188,7 +186,6 @@ img { -webkit-user-drag: none; }
 }
 [data-subs="en"] .en:empty { display: none; }
 
-/* Left aligned column, vertically centered: waiting, sending, saved, error. */
 .col {
   display: flex;
   flex-direction: column;
@@ -200,7 +197,6 @@ img { -webkit-user-drag: none; }
 .col > .headline:first-child { margin-top: 0; }
 .col .sub { margin-top: calc(4 * var(--u)); }
 
-/* Idle: today's numeral, weekday and month stacked beside it, clock far right. */
 .clock {
   display: flex;
   align-items: center;
@@ -259,7 +255,6 @@ img { -webkit-user-drag: none; }
 .family-code span:empty, .family-code-en { display: none; }
 [data-subs="en"] .family-code-en:not(:empty) { display: inline; margin-left: calc(3 * var(--u)); color: #4E4B47; }
 
-/* Recording: headline column left, REC and the counter on the right. */
 .rec {
   display: flex;
   align-items: center;
@@ -312,7 +307,7 @@ img { -webkit-user-drag: none; }
 }
 .counter s { text-decoration: none; color: var(--fog); padding: 0 1px; }
 
-/* Sending: one slow breathe on the line. Nothing spins. */
+/* Sending shows no spinner. */
 [data-state="sending"] .send { opacity: 1; transition-duration: var(--enter); }
 .send .headline { font-size: calc(29 * var(--u)); }
 [data-state="sending"] .send .headline { animation: send 2.4s ease-in-out infinite alternate; }
@@ -321,7 +316,7 @@ img { -webkit-user-drag: none; }
   to { opacity: 0.55; }
 }
 
-/* Saved: her story is in. The oxblood ribbon marks the new entry, as it does on paper. */
+/* The oxblood ribbon marks the new entry, as it does on paper. */
 .saved .headline { font-size: calc(24 * var(--u)); }
 .ribbon {
   position: absolute;
@@ -336,10 +331,8 @@ img { -webkit-user-drag: none; }
   clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 2.25 * var(--u)), 0 100%);
 }
 
-/* Error: calm, brief, returns on its own. */
 .err .headline { font-size: calc(22 * var(--u)); max-width: 100%; }
 
-/* Playing: story film fades in over 2s, out in 500ms. */
 .media { overflow: hidden; background: var(--night); transition-duration: 500ms; }
 .media > * { position: absolute; inset: 0; width: 100%; height: 100%; }
 [data-state="playing"] .media { opacity: 1; transition: opacity 2s ease-out; }
@@ -357,7 +350,6 @@ img { -webkit-user-drag: none; }
 
 .kb img, #video { filter: saturate(0.85) brightness(0.82); }
 .kb { transition: opacity 600ms var(--ease-out); }
-/* Scene crossfade: the outgoing still fades out in 500ms, then its drift resets out of sight. */
 .kb img {
   position: absolute;
   inset: 0;
@@ -368,7 +360,6 @@ img { -webkit-user-drag: none; }
   transform: scale(1.03);
   transition: opacity 500ms var(--ease-out), transform 0s linear 500ms;
 }
-/* The incoming still fades in over 700ms and drifts slowly for as long as its beat lasts. */
 .kb img.on {
   opacity: 1;
   transform: scale(1.10) translate(var(--kx), var(--ky));

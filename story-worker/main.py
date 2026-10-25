@@ -68,7 +68,6 @@ def now_iso():
     return datetime.now(timezone.utc).isoformat()
 
 
-# Supabase REST and storage
 
 
 def headers(extra=None):
@@ -202,7 +201,6 @@ def slow_video(src, dest):
     return dest
 
 
-# Pipeline
 
 
 def call_make_story(message_id):

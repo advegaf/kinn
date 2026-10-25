@@ -14,15 +14,13 @@ import sys
 
 import numpy as np
 
-# ==== MEASURE FIRST. Single source: hearth_parts.py, hearth_v4.py and the renders import these. ====
+# Measure these values first. hearth_parts.py, hearth_v4.py and the renders import them.
 TAB_W, TAB_H, TAB_T = 208.94, 132.64, 7.95   # Alexa Tablet 8 (2026): 208.94 x 132.64 x 7.95. Calipers, case off.
 TAB_CORNER_R = 9.0                          # guess
 ACT_W, ACT_H = 190.14, 113.52               # lit area: 1340 x 800 px at 179 ppi (8.7 in). Measure the offset.
 SCREEN_OFF_X, SCREEN_OFF_Y = 0.0, 0.0       # active area centre offset from body centre (front view). Measure.
 CLR = 0.6                                   # gap per side between tablet and the bezel ribs
-# ==== end measure block ====
 
-# ---- Body ----
 W, H = 228.0, 152.0      # footprint seen from the front
 R_PLAN = 20.0            # corner radius seen from the front
 FACE_T = 1.6             # bezel face
@@ -34,7 +32,7 @@ K_SEAM = 0.8             # soft seam where bezel meets shell
 R_F = 5.0                # soft front edge, like DR's pillowy face
 FACE_CH = 2 * R_F * (1 - 1 / math.sqrt(2))   # 45 degree line tangent to R_F: prints clean face down
 
-# ---- Hump (front view coords) ----
+# The hump values use front view coordinates.
 HUMP_X0, HUMP_X1 = -84.0, 46.0      # base extent across
 HUMP_Y0, HUMP_Y1 = -H / 2 - 30, 56.0  # base extent up; runs well past the bottom so the back meets the ground clean
 HUMP_R = 26.0            # plan corner radius
@@ -43,11 +41,10 @@ HUMP_ROUND = 14.0        # top edge round
 HUMP_TAPER = 30.0        # side lean from vertical, degrees
 K_BLEND = 12.0           # fillet between slab and hump
 
-# ---- Stand: bottom is one flat face tilted so the case leans back ----
+# The bottom is one flat face, tilted so the case leans back.
 LEAN_DEG = 9.0
 K_FOOT = 1.5
 
-# ---- Window, glow bands, button ----
 WIN_MARGIN_X = 3.0
 WIN_R = 3.0
 WIN_CH = 0.8
@@ -59,7 +56,6 @@ BTN_HOLE_D = 20.0
 RING_D, RING_W = 33.0, 1.6   # DR style touch ring: 45 degree V groove around the cap
 CAP_D = 28.0
 
-# ---- Joinery ----
 LUG_FIT = 0.15           # gap per side between lug and shell wall; 0.0 to 0.1 for tighter
 LUG_T, LUG_H = 1.8, 5.0
 LUGS_LONG_X = (-75.0, -25.0, 25.0, 75.0)   # on the top wall
@@ -68,7 +64,6 @@ LUGS_SHORT_Y = (-44.0, 44.0)               # on left and right walls
 LUG_LEN_LONG, LUG_LEN_SHORT = 22.0, 16.0
 RIB_T, RIB_H, RIB_LEG = 1.2, 5.0, 16.0     # corner L ribs that locate the tablet
 
-# ---- Ports and sound ----
 USB_SIDE = -1            # -1 = left short edge seen from the front, +1 = right
 USB_Y, USB_W = 0.0, 60.0  # notch centre and width along the edge
 USB_H = 9.0              # notch height from the bezel back
@@ -173,7 +168,6 @@ def bezel(X, Y, Z):
     lug = smax(smax(lug, lug_mask(X, Y), 0.8), Z - (FACE_T + LUG_H), 0.8)
     lug = np.maximum(lug, FACE_T - 0.4 - Z)
     d = np.minimum(d, lug)
-    # corner L ribs around the tablet pocket
     px_, py_ = TAB_W / 2 + CLR, TAB_H / 2 + CLR
     pocket = rrect(X, Y, px_, py_, TAB_CORNER_R + CLR)
     corner = np.maximum(px_ - RIB_LEG - np.abs(X), py_ - RIB_LEG - np.abs(Y))

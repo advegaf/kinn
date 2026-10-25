@@ -23,8 +23,6 @@ struct PairView: View {
         .onDisappear { pending?.cancel() }
     }
 
-    // MARK: Family: type the code her Hearth shows
-
     private var familyPage: some View {
         OnbPage(back: BackButton(action: onBack)) {
             VStack(alignment: .leading, spacing: 0) {
@@ -50,8 +48,6 @@ struct PairView: View {
             }
         }
     }
-
-    // MARK: Elder: type the code from the family phone
 
     private var elderPage: some View {
         OnbPage(back: BackButton(title: "Atr\u{E1}s", action: onBack)) {
@@ -152,8 +148,6 @@ struct PairView: View {
         }
     }
 }
-
-// MARK: Code parts
 
 /// Six serif characters, each on its own underline.
 struct CodeSlots: View {

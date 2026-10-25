@@ -39,7 +39,6 @@ export function adminClient() {
   });
 }
 
-// Accept paths with or without a leading "<bucket>/" prefix.
 export function stripBucket(bucket: string, path: string): string {
   return path.startsWith(bucket + "/") ? path.slice(bucket.length + 1) : path;
 }

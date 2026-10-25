@@ -38,7 +38,6 @@
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
   }
-  /* paper grain over everything */
   body::after {
     content: "";
     position: fixed;
@@ -64,13 +63,11 @@
   }
   .wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
 
-  /* top line */
   .top {
     display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
     padding-top: 22px; padding-bottom: 18px;
   }
 
-  /* hero */
   .hero-img { width: 100%; aspect-ratio: 1920 / 1200; object-fit: cover; background: #3a2c22; }
   .masthead { position: relative; padding-top: clamp(40px, 7vw, 96px); padding-bottom: clamp(48px, 8vw, 112px); }
   .ribbon {
@@ -104,7 +101,6 @@
   .head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; border-top: 1px solid var(--ink); padding-top: 14px; margin-bottom: clamp(28px, 4vw, 48px); }
   h2 { margin: 0; font-weight: 400; font-size: clamp(36px, 5vw, 64px); line-height: 1; letter-spacing: -.02em; }
 
-  /* how it works: ruled rows with roman numerals */
   .steps { list-style: none; margin: 0; padding: 0; }
   .steps li {
     display: grid; grid-template-columns: 48px minmax(0, 1fr) minmax(0, 1fr); gap: 8px 32px;
@@ -117,14 +113,13 @@
   .steps p { margin: 4px 0 0; font-size: 19px; line-height: 1.4; color: var(--soft); text-wrap: pretty; }
   .steps p i { color: var(--sub); }
 
-  /* gallery */
   .gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(12px, 2vw, 24px); margin: 0; }
   .gallery figure { margin: 0; }
   .gallery .wide { grid-column: 1 / -1; }
   .gallery img { width: 100%; aspect-ratio: 1920 / 1200; object-fit: cover; border-radius: 2px; background: #3a2c22; }
   figcaption { margin-top: 10px; font-style: italic; font-size: 18px; color: var(--sub); }
 
-  /* Hearth states: just the visible strip of the 1280 x 800 frame */
+  /* Show only the visible strip of the 1280 x 800 frame. */
   .states { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(16px, 2.4vw, 32px); }
   .state { margin: 0; }
   .strip {
@@ -137,7 +132,6 @@
   .cap b { font-weight: 400; font-size: 22px; line-height: 1.1; }
   .cap i { font-size: 17px; color: var(--sub); }
 
-  /* iPhone screens */
   .phones { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(16px, 2.4vw, 32px); }
   .phone { margin: 0; }
   .bezel { padding: 6px; background: #1d1c1a; border-radius: 13% / 6%; box-shadow: 0 0 0 1px #8f8a82, 0 18px 30px -22px rgba(40,28,16,.6); }

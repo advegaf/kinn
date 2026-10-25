@@ -15,12 +15,11 @@ import bmesh
 import bpy
 from mathutils import Matrix
 
-# ---- Fire HD 8 (2024, 12th gen). Measured values live in the measure block of hearth_v4_sdf.py. ----
+# Fire HD 8 (2024, 12th gen). The measured values are in hearth_v4_sdf.py.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from hearth_v4_sdf import TAB_W, TAB_H, TAB_T, TAB_CORNER_R, ACT_W, ACT_H, SCREEN_OFF_X, SCREEN_OFF_Y, CLR  # noqa: E402
 from hearth_v4_sdf import BTN_X, BTN_Y, BTN_HOLE_D  # noqa: E402
 
-# ---- Plate ----
 PLATE_W, PLATE_H, PLATE_D = 232.0, 160.0, 15.0
 PLATE_R = 18.0          # corner radius seen from the front
 FRONT_ROUND = 2.0       # 45 degree chamfer on the face edge (prints clean face down)
@@ -33,7 +32,6 @@ USB_SIDE = -1           # -1 = left short edge seen from the front, +1 = right
 USB_Y = 0.0             # notch centre along the short edge (front view Y)
 USB_W, USB_H = 70.0, 8.0  # wide: USB-C, jack, power, volume share this edge
 
-# ---- Clips and slots ----
 BOSS_Y = 54.0           # clip boss centre (front view |Y|) on both short sides
 BOSS_LEN = 14.0
 SLOT_W, SLOT_L, SLOT_DEPTH = 3.4, 8.4, 7.0
@@ -43,7 +41,6 @@ CLIP_GAP = 0.25        # arm sits this far above the tablet back
 CLIP_REACH = 12.0       # how far the arm reaches over the tablet back
 LUG_X, LUG_W = 70.0, 10.0  # locating lugs on the long sides
 
-# ---- Button ----
 CAP_D, CAP_HEAD_T = 28.0, 5.0
 FOAM_T = 3.0                 # adhesive foam ring under the cap head (rest height)
 POST_D, SOCKET_D, SOCKET_DEPTH = 9.0, 5.2, 6.0
@@ -51,7 +48,6 @@ NIB_PROTRUDE = 2.0           # how far the stylus nib sticks out of the socket. 
 TIP_GAP = 1.0                # nib to glass at rest
 TAPE_W, TAPE_DEPTH = 7.0, 0.4
 
-# ---- Stand feet ----
 LEAN_DEG = 10.0
 FOOT_W, FOOT_H, FOOT_DEPTH = 10.0, 45.0, 30.0
 FOOT_REBATE_W, FOOT_REBATE_D = 2.6, 4.0

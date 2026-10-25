@@ -152,7 +152,6 @@ else:
     for f, x in zip(feet, (-(rim_in + hp.FOOT_W), rim_in)):
         f.matrix_world = Matrix.Translation((x * mm, y_off, 0)) @ FOOT_TO_SCENE
 
-# Counter, wall, grandkid's phone (same set as v1).
 wood = mat("counter", (0.42, 0.27, 0.16), rough=0.45)
 nt = wood.node_tree
 wave = nt.nodes.new("ShaderNodeTexWave")

@@ -50,7 +50,6 @@ grant all on public.profiles, public.threads, public.messages to anon, authentic
 alter table public.messages replica identity full;
 alter publication supabase_realtime add table public.messages;
 
--- Storage
 insert into storage.buckets (id, name, public)
 values ('audio', 'audio', true), ('images', 'images', true)
 on conflict (id) do nothing;
