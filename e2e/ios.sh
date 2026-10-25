@@ -64,7 +64,7 @@ run() {
   local status=$?
   grep -E "Test Case .*(passed|failed)|error:|Executed" "$OUT/$name.log"
   [ "$status" -eq 0 ] || { echo "$name run ended with status $status"; failed=1; }
-  xcrun xcresulttool export attachments --path "$OUT/$name.xcresult" --output-path "$OUT/$name" >/dev/null 2>&1
+  limit 30 xcrun xcresulttool export attachments --path "$OUT/$name.xcresult" --output-path "$OUT/$name" >/dev/null 2>&1
 }
 
 run light light 200
