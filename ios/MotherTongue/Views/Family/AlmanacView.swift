@@ -6,10 +6,12 @@ struct AlmanacView: View {
 
     @Environment(AppSession.self) private var session
 
-    /// Every ready note, hers and mine, newest first, minus the one featured above.
+    /// This week's ready notes, hers and mine, newest first, minus the one featured above. Older ones are in the archive.
     private var others: [Message] {
         let featuredId = session.latestFromPartner?.id
-        return session.messages.filter { $0.status == .ready && $0.id != featuredId }.reversed()
+        return session.messages.filter {
+            $0.status == .ready && $0.id != featuredId && Almanac.calendar.isDate($0.date, equalTo: .now, toGranularity: .weekOfYear)
+        }.reversed()
     }
 
     var body: some View {
@@ -146,26 +148,8 @@ struct AlmanacView: View {
         }
     }
 
-    @ViewBuilder private var empty: some View {
-        if !session.hasLoaded, session.lastError != nil {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("This week could not load. Check the connection.")
-                    .font(.serif(19))
-                    .foregroundStyle(Color.soft)
-                Button("Try again") { Task { await session.start() } }
-                    .font(.serif(19))
-                    .foregroundStyle(Color.ink)
-                    .dottedUnderline(.ink)
-                    .buttonStyle(PressStyle())
-                    .tapTarget()
-            }
-        } else if !session.hasLoaded {
-            Breathing {
-                Text("Opening this week.")
-                    .font(.serif(19))
-                    .foregroundStyle(Color.soft)
-            }
-        } else {
+    private var empty: some View {
+        FirstLoad(opening: "Opening this week.", failed: "This week could not load. Check the connection.") {
             Text("Nothing from \(session.partnerName) yet. Her stories will land on this page.")
                 .font(.serif(19))
                 .foregroundStyle(Color.soft)
@@ -230,6 +214,39 @@ struct AlmanacView: View {
             }
         }
         .overlay(alignment: .top) { if !rows.isEmpty { Hairline() } }
+    }
+}
+
+/// A calm line while the first fetch runs, the error and a retry if it failed, else the page's own empty state.
+struct FirstLoad<Empty: View>: View {
+    var opening: String
+    var failed: String
+    @ViewBuilder var empty: Empty
+
+    @Environment(AppSession.self) private var session
+
+    var body: some View {
+        if !session.hasLoaded, session.lastError != nil {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(failed)
+                    .font(.serif(19))
+                    .foregroundStyle(Color.soft)
+                Button("Try again") { Task { await session.start() } }
+                    .font(.serif(19))
+                    .foregroundStyle(Color.ink)
+                    .dottedUnderline(.ink)
+                    .buttonStyle(PressStyle())
+                    .tapTarget()
+            }
+        } else if !session.hasLoaded {
+            Breathing {
+                Text(opening)
+                    .font(.serif(19))
+                    .foregroundStyle(Color.soft)
+            }
+        } else {
+            empty
+        }
     }
 }
 

@@ -66,6 +66,12 @@ struct Story: Codable, Hashable, Sendable {
         self.scenes = scenes
     }
 
+    /// The first still of the story. A video story has only poster frames, and they live in the videos bucket.
+    var cover: (path: String, video: Bool)? {
+        if let p = scenes?.first?.imagePath ?? imagePaths?.first { return (p, false) }
+        return (scenes?.first?.thumbPath ?? thumbPath).map { ($0, true) }
+    }
+
     /// Tolerant: a malformed `scenes` entry drops the scenes, never the story.
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)

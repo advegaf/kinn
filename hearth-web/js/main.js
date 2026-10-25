@@ -12,11 +12,12 @@ import { hasStory, filmPending, storyFor, buildScenes, startScenes, setProgress,
 import { narrate, clearTimers, stopAll } from './narration.js';
 import { showToast, hideToast } from './toast.js';
 import { bindInput, startHold, cancelHold, unlock } from './input.js';
+import { inPast, pastItem, openPast, nextPast, olderWeekPast, closePast, renderPast } from './past.js';
 
-const S = { CLOCK: 'clock', WAITING: 'waiting', RECORDING: 'recording', SENDING: 'sending', SAVED: 'saved', PLAYING: 'playing', ERROR: 'error' };
+const S = { CLOCK: 'clock', WAITING: 'waiting', RECORDING: 'recording', SENDING: 'sending', SAVED: 'saved', PLAYING: 'playing', ERROR: 'error', PAST: 'past' };
 
 const DEBOUNCE_MS = 250;
-const DOUBLE_MS = 650; // a second tap this soon after the first counts as a double tap
+const BOUNCE_MS = 650; // a press this soon after a state change is a bounce or a shaky double tap
 const MIN_RECORD_MS = 900;
 const MAX_RECORD_MS = 3 * 60 * 1000;
 const MIN_SENDING_MS = 1400;
@@ -24,7 +25,7 @@ const READY_TIMEOUT_MS = 90 * 1000;
 const ERROR_MS = 3500;
 const SAVED_MS = 4000;
 const LINGER_MS = 1500;
-const HISTORY = 7;
+const PAST_IDLE_MS = 60 * 1000;
 const HEARD_KEY = 'hearth.heard';
 const SAVED_STATUS = 'tu historia est\u00e1 guardada';
 const MAKING = ['preparando la pel\u00edcula', 'making the film'];
@@ -43,7 +44,6 @@ applyStrip(strip);
 let state = 'boot';
 let enteredAt = 0;
 let lastPress = -Infinity;
-let lastTap = -Infinity;
 let messages = [];
 const heardLocal = loadHeard();
 
@@ -59,7 +59,7 @@ function setState(next) {
 const partnerName = () => backend.partner?.name || 'tu familia';
 const isMine = (m) => m.sender_id === backend.profile?.id;
 const unheard = () => messages.filter((m) => !isMine(m) && m.status === 'ready' && !m.heard_at && !heardLocal.has(m.id));
-const history = () => messages.filter((m) => !isMine(m) && m.status === 'ready').slice(-HISTORY).reverse();
+const past = () => messages.filter((m) => m.status === 'ready').reverse();
 const idleState = () => (unheard().length ? S.WAITING : S.CLOCK);
 const wait = (ms) => new Promise((r) => setTimeout(r, Math.max(0, ms)));
 
@@ -75,6 +75,7 @@ function renderText() {
     setText('waiting-sub', film ? MAKING[0] : es ? `${when}, sobre \u00ab${es}\u00bb` : when);
     setText('waiting-sub-en', film ? MAKING[1] : en ? `${whenEn}, about \u00ab${en}\u00bb` : whenEn);
   }
+  root.toggleAttribute('data-past', past().length > 0);
   const [prompt, promptEn] = recPrompt(name, messages, isMine);
   setText('rec-prompt', prompt);
   setText('rec-prompt-en', promptEn);
@@ -121,11 +122,12 @@ async function refresh() {
     refreshing = false;
   }
   renderText();
+  if (inPast()) syncPast();
   if (state === S.CLOCK || state === S.WAITING) setState(idleState());
   if (refreshAgain) { refreshAgain = false; refresh(); }
 }
 
-function press(source) {
+function press(source, act) {
   const now = performance.now();
   if (now - lastPress < DEBOUNCE_MS) return;
   lastPress = now;
@@ -136,16 +138,21 @@ function press(source) {
   switch (state) {
     case S.CLOCK:
     case S.ERROR:
+      if (state === S.CLOCK && act === 'past' && past().length) return showPast();
       if (source === 'key') return startRecording();
       return startHold(() => (state === S.CLOCK || state === S.ERROR) && startRecording());
+    case S.PAST:
+      if (age < BOUNCE_MS) return;
+      if (act === 'back') return leavePast();
+      if (act === 'next') { nextPast(); return showPast(); }
+      if (act === 'older') { olderWeekPast(); return showPast(); }
+      return listen(pastItem(), !unheard().some((m) => m.id === pastItem().id));
     case S.WAITING:
       return listen(unheard().at(-1));
     case S.RECORDING:
-      if (age < DOUBLE_MS) return; // bounce guard
-      return stopAndSend();
     case S.PLAYING:
-      if (age < DOUBLE_MS) return; // bounce guard, and keeps a double press from stopping its own replay
-      return stopPlayback();
+      if (age < BOUNCE_MS) return;
+      return state === S.RECORDING ? stopAndSend() : stopPlayback();
     case S.SAVED:
       clearTimeout(savedTimer);
       return setState(idleState());
@@ -154,18 +161,14 @@ function press(source) {
   }
 }
 
-// A release before the hold is done is a short tap: it goes back, and a double tap on the clock
-// replays her latest notes.
+// A release before the hold is done is a short tap: it goes back.
 function release() {
   if (!cancelHold()) return;
   root.removeAttribute('data-reply');
   if (state === S.ERROR) {
     clearTimeout(errorTimer);
-    return setState(idleState());
+    setState(idleState());
   }
-  const now = performance.now();
-  if (now - lastTap < DOUBLE_MS) { lastTap = -Infinity; return replay(); }
-  lastTap = now;
 }
 
 bindInput(press, release, zone, strip);
@@ -296,9 +299,9 @@ function flushToast() {
 }
 
 // A note whose film is still being made does not play yet. A tap says so instead.
-function listen(msg) {
+function listen(msg, isReplay = false) {
   if (msg && filmPending(msg)) return showToast(MAKING, titles(msg, messages, isMine), null);
-  play(msg);
+  play(msg, isReplay);
 }
 
 // Her story is in. The title shows when the story worker has already named it.
@@ -316,20 +319,39 @@ function showSaved(row, hold = false) {
 let playingId = null;
 let lingerTimer = 0;
 let cleanupTimer = 0;
-let replayCursor = 0;
-let lastReplayAt = -Infinity;
+let pastTimer = 0;
 
-function replay() {
-  const list = history();
-  if (!list.length) return setState(idleState());
-  const now = performance.now();
-  replayCursor = now - lastReplayAt < 60000 ? (replayCursor + 1) % list.length : 0;
-  lastReplayAt = now;
-  play(list[replayCursor], true);
+function renderCard() {
+  const msg = pastItem();
+  const m = backend.media(storyFor(msg, messages));
+  renderPast({ mine: isMine(msg), name: partnerName(), titles: titles(msg, messages, isMine), image: m.scenes[0]?.image || m.images[0] });
+}
+
+function syncPast() {
+  openPast(past(), pastItem().id);
+  if (state !== S.PAST) return;
+  if (inPast()) renderCard();
+  else leavePast();
+}
+
+function showPast() {
+  if (!inPast()) openPast(past());
+  renderCard();
+  setState(S.PAST);
+  clearTimeout(pastTimer);
+  pastTimer = setTimeout(() => state === S.PAST && leavePast(), PAST_IDLE_MS);
+}
+
+function leavePast() {
+  clearTimeout(pastTimer);
+  closePast();
+  setState(idleState());
 }
 
 function play(msg, isReplay = false) {
   hideToast();
+  clearTimeout(pastTimer);
+  if (msg?.id !== pastItem()?.id) closePast();
   if (!msg) return setState(idleState());
   clearPlayTimers();
   playingId = msg.id;
@@ -388,7 +410,8 @@ function stopPlayback() {
   clearPlayTimers();
   playingId = null;
   stopAll();
-  setState(idleState());
+  if (inPast()) showPast();
+  else setState(idleState());
   flushToast();
   // Let the strip fade before tearing the media down.
   cleanupTimer = setTimeout(() => {
@@ -432,8 +455,9 @@ function enterDemoState(s) {
     const pick = messages.find((m) => m.id === config.startMsg)
       || (config.at != null ? messages.filter((m) => isMine(m) && hasStory(m.story)).at(-1) : null);
     if (pick) play(pick, true);
-    else play(unheard().at(-1) || history()[0]);
+    else play(unheard().at(-1) || past().find((m) => !isMine(m)));
   }
+  else if (s === S.PAST) showPast();
   else if (s === S.ERROR) showError(SEND_FAILED, SEND_FAILED_EN, true);
   else if (s === S.SAVED) showSaved(messages.filter((m) => isMine(m) && hasStory(m.story)).at(-1), true);
 }
