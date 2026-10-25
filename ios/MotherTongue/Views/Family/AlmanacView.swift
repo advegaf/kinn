@@ -43,6 +43,7 @@ struct AlmanacView: View {
             .padding(.bottom, 40)
         }
         .scrollClipDisabled()
+        .mask { Rectangle().ignoresSafeArea(edges: .bottom) }
         .scrollIndicators(.hidden)
     }
 
