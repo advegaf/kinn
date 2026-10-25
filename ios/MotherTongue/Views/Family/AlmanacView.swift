@@ -67,7 +67,8 @@ struct AlmanacView: View {
                 let color: Color = i == todayIndex ? .ink : i < todayIndex ? .soft : .later
                 VStack(spacing: 12) {
                     Text(Almanac.weekdays[i])
-                        .tinyCaps(i == todayIndex ? .ink : i < todayIndex ? .fog : .later, size: 10, tracking: 0.1)
+                        .font(.sans(12))
+                        .foregroundStyle(i == todayIndex ? Color.ink : i < todayIndex ? Color.fog : Color.later)
                     Text("\(Almanac.dayNumber(day))")
                         .font(.serif(40))
                         .monospacedDigit()
@@ -94,8 +95,6 @@ struct AlmanacView: View {
 
     private func featured(_ m: Message) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("\(Almanac.day(m.date)), \(Almanac.time(m.date))")
-                .tinyCaps(.soft)
             Button { open(m.id) } label: {
                 VStack(alignment: .leading, spacing: -2) {
                     Text(Almanac.titleEn(m))
@@ -111,7 +110,10 @@ struct AlmanacView: View {
                 .contentShape(.rect)
             }
             .buttonStyle(PressStyle())
-            .padding(.top, 10)
+            Text("\(Almanac.day(m.date)) at \(Almanac.time(m.date))")
+                .font(.serif(17))
+                .foregroundStyle(Color.soft)
+                .padding(.top, 6)
             HStack(spacing: 18) {
                 Button("Listen") { open(m.id) }
                     .font(.serif(19))

@@ -26,7 +26,7 @@ struct PairView: View {
     // MARK: Family: type the code her Hearth shows
 
     private var familyPage: some View {
-        OnbPage(left: "Kinn", right: "First page", back: BackButton(action: onBack)) {
+        OnbPage(back: BackButton(action: onBack)) {
             VStack(alignment: .leading, spacing: 0) {
                 OnbHeadline(title: "Type the code on her Kinn")
 
@@ -54,19 +54,16 @@ struct PairView: View {
     // MARK: Elder: type the code from the family phone
 
     private var elderPage: some View {
-        OnbPage(left: "Kinn", right: "Primera p\u{E1}gina", back: BackButton(title: "Atr\u{E1}s", action: onBack)) {
+        OnbPage(back: BackButton(title: "Atr\u{E1}s", action: onBack)) {
             VStack(alignment: .leading, spacing: 0) {
-                OnbHeadline(title: "Tu familia", note: "Escribe las letras que ves en su tel\u{E9}fono.")
+                OnbHeadline(title: "Tu familia", note: openThreads.isEmpty
+                    ? "Escribe las letras que ves en su tel\u{E9}fono."
+                    : "Escribe las letras que ves en su tel\u{E9}fono, o toca tu familia abajo.")
 
                 CodeEntry(code: $code).padding(.top, 34)
 
                 VStack(spacing: 0) {
-                    if !openThreads.isEmpty {
-                        Text("O toca tu familia").tinyCaps()
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.bottom, 12)
-                        Hairline()
-                    }
+                    if !openThreads.isEmpty { Hairline() }
                     ForEach(openThreads) { open in
                         Button { join(open.thread) } label: {
                             VStack(spacing: 0) {
@@ -75,7 +72,9 @@ struct PairView: View {
                                         .font(.serif(26))
                                         .foregroundStyle(Color.ink)
                                     Spacer()
-                                    Text(open.thread.code).tinyCaps(size: 12)
+                                    Text(open.thread.code)
+                                        .font(.serif(22))
+                                        .foregroundStyle(Color.soft)
                                 }
                                 .padding(.vertical, 14)
                                 Hairline()

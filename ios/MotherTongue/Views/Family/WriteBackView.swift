@@ -115,13 +115,12 @@ struct WriteBackView: View {
     private var controls: some View {
         HStack(alignment: .bottom) {
             VStack(alignment: .leading, spacing: 10) {
-                HStack(spacing: 7) {
+                HStack(spacing: 10) {
+                    counter
                     Circle().fill(Color.rec).frame(width: 8, height: 8)
-                    Text("REC").font(.sans(11, medium: true)).tracking(1.32).foregroundStyle(Color.rec)
+                        .opacity(recorder.isRecording ? 1 : 0)
+                        .accessibilityHidden(true)
                 }
-                .opacity(recorder.isRecording ? 1 : 0)
-                .accessibilityHidden(!recorder.isRecording)
-                counter
                 Text(note ?? hint)
                     .font(.serif(18))
                     .foregroundStyle(Color.soft)
@@ -159,7 +158,7 @@ struct WriteBackView: View {
             .monospacedDigit()
             .tracking(-0.46)
             .foregroundStyle(Color.ink)
-            .accessibilityLabel("\(s) seconds")
+            .accessibilityLabel(recorder.isRecording ? "Recording, \(s) seconds" : "\(s) seconds")
     }
 
     /// Under 0.3 s is a tap that toggles; anything longer records while held.

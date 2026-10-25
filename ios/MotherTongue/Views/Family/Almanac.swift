@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Calendar math and the date lines the almanac prints, in English.
 enum Almanac {
-    static let weekdays = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+    static let weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
     static let calendar: Calendar = {
         var c = Calendar(identifier: .iso8601)
