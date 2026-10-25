@@ -37,7 +37,7 @@ function tokens(s: string): Set<string> {
   );
 }
 
-// The 25% rule stops a long free note that shares a few common words from matching a canned one.
+// The 70% rule stops a long free note that shares a few common words from matching a canned one.
 export function scoreMatch(heard: string, candidates: string[]): { index: number; score: number; heard: number } {
   const h = tokens(heard);
   const scores = candidates.map((c) => {
@@ -49,7 +49,7 @@ export function scoreMatch(heard: string, candidates: string[]): { index: number
   const best = Math.max(-1, ...scores);
   const i = scores.indexOf(best);
   const tied = scores.filter((s) => s === best).length > 1;
-  const strong = best >= 3 && best >= 0.25 * h.size && !tied;
+  const strong = best >= 3 && best >= 0.7 * h.size && !tied;
   return { index: strong ? i : -1, score: Math.max(0, best), heard: h.size };
 }
 
@@ -135,10 +135,11 @@ export function replyFields(r: DemoReply, i: number) {
 
 type Row = { id: string; transcript: string | null };
 
-export function pickStory(heard: string, existing: Row[]): DemoStory {
+export function pickStory(heard: string, existing: Row[]): DemoStory | null {
   const used = new Set(existing.map((m) => m.transcript));
   const i = scoreMatch(heard, STORIES.map((s) => s.transcript)).index;
   if (i >= 0) return STORIES[i];
+  if (heard.trim()) return null;
   return STORIES.find((s) => !used.has(s.transcript)) ?? STORIES[0];
 }
 
