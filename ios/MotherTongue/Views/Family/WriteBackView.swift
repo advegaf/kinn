@@ -26,7 +26,7 @@ struct WriteBackView: View {
                 .padding(.top, 8)
             if let message {
                 Text(Almanac.quote(message))
-                    .font(.serifItalic(22))
+                    .font(.serif(22))
                     .foregroundStyle(Color.soft)
                     .lineSpacing(5)
                     .padding(.top, 26)
@@ -76,11 +76,11 @@ struct WriteBackView: View {
                     HStack(alignment: .firstTextBaseline, spacing: 0) {
                         Text(Almanac.roman(i))
                             .font(.serif(22))
-                            .foregroundStyle(on ? Color.ink : Color.fog)
+                            .foregroundStyle(on ? Color.ink : Color.sub)
                             .frame(width: 44, alignment: .leading)
                         Text(prompt)
                             .font(.serif(19))
-                            .foregroundStyle(on ? Color.ink : Color.muted)
+                            .foregroundStyle(on ? Color.ink : Color.sub)
                             .multilineTextAlignment(.leading)
                         Spacer(minLength: 0)
                     }
@@ -103,7 +103,7 @@ struct WriteBackView: View {
         let stop = prompt.last.map { ".?!".contains($0) } == true ? "" : "."
         let tail = recorder.isRecording ? "" : "\(stop) Tap the disc and answer."
         return HStack(alignment: .lastTextBaseline, spacing: 3) {
-            (Text(prompt).foregroundColor(.ink) + Text(tail).foregroundColor(Color(hex: 0xA9A39A)))
+            (Text(prompt).foregroundColor(.ink) + Text(tail).foregroundColor(.later))
                 .font(.serif(32, relativeTo: .title))
                 .tracking(-0.3)
                 .lineSpacing(6)
@@ -122,7 +122,7 @@ struct WriteBackView: View {
                         .accessibilityHidden(true)
                 }
                 Text(note ?? hint)
-                    .font(.serifItalic(18))
+                    .font(.serif(18))
                     .foregroundStyle(Color.soft)
             }
             Spacer()
@@ -153,7 +153,7 @@ struct WriteBackView: View {
 
     private var counter: some View {
         let s = Int(recorder.elapsed)
-        return (Text(String(format: "%02d", s / 60)) + Text(":").foregroundColor(.fog) + Text(String(format: "%02d", s % 60)))
+        return (Text(String(format: "%02d", s / 60)) + Text(":").foregroundColor(.sub) + Text(String(format: "%02d", s % 60)))
             .font(.sansLight(46))
             .monospacedDigit()
             .tracking(-0.46)

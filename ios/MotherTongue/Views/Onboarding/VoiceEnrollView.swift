@@ -32,7 +32,7 @@ struct VoiceEnrollView: View {
                 ruledScript.padding(.top, 28)
 
                 Text(es ? "Tu voz solo se usa para decir tus propios mensajes a tu familia." : "Your voice is only used to speak your own messages to your family.")
-                    .font(.serifItalic(17))
+                    .font(.serif(17))
                     .foregroundStyle(Color.soft)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.leading, 16)
@@ -53,10 +53,11 @@ struct VoiceEnrollView: View {
                         session.recorder.cancel()
                         onDone()
                     }
-                    .font(.serifItalic(17))
+                    .font(.serif(17))
                     .foregroundStyle(Color.sub)
                     .underline(color: .faint)
                     .buttonStyle(PressStyle())
+                    .tapTarget()
                 }
             }
             .animation(.enter, value: phase)
@@ -107,7 +108,7 @@ struct VoiceEnrollView: View {
                     .transition(.fade)
                 }
                 Text(hint)
-                    .font(.serifItalic(18))
+                    .font(.serif(18))
                     .foregroundStyle(Color.soft)
                     .fixedSize(horizontal: false, vertical: true)
             }

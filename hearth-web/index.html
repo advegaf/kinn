@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="toast.css">
   <link rel="stylesheet" href="calibrate.css">
   <!-- Fallback only: the bundled fonts in fonts/ come first in the stack. Non-blocking so an offline Hearth still renders. -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&display=swap" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@300;400;500&display=swap" media="print" onload="this.media='all'">
 </head>
 <body>
   <div id="hearth" data-state="boot">
@@ -27,7 +27,7 @@
 
       <div class="layer clock" id="clock" aria-live="off">
         <b class="day-num" id="day-num"></b>
-        <div class="day-wd"><span id="day-wd"></span><em id="day-mo"></em><span class="en" id="day-en"></span></div>
+        <div class="day-wd"><span id="day-wd"></span><span class="day-mo" id="day-mo"></span><span class="en" id="day-en"></span></div>
         <div class="clk"><span id="clock-h">0</span><span class="colon" id="clock-colon">:</span><span id="clock-m">00</span></div>
         <p class="hint">toca para contar una historia<span class="en">tap to tell a story</span></p>
         <p class="family-code"><span id="fam-code-es"></span><span class="family-code-en" id="fam-code-en"></span></p>
@@ -43,7 +43,7 @@
 
       <div class="layer rec" id="rec">
         <div class="rec-text">
-          <h1 class="headline italic">te escucho</h1>
+          <h1 class="headline">Te escucho</h1>
           <p class="en">I'm listening</p>
           <p class="sub" id="rec-prompt"></p>
           <p class="en" id="rec-prompt-en"></p>
@@ -56,7 +56,7 @@
       </div>
 
       <div class="layer col send" id="send">
-        <h1 class="headline italic" id="send-line"></h1>
+        <h1 class="headline" id="send-line"></h1>
         <p class="en">saving your story</p>
         <p class="sub" id="send-sub"></p>
         <p class="en" id="send-sub-en"></p>

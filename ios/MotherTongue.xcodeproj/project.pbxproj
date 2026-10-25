@@ -35,7 +35,6 @@
 		712DB18EDE0FAF535DD8B32E /* s3-es.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = CC345D92DD5E5D378C0DF065 /* s3-es.mp3 */; };
 		80A17BF094F352C57A17510B /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = EBC62470F411D19B6AE7CD97 /* Supabase */; };
 		81F3BF7C65FBA3C6BD58DA06 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7957B1C7C2FCEA72DFEFD264 /* Haptics.swift */; };
-		86CCDBD6D478D9A69D58CD92 /* InstrumentSerif-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C14DAD23D6F3F1C19A498C5A /* InstrumentSerif-Italic.ttf */; };
 		8BB0E1ADA217F1E71362CDA3 /* Inter-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = B198108154832FDA4E862AB5 /* Inter-OFL.txt */; };
 		8C04BB362F0013AE3DC1CB75 /* DemoBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CCDCC135557D62547110F49 /* DemoBackend.swift */; };
 		8D16D3DE68D4CA59F1570210 /* r1-en.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E5794D1C5957360B6FB2F734 /* r1-en.mp3 */; };
@@ -106,7 +105,6 @@
 		B82A3A1453777A713F59058E /* Inter-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Light.ttf"; sourceTree = "<group>"; };
 		BCBFB19AA3A163C83919A9F4 /* s4-es.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "s4-es.mp3"; sourceTree = "<group>"; };
 		BDCB273091465F05CD61FB5B /* Icon */ = {isa = PBXFileReference; path = "Icon"; sourceTree = "<group>"; };
-		C14DAD23D6F3F1C19A498C5A /* InstrumentSerif-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "InstrumentSerif-Italic.ttf"; sourceTree = "<group>"; };
 		C7AC9EA0F9AD30F465BD1E7A /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
 		C8075A1030F44F75C7ECFA1A /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		C80967699E639046261D6D66 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -216,7 +214,6 @@
 			isa = PBXGroup;
 			children = (
 				9E52EE0931A8CBA30F8DE241 /* Icon */,
-				C14DAD23D6F3F1C19A498C5A /* InstrumentSerif-Italic.ttf */,
 				98127B5F8EE5E9B6961FE753 /* InstrumentSerif-OFL.txt */,
 				92B36C8373F868DD8A9BA1C6 /* InstrumentSerif-Regular.ttf */,
 				B82A3A1453777A713F59058E /* Inter-Light.ttf */,
@@ -380,7 +377,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				11DFF285D8FDC1D01FB259DB /* Assets.xcassets in Resources */,
-				86CCDBD6D478D9A69D58CD92 /* InstrumentSerif-Italic.ttf in Resources */,
 				24D6540A80C677EF39844A61 /* InstrumentSerif-OFL.txt in Resources */,
 				67443A36D30FF42D4A49D477 /* InstrumentSerif-Regular.ttf in Resources */,
 				102CD473BB6D9F7BA2DD84AD /* Inter-Light.ttf in Resources */,

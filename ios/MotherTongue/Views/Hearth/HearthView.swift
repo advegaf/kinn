@@ -3,6 +3,7 @@ import SwiftUI
 struct HearthView: View {
     @Environment(AppSession.self) private var session
     @AppStorage(StorageKeys.shutterRemote) private var shutterRemote = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var pressActive = false
     @State private var pressStart: Date?
@@ -81,8 +82,8 @@ struct HearthView: View {
             }
             RadialGradient(colors: [Color.ember.opacity(glow ? 0.55 : 0), .clear],
                            center: .center, startRadius: 40, endRadius: 520)
-                .scaleEffect(glow ? 1.15 : 0.9)
-                .animation(glow ? .easeInOut(duration: 2.4).repeatForever(autoreverses: true) : .easeOut(duration: 0.6), value: glow)
+                .scaleEffect(glow && !reduceMotion ? 1.15 : 0.9)
+                .animation(glow && !reduceMotion ? .easeInOut(duration: 2.4).repeatForever(autoreverses: true) : .easeOut(duration: 0.6), value: glow)
             GrainOverlay(opacity: 0.12)
         }
         .ignoresSafeArea()
@@ -91,12 +92,12 @@ struct HearthView: View {
     private var header: some View {
         VStack(spacing: 6) {
             Text(greeting)
-                .font(.display(40, weight: .semibold))
+                .font(.serif(40, relativeTo: .largeTitle))
                 .foregroundStyle(Color(UIColor(hex: 0xFBEEDD)))
                 .multilineTextAlignment(.center)
             if let title = session.messages.last(where: { $0.story?.title != nil })?.story?.title {
                 Text(title)
-                    .font(.display(22, weight: .regular).italic())
+                    .font(.serif(22))
                     .foregroundStyle(Color(UIColor(hex: 0xFBEEDD)).opacity(0.75))
             }
         }
@@ -125,20 +126,22 @@ struct HearthView: View {
                 Circle()
                     .fill(Color.ember.opacity(0.45))
                     .blur(radius: 40)
-                    .scaleEffect(glow ? 1.25 : 1.0)
-                    .animation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true), value: glow)
+                    .scaleEffect(glow && !reduceMotion ? 1.25 : 1.0)
+                    .animation(reduceMotion ? nil : .easeInOut(duration: 1.8).repeatForever(autoreverses: true), value: glow)
             }
             Circle()
                 .fill(fill(for: m))
                 .shadow(color: .black.opacity(0.35), radius: 30, y: 14)
                 .overlay(Circle().stroke(Color.white.opacity(0.25), lineWidth: 1.5))
-                .scaleEffect(pressActive ? 0.95 : 1)
+                .scaleEffect(pressActive && !reduceMotion ? 0.96 : 1)
             VStack(spacing: 14) {
                 icon(for: m)
                     .font(.system(size: size * 0.16, weight: .semibold))
                     .contentTransition(.symbolEffect(.replace))
                 Text(label(for: m))
-                    .font(.display(size * 0.13, weight: .bold))
+                    .font(.serif(size * 0.13))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
                     .contentTransition(.opacity)
             }
             .foregroundStyle(foreground(for: m))
@@ -151,7 +154,7 @@ struct HearthView: View {
                 .onEnded { _ in pressUp() }
         )
         .animation(.gentle, value: m)
-        .animation(.spring(response: 0.25, dampingFraction: 0.7), value: pressActive)
+        .animation(.press, value: pressActive)
         .accessibilityElement()
         .accessibilityLabel(label(for: m))
         .accessibilityAddTraits(.isButton)
@@ -162,20 +165,20 @@ struct HearthView: View {
         ZStack {
             VStack(spacing: 8) {
                 Text(subtitle)
-                    .font(.system(size: 28, weight: .medium))
+                    .font(.serif(28))
                     .multilineTextAlignment(.center)
                     .foregroundStyle(Color(UIColor(hex: 0xFBEEDD)).opacity(0.92))
                     .contentTransition(.opacity)
                     .animation(.gentle, value: subtitle)
                 if mode == .recording {
                     Text(formatDuration(session.recorder.elapsed))
-                        .font(.system(size: 30, weight: .semibold, design: .rounded).monospacedDigit())
+                        .font(.serif(30).monospacedDigit())
                         .foregroundStyle(Color(UIColor(hex: 0xFBEEDD)))
                         .contentTransition(.numericText())
                 }
                 if mode == .idle, session.latestFromPartner != nil {
                     Button("Escuchar otra vez") { replayLast() }
-                        .font(.system(size: 22, weight: .semibold))
+                        .font(.serif(24))
                         .foregroundStyle(Color(UIColor(hex: 0xFBEEDD)))
                         .padding(.horizontal, 22)
                         .padding(.vertical, 12)
@@ -186,13 +189,12 @@ struct HearthView: View {
             .frame(maxWidth: .infinity)
             HStack {
                 Spacer()
-                Image(systemName: "gearshape")
-                    .font(.title3)
-                    .foregroundStyle(.white.opacity(0.3))
-                    .frame(width: 44, height: 44)
-                    .contentShape(Rectangle())
-                    .onLongPressGesture(minimumDuration: 1) { showSettings = true }
-                    .accessibilityLabel("Ajustes, mantén presionado")
+                Button("Ajustes") { showSettings = true }
+                    .font(.serif(19))
+                    .foregroundStyle(Color(UIColor(hex: 0xFBEEDD)).opacity(0.75))
+                    .buttonStyle(PressStyle())
+                    .frame(minWidth: 44)
+                    .tapTarget()
             }
             .frame(maxHeight: .infinity, alignment: .bottom)
         }
