@@ -106,9 +106,27 @@ final class AppSession {
         setThread(joined)
     }
 
+    /// Elder: joins a waiting family thread. Family: finds the thread by code and, when a family
+    /// profile already holds it, becomes that profile; otherwise claims it.
     func join(code: String) async throws {
         let code = code.trimmingCharacters(in: .whitespaces).uppercased()
         guard code.count >= 4 else { throw SessionError.badCode }
+        if role == .family {
+            guard let backend, let me = profile else { throw SessionError.notConfigured }
+            guard let found = try await backend.findThread(code: code) else { throw SessionError.badCode }
+            if let fid = found.familyId, fid != me.id, let owner = try await backend.fetchProfile(id: fid), owner.role == .family {
+                profile = owner
+                defaults.set(owner.id.uuidString, forKey: StorageKeys.profileId)
+                defaults.set(owner.name, forKey: StorageKeys.name)
+                setThread(found)
+            } else {
+                setThread(try await backend.claimThread(id: found.id, familyId: me.id))
+            }
+            defaults.set("en", forKey: StorageKeys.lang)
+            partner = nil
+            await loadPartner()
+            return
+        }
         let open = try await openThreads()
         guard let match = open.first(where: { $0.thread.id.uuidString.uppercased().hasPrefix(code) }) else { throw SessionError.badCode }
         try await join(match.thread)
@@ -131,7 +149,8 @@ final class AppSession {
     func reset() {
         stopSync()
         player.stop()
-        for key in [StorageKeys.onboarded, StorageKeys.profileId, StorageKeys.threadId, StorageKeys.heardIds, StorageKeys.enrolled] {
+        for key in [StorageKeys.onboarded, StorageKeys.profileId, StorageKeys.threadId, StorageKeys.heardIds, StorageKeys.enrolled,
+                    StorageKeys.lang, StorageKeys.role, StorageKeys.name] {
             defaults.removeObject(forKey: key)
         }
         profile = nil
@@ -164,7 +183,7 @@ final class AppSession {
         defaults.set(heardIds.map(\.uuidString), forKey: StorageKeys.heardIds)
     }
 
-    func send(recording url: URL?) async {
+    func send(recording url: URL?, replyTo: UUID? = nil) async {
         guard let backend, let profile, let thread else {
             lastError = "Not connected to a family thread yet."
             return
@@ -173,14 +192,14 @@ final class AppSession {
         let path = "\(thread.id.lower)/\(id.lower).m4a"
         if let url { localFiles[id] = url }
         let draft = Message(id: id, threadId: thread.id, senderId: profile.id, sourceLang: profile.lang, targetLang: partnerLang,
-                            originalPath: path, status: .uploaded, createdAt: Message.timestamp())
+                            originalPath: path, status: .uploaded, createdAt: Message.timestamp(), replyTo: replyTo)
         messages.append(draft)
         localOnly.insert(id)
         askPrompt = nil
         do {
             try await backend.uploadAudio(path: path, fileURL: url)
             let row = NewMessage(id: id, threadId: thread.id, senderId: profile.id, sourceLang: profile.lang,
-                                 targetLang: partnerLang, originalPath: path, status: .uploaded)
+                                 targetLang: partnerLang, originalPath: path, status: .uploaded, replyTo: replyTo)
             let inserted = try await backend.insertMessage(row)
             localOnly.remove(id)
             upsert(inserted)
@@ -208,7 +227,7 @@ final class AppSession {
         if localOnly.contains(m.id) {
             messages.removeAll { $0.id == m.id }
             localOnly.remove(m.id)
-            await send(recording: localFiles[m.id])
+            await send(recording: localFiles[m.id], replyTo: m.replyTo)
             return
         }
         if let updated = try? await backend.processMessage(id: m.id) { upsert(updated) }
@@ -290,18 +309,18 @@ final class AppSession {
     // MARK: Playback
 
     func translatedSource(_ m: Message) -> PlaybackSource? {
-        if isDemo, let url = DemoBackend.bundledAudio(m.translatedPath) { return .url(url) }
-        if !isDemo, let path = m.translatedPath, let url = AppConfig.publicURL(bucket: "audio", path: path) { return .url(url) }
-        if let text = m.translation { return .speech(text: text.unmarked, lang: m.targetLang) }
-        return nil
+        let speech = m.translation.map { PlaybackSource.speech(text: $0.unmarked, lang: m.targetLang) }
+        if isDemo, let url = DemoBackend.bundledAudio(m.translatedPath) { return .url(url, fallback: speech) }
+        if !isDemo, let path = m.translatedPath, !path.isEmpty, let url = AppConfig.publicURL(bucket: "audio", path: path) { return .url(url, fallback: speech) }
+        return speech
     }
 
     func originalSource(_ m: Message) -> PlaybackSource? {
         if let local = localFiles[m.id] { return .url(local) }
         if isDemo, let url = DemoBackend.bundledAudio(m.originalPath) { return .url(url) }
-        if !isDemo, let url = AppConfig.publicURL(bucket: "audio", path: m.originalPath) { return .url(url) }
-        if let text = m.transcript { return .speech(text: text, lang: m.sourceLang) }
-        return nil
+        let speech = m.transcript.map { PlaybackSource.speech(text: $0, lang: m.sourceLang) }
+        if !isDemo, !m.originalPath.isEmpty, let url = AppConfig.publicURL(bucket: "audio", path: m.originalPath) { return .url(url, fallback: speech) }
+        return speech
     }
 
     func imageURL(_ path: String) -> URL? {

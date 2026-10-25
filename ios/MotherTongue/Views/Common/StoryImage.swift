@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// A story still. `demo/<name>` paths load from the asset catalog, others from the images bucket.
+/// A story still. In demo mode `demo/<name>` paths load from the asset catalog; otherwise from the
+/// images bucket, which also holds the live demo thread's `demo/s2-1.jpg` style paths.
 /// Fills its frame, cropping around `focus`.
 struct StoryImage: View {
     @Environment(AppSession.self) private var session
@@ -10,10 +11,10 @@ struct StoryImage: View {
     var body: some View {
         GeometryReader { geo in
             Group {
-                if path.hasPrefix("demo/") {
+                if session.isDemo, path.hasPrefix("demo/") {
                     fill(Image(String(path.dropFirst(5))), in: geo.size)
                 } else {
-                    AsyncImage(url: session.imageURL(path), transaction: Transaction(animation: .easeOut(duration: 2))) { phase in
+                    AsyncImage(url: session.imageURL(path), transaction: Transaction(animation: .easeOut(duration: 0.3))) { phase in
                         if case .success(let image) = phase {
                             fill(image, in: geo.size)
                         } else {

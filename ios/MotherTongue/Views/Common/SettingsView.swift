@@ -60,6 +60,7 @@ struct SettingsView: View {
             .frame(maxWidth: 560)
             .frame(maxWidth: .infinity)
         }
+        .scrollIndicators(.hidden)
         .background { PaperCanvas() }
         .presentationBackground(Color.paper)
         .sheet(isPresented: $reenroll) {

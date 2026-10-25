@@ -2,7 +2,8 @@ import SwiftUI
 
 struct PairView: View {
     @Environment(AppSession.self) private var session
-    var onDone: () -> Void
+    /// `joinedByCode` is true when the family phone joined an existing thread, so there is no voice step.
+    var onDone: (_ joinedByCode: Bool) -> Void
 
     @State private var openThreads: [OpenThread] = []
     @State private var code = ""
@@ -15,40 +16,43 @@ struct PairView: View {
         Group {
             if isElder { elderPage } else { familyPage }
         }
-        .task { await load() }
+        .task { if isElder { await load() } }
     }
 
-    // MARK: Family: show the code her Hearth needs
+    // MARK: Family: type the code her Hearth shows
 
     private var familyPage: some View {
         OnbPage(left: "Kinn", right: "First page") {
             VStack(alignment: .leading, spacing: 0) {
-                OnbHeadline(title: "Connect to her Hearth", note: "Enter these on her Hearth.")
+                OnbHeadline(title: "Type the code on her Hearth", note: "Six letters and numbers on her clock.")
 
-                if let thread = session.thread {
-                    VStack(alignment: .leading, spacing: 0) {
-                        MiniHearth(code: thread.code)
-                        CodeSlots(code: thread.code).padding(.top, 26)
-                    }
-                    .padding(.top, 30)
-                    .transition(.fade)
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("Family code \(thread.code.map(String.init).joined(separator: " "))")
-                } else if error == nil {
-                    ProgressView().tint(.ink).padding(.top, 40)
+                CodeEntry(code: $code, label: "Family code").padding(.top, 34)
+
+                if code.count < 6 {
+                    Text("Connect works once all six are in.")
+                        .font(.serif(17))
+                        .foregroundStyle(Color.soft)
+                        .padding(.top, 16)
+                        .transition(.fade)
                 }
-
-                Text("Once she types them, her Hearth will hold your stories.")
-                    .font(.serifItalic(18))
-                    .foregroundStyle(Color.soft)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.top, 30)
 
                 if let error { OnbNotice(text: error).padding(.top, 20) }
             }
-            .animation(.enter, value: session.thread?.code)
+            .animation(.enter, value: code.count < 6)
         } footer: {
-            slab("Next, your voice", enabled: session.thread != nil) { onDone() }
+            VStack(spacing: 14) {
+                slab("Connect", enabled: code.count == 6) {
+                    run(joinedByCode: true) { try await session.join(code: code) }
+                }
+                Button("Continue without pairing") {
+                    run { if session.thread == nil { try await session.createThread() } }
+                }
+                .font(.serif(17))
+                .foregroundStyle(Color.soft)
+                .frame(minHeight: 44)
+                .buttonStyle(PressStyle())
+                .disabled(busy)
+            }
         }
     }
 
@@ -124,11 +128,7 @@ struct PairView: View {
         busy = true
         defer { busy = false }
         do {
-            if isElder {
-                openThreads = try await session.openThreads()
-            } else if session.thread == nil {
-                try await session.createThread()
-            }
+            openThreads = try await session.openThreads()
         } catch {
             self.error = error.localizedDescription
         }
@@ -138,7 +138,7 @@ struct PairView: View {
         run { try await session.join(thread) }
     }
 
-    private func run(_ work: @escaping () async throws -> Void) {
+    private func run(joinedByCode: Bool = false, _ work: @escaping () async throws -> Void) {
         busy = true
         error = nil
         Task {
@@ -146,7 +146,7 @@ struct PairView: View {
             do {
                 try await work()
                 Haptics.arrival()
-                onDone()
+                onDone(joinedByCode)
             } catch {
                 Haptics.error()
                 self.error = error.localizedDescription
@@ -191,9 +191,10 @@ struct CodeSlots: View {
     }
 }
 
-/// Code slots with a hidden field on top, for typing on the Hearth.
+/// Code slots with a hidden field on top.
 struct CodeEntry: View {
     @Binding var code: String
+    var label = "C\u{F3}digo"
     @FocusState private var focused: Bool
 
     var body: some View {
@@ -207,7 +208,7 @@ struct CodeEntry: View {
                     .foregroundStyle(.clear)
                     .tint(.clear)
                     .focused($focused)
-                    .accessibilityLabel("C\u{F3}digo")
+                    .accessibilityLabel(label)
             }
             .contentShape(.rect)
             .onTapGesture { focused = true }
@@ -215,46 +216,5 @@ struct CodeEntry: View {
                 let clean = String(new.uppercased().filter { $0.isLetter || $0.isNumber }.prefix(6))
                 if clean != new { code = clean }
             }
-    }
-}
-
-/// A small taupe Hearth with the code lit on its night glass.
-struct MiniHearth: View {
-    var code: String
-
-    var body: some View {
-        HStack(spacing: 14) {
-            Text(code.map(String.init).joined(separator: " "))
-                .font(.serif(28))
-                .monospacedDigit()
-                .foregroundStyle(Color.cream)
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
-                .frame(width: 176, height: 50)
-                .background(Color.night, in: .rect(cornerRadius: 6))
-                .padding(2)
-                .background(Color(hex: 0xC4BBAC), in: .rect(cornerRadius: 8))
-            Circle()
-                .fill(Color(hex: 0xC8BFB1))
-                .overlay(
-                    Circle().stroke(Color(hex: 0x463A2C, opacity: 0.35), lineWidth: 3)
-                        .blur(radius: 2).offset(y: 1.5).mask(Circle())
-                )
-                .frame(width: 22, height: 22)
-        }
-        .padding(.leading, 10)
-        .frame(width: 236, height: 74, alignment: .leading)
-        .background {
-            RoundedRectangle(cornerRadius: 22)
-                .fill(Color.taupe)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 22)
-                        .fill(LinearGradient(colors: [.white.opacity(0.18), .clear, Color(hex: 0x5A4C3A, opacity: 0.16)],
-                                             startPoint: .top, endPoint: .bottom))
-                )
-                .overlay(RoundedRectangle(cornerRadius: 22).strokeBorder(.white.opacity(0.45), lineWidth: 0.75).blendMode(.overlay))
-                .shadow(color: Color(hex: 0x3C3226, opacity: 0.35), radius: 8, y: 8)
-        }
-        .accessibilityHidden(true)
     }
 }

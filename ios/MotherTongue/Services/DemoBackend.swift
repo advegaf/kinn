@@ -3,8 +3,8 @@ import Foundation
 /// Canned, offline backend so the UI can be built and screenshotted with no network.
 @MainActor
 final class DemoBackend: Backend {
-    static let elder = Profile(id: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!, name: "Rosa", role: .elder, lang: "es", voiceId: "demo")
-    static let family = Profile(id: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!, name: "Sofia", role: .family, lang: "en", voiceId: "demo")
+    static let elder = Profile(id: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!, name: "Margaret", role: .elder, lang: "es", voiceId: "demo")
+    static let family = Profile(id: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!, name: "Angel", role: .family, lang: "en", voiceId: "demo")
     static let thread = ChatThread(id: UUID(uuidString: "a1b2c3d4-0000-4000-8000-000000000001")!, elderId: elder.id, familyId: family.id)
 
     private var messages: [Message]
@@ -35,6 +35,12 @@ final class DemoBackend: Backend {
 
     func joinThread(id: UUID, elderId: UUID) async throws -> ChatThread { Self.thread }
 
+    func findThread(code: String) async throws -> ChatThread? {
+        Self.thread.code.hasPrefix(code.uppercased()) ? Self.thread : nil
+    }
+
+    func claimThread(id: UUID, familyId: UUID) async throws -> ChatThread { Self.thread }
+
     func fetchMessages(threadId: UUID) async throws -> [Message] { messages }
 
     func uploadAudio(path: String, fileURL: URL?) async throws {
@@ -42,7 +48,7 @@ final class DemoBackend: Backend {
     }
 
     func insertMessage(_ m: NewMessage) async throws -> Message {
-        let row = Message(id: m.id, threadId: m.threadId, senderId: m.senderId, sourceLang: m.sourceLang, targetLang: m.targetLang, originalPath: m.originalPath, status: .uploaded, createdAt: Message.timestamp())
+        let row = Message(id: m.id, threadId: m.threadId, senderId: m.senderId, sourceLang: m.sourceLang, targetLang: m.targetLang, originalPath: m.originalPath, status: .uploaded, createdAt: Message.timestamp(), replyTo: m.replyTo)
         messages.append(row)
         continuation?.yield()
         return row
@@ -89,9 +95,9 @@ final class DemoBackend: Backend {
     }
 
     private static let elderReplies = [
-        Reply(transcript: "Claro que sí, mija. Te enseño todo, desde la masa hasta la salsa de mi abuela.",
-              translation: "Of course, mija. I will teach you everything, from the masa to my grandmother's salsa.",
-              notes: [CulturalNote(term: "mija", note: "Short for mi hija, my daughter. A tender name for any girl in the family.")],
+        Reply(transcript: "Claro que sí, mijo. Te enseño todo, desde la masa hasta la salsa de mi abuela.",
+              translation: "Of course, mijo. I will teach you everything, from the masa to my grandmother's salsa.",
+              notes: [CulturalNote(term: "mijo", note: "Short for mi hijo, my son. A tender name for any boy in the family.")],
               ask: ["Ask her what made her grandmother's salsa special"])
     ]
 
@@ -107,6 +113,8 @@ final class DemoBackend: Backend {
             var text_es: String?
             var text_en: String?
             var prompt: String?
+            var t_en: [Double]?
+            var t_es: [Double]?
         }
         struct DemoStory: Decodable {
             var id: String
@@ -123,6 +131,9 @@ final class DemoBackend: Backend {
             var minutes_after: Double
             var text_en: String
             var translation_es: String
+            var title: String?
+            var title_es: String?
+            var scenes: [DemoScene]?
         }
         var stories: [DemoStory]
         var replies: [DemoReply]
@@ -159,12 +170,16 @@ final class DemoBackend: Backend {
         }
         var out: [Message] = []
         var dates: [String: Date] = [:]
-        for (i, s) in file.stories.enumerated() {
-            let scenes = s.scenes.map {
-                StoryScene(textEs: $0.text_es, textEn: $0.text_en, prompt: $0.prompt, imagePath: "demo/scene-\($0.image)")
+        func scenes(_ list: [DemoFile.DemoScene]) -> [StoryScene] {
+            list.map {
+                StoryScene(start: $0.t_en?.first, end: $0.t_en?.last, textEs: $0.text_es, textEn: $0.text_en, prompt: $0.prompt,
+                           imagePath: "demo/scene-\($0.image)", tEn: $0.t_en, tEs: $0.t_es)
             }
-            let story = Story(title: s.title, imagePaths: scenes.first?.imagePath.map { [$0] }, titleEs: s.title_es,
-                              status: "ready", scenes: scenes)
+        }
+        for (i, s) in file.stories.enumerated() {
+            let list = scenes(s.scenes)
+            let story = Story(title: s.title, imagePaths: list.first?.imagePath.map { [$0] }, titleEs: s.title_es,
+                              status: "ready", scenes: list)
             let date = day(s.days_ago)
             dates[s.id] = date
             out.append(msg(i + 1, from: elder, at: date, transcript: s.transcript, translation: s.translation,
@@ -172,7 +187,9 @@ final class DemoBackend: Backend {
         }
         for (i, r) in file.replies.enumerated() {
             let date = (dates[r.after_story] ?? .now).addingTimeInterval(r.minutes_after * 60)
-            out.append(msg(file.stories.count + i + 1, from: family, at: date, transcript: r.text_en, translation: r.translation_es, audio: "r\(i + 1)"))
+            let story = r.title == nil && r.scenes == nil ? nil : Story(title: r.title, titleEs: r.title_es, status: "ready", scenes: r.scenes.map(scenes))
+            out.append(msg(file.stories.count + i + 1, from: family, at: date, transcript: r.text_en, translation: r.translation_es,
+                           story: story, audio: "r\(i + 1)"))
         }
         return out.sorted { $0.date < $1.date }
     }

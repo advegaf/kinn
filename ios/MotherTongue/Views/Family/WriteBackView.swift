@@ -1,27 +1,34 @@
 import SwiftUI
 
-/// 03 writing back: her line quoted, three prompts in the margin, and a disc to hold while you talk.
+/// 03 writing back: her line quoted when replying, three prompts in the margin, and a disc to tap or hold while you talk.
 struct WriteBackView: View {
-    var message: Message
+    var message: Message?
     var close: () -> Void
     var sent: () -> Void
 
     @Environment(AppSession.self) private var session
     @State private var selected = 0
-    @State private var pressing = false
+    @State private var pressStart: Date?
+    /// A short tap leaves the recording running until the next tap.
+    @State private var latched = false
     @State private var note: String?
 
     private var recorder: AudioRecorder { session.recorder }
-    private var prompts: [String] { Array((message.askAbout ?? []).prefix(3)) }
+    private var prompts: [String] {
+        let asked = Array((message?.askAbout ?? []).prefix(3))
+        return asked.isEmpty ? ["Tell her about your day", "Tell her what you ate", "Tell her what made you laugh"] : asked
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             head
-            Text(Almanac.quote(message))
-                .font(.serifItalic(22))
-                .foregroundStyle(Color.soft)
-                .lineSpacing(5)
-                .padding(.top, 26)
+            if let message {
+                Text(Almanac.quote(message))
+                    .font(.serifItalic(22))
+                    .foregroundStyle(Color.soft)
+                    .lineSpacing(5)
+                    .padding(.top, 26)
+            }
             if !prompts.isEmpty {
                 margin.padding(.top, 26)
             }
@@ -47,8 +54,9 @@ struct WriteBackView: View {
 
     private var head: some View {
         HStack(alignment: .firstTextBaseline) {
-            Text("To \(session.partnerName), \(Almanac.dayEs(message.date))")
-                .tinyCaps()
+            Text(message == nil ? "A new note to \(session.partnerName)" : "To \(session.partnerName)")
+                .font(.serif(24, relativeTo: .title2))
+                .foregroundStyle(Color.ink)
             Spacer()
             Button("Close") {
                 if recorder.isRecording { recorder.cancel() }
@@ -59,7 +67,6 @@ struct WriteBackView: View {
             .frame(minWidth: 44, minHeight: 44, alignment: .trailing)
             .contentShape(.rect)
         }
-        .frame(height: 22)
     }
 
     private var margin: some View {
@@ -97,7 +104,8 @@ struct WriteBackView: View {
     /// The selected prompt set as the headline of the reply; a caret while she listens.
     private var draft: some View {
         let prompt = prompts.indices.contains(selected) ? prompts[selected] : "Tell her something."
-        let tail = recorder.isRecording ? "" : " Hold the disc and answer."
+        let stop = prompt.last.map { ".?!".contains($0) } == true ? "" : "."
+        let tail = recorder.isRecording ? "" : "\(stop) Tap the disc and answer."
         return HStack(alignment: .lastTextBaseline, spacing: 3) {
             (Text(prompt).foregroundColor(.ink) + Text(tail).foregroundColor(Color(hex: 0xA9A39A)))
                 .font(.serif(32, relativeTo: .title))
@@ -115,22 +123,37 @@ struct WriteBackView: View {
                     Circle().fill(Color.rec).frame(width: 8, height: 8)
                     Text("REC").font(.sans(11, medium: true)).tracking(1.32).foregroundStyle(Color.rec)
                 }
-                .opacity(recorder.isRecording ? 1 : 0.4)
+                .opacity(recorder.isRecording ? 1 : 0)
+                .accessibilityHidden(!recorder.isRecording)
                 counter
-                Text(note ?? (recorder.isRecording ? "Let go to send" : "Hold to record"))
+                Text(note ?? hint)
                     .font(.serifItalic(18))
                     .foregroundStyle(Color.soft)
             }
             Spacer()
             RecordDisc(live: recorder.isRecording)
-                .scaleEffect(pressing ? 0.97 : 1)
-                .animation(.press, value: pressing)
-                .gesture(hold)
+                .scaleEffect(pressStart != nil ? 0.97 : 1)
+                .animation(.press, value: pressStart != nil)
+                .gesture(press)
                 .accessibilityElement()
-                .accessibilityLabel(recorder.isRecording ? "Recording. Let go to send" : "Hold to record")
+                .accessibilityLabel(recorder.isRecording ? "Recording. Tap to send" : "Record")
                 .accessibilityAddTraits(.isButton)
+                .accessibilityAction {
+                    if recorder.isRecording {
+                        latched = false
+                        finish()
+                    } else {
+                        latched = true
+                        begin()
+                    }
+                }
                 .padding(.bottom, 6)
         }
+    }
+
+    private var hint: String {
+        if !recorder.isRecording { return "Tap to record, tap again to send" }
+        return latched ? "Tap again to send" : "Let go to send"
     }
 
     private var counter: some View {
@@ -143,28 +166,42 @@ struct WriteBackView: View {
             .accessibilityLabel("\(s) seconds")
     }
 
-    private var hold: some Gesture {
+    /// Under 0.3 s is a tap that toggles; anything longer records while held.
+    private var press: some Gesture {
         DragGesture(minimumDistance: 0)
             .onChanged { _ in
-                guard !pressing else { return }
-                pressing = true
-                note = nil
-                session.player.stop()
-                Task {
-                    do {
-                        try await recorder.start(allowSimulated: session.isDemo)
-                        Haptics.recordStart()
-                        if !pressing { finish() }
-                    } catch {
-                        Haptics.error()
-                        note = error.localizedDescription
-                    }
-                }
+                guard pressStart == nil else { return }
+                pressStart = .now
+                if !latched { begin() }
             }
             .onEnded { _ in
-                pressing = false
-                if recorder.isRecording { finish() }
+                let held = Date.now.timeIntervalSince(pressStart ?? .now)
+                pressStart = nil
+                if latched {
+                    latched = false
+                    if recorder.isRecording { finish() }
+                } else if held < 0.3 {
+                    latched = true
+                } else if recorder.isRecording {
+                    finish()
+                }
             }
+    }
+
+    private func begin() {
+        note = nil
+        session.player.stop()
+        Task {
+            do {
+                try await recorder.start(allowSimulated: session.isDemo)
+                Haptics.recordStart()
+                if pressStart == nil && !latched { finish() }
+            } catch {
+                Haptics.error()
+                latched = false
+                note = error.localizedDescription
+            }
+        }
     }
 
     private func finish() {
@@ -172,10 +209,10 @@ struct WriteBackView: View {
         Haptics.recordStop()
         guard result.duration >= 0.8 else {
             if let url = result.url { try? FileManager.default.removeItem(at: url) }
-            note = "Hold a little longer"
+            note = "Too short. Say a little more"
             return
         }
-        Task { await session.send(recording: result.url) }
+        Task { await session.send(recording: result.url, replyTo: message?.id) }
         sent()
     }
 }

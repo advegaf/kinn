@@ -6,6 +6,7 @@ struct FamilyRoot: View {
         case week
         case entry(UUID)
         case write(UUID)
+        case compose
     }
 
     @Environment(AppSession.self) private var session
@@ -19,7 +20,8 @@ struct FamilyRoot: View {
         ZStack {
             switch route {
             case .week:
-                AlmanacView(open: { route = .entry($0) }, settings: { showSettings = true })
+                AlmanacView(open: { route = .entry($0) })
+                    .kinnTabBar(home: { route = .week }, compose: { route = .compose }, settings: { showSettings = true })
                     .transition(.fade)
             case .entry(let id):
                 if let m = message(id) {
@@ -31,6 +33,9 @@ struct FamilyRoot: View {
                     WriteBackView(message: m, close: { route = .week }, sent: { route = .week })
                         .transition(.fade)
                 }
+            case .compose:
+                WriteBackView(message: nil, close: { route = .week }, sent: { route = .week })
+                    .transition(.fade)
             }
         }
         .animation(.enter, value: route)
@@ -50,11 +55,17 @@ struct FamilyRoot: View {
     }
 
     #if DEBUG
-    /// Screenshot aids: `-openEntry YES`, `-writingBack YES`, `-fakeRecording YES`, `-openSettings YES`.
+    /// Screenshot aids: `-compose YES`, `-openEntry YES`, `-writingBack YES`, `-fakeRecording YES`, `-openSettings YES`.
     private func applyDebugRoute() {
-        guard !debugApplied, let latest = session.latestFromPartner else { return }
-        debugApplied = true
+        guard !debugApplied else { return }
         let d = UserDefaults.standard
+        if d.bool(forKey: "compose") {
+            debugApplied = true
+            route = .compose
+            return
+        }
+        guard let latest = session.latestFromPartner else { return }
+        debugApplied = true
         if d.bool(forKey: "writingBack") || d.bool(forKey: "fakeRecording") {
             route = .write(latest.id)
         } else if d.bool(forKey: "openEntry") {

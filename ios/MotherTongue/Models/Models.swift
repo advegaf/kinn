@@ -92,6 +92,15 @@ struct Story: Codable, Hashable, Sendable {
             }
             return out
         }
+        if out.allSatisfy({ ($0.tEn?.count ?? 0) == 2 }) {
+            for i in out.indices {
+                if let t = out[i].tEn, t.count == 2 {
+                    out[i].start = t[0]
+                    out[i].end = t[1]
+                }
+            }
+            return out
+        }
         let full = (translation ?? "").unmarked as NSString
         let total = Double(max(1, full.length))
         var cursor = 0
@@ -125,9 +134,13 @@ struct StoryScene: Codable, Hashable, Sendable {
     var videoPath: String?
     var thumbPath: String?
     var imagePath: String?
+    var tEn: [Double]?
+    var tEs: [Double]?
 
     enum CodingKeys: String, CodingKey {
         case start, end, prompt
+        case tEn = "t_en"
+        case tEs = "t_es"
         case textEs = "text_es"
         case textEn = "text_en"
         case videoPath = "video_path"
@@ -136,7 +149,7 @@ struct StoryScene: Codable, Hashable, Sendable {
     }
 
     init(start: Double? = nil, end: Double? = nil, textEs: String? = nil, textEn: String? = nil, prompt: String? = nil,
-         videoPath: String? = nil, thumbPath: String? = nil, imagePath: String? = nil) {
+         videoPath: String? = nil, thumbPath: String? = nil, imagePath: String? = nil, tEn: [Double]? = nil, tEs: [Double]? = nil) {
         self.start = start
         self.end = end
         self.textEs = textEs
@@ -145,6 +158,8 @@ struct StoryScene: Codable, Hashable, Sendable {
         self.videoPath = videoPath
         self.thumbPath = thumbPath
         self.imagePath = imagePath
+        self.tEn = tEn
+        self.tEs = tEs
     }
 
     init(from decoder: Decoder) throws {
@@ -157,6 +172,8 @@ struct StoryScene: Codable, Hashable, Sendable {
         videoPath = try? c.decodeIfPresent(String.self, forKey: .videoPath)
         thumbPath = try? c.decodeIfPresent(String.self, forKey: .thumbPath)
         imagePath = try? c.decodeIfPresent(String.self, forKey: .imagePath)
+        tEn = try? c.decodeIfPresent([Double].self, forKey: .tEn)
+        tEs = try? c.decodeIfPresent([Double].self, forKey: .tEs)
     }
 
     var hasMedia: Bool { videoPath != nil || imagePath != nil || thumbPath != nil }
@@ -190,9 +207,11 @@ struct Message: Codable, Identifiable, Hashable, Sendable {
     var error: String?
     var createdAt: String?
     var heardAt: String?
+    var replyTo: UUID? = nil
 
     enum CodingKeys: String, CodingKey {
         case id, transcript, translation, story, status, error
+        case replyTo = "reply_to"
         case threadId = "thread_id"
         case senderId = "sender_id"
         case sourceLang = "source_lang"
@@ -238,9 +257,11 @@ struct NewMessage: Encodable, Sendable {
     var targetLang: String
     var originalPath: String
     var status: MessageStatus
+    var replyTo: UUID? = nil
 
     enum CodingKeys: String, CodingKey {
         case id, status
+        case replyTo = "reply_to"
         case threadId = "thread_id"
         case senderId = "sender_id"
         case sourceLang = "source_lang"

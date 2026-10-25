@@ -12,7 +12,9 @@ struct VoiceEnrollView: View {
 
     enum Phase { case ready, recording, uploading, done }
 
-    private var es: Bool { session.myLang == "es" }
+    /// The phone belongs to the grandchild, who reads English. Only the elder path is Spanish,
+    /// so key off the role, not the stored language (a stale "es" pick used to leak in here).
+    private var es: Bool { session.role == .elder }
 
     private var script: String {
         es
@@ -165,7 +167,9 @@ struct VoiceEnrollView: View {
                     Haptics.arrival()
                     withAnimation(.enter) { phase = .done }
                 } catch {
-                    self.error = error.localizedDescription
+                    self.error = es
+                        ? "No pudimos guardar tu voz ahora. Puedes seguir y probar otra vez después."
+                        : "We could not save your voice right now. Skip for now and try again later in Settings."
                     withAnimation(.enter) { phase = .ready }
                 }
             }
