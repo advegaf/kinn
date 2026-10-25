@@ -120,11 +120,34 @@ def press_key():
     ab("press", "Enter")
 
 
-def press_button():
+def button_down():
     x, y = js("(() => { const r = document.querySelector('#spot').getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()")
     ab("mouse", "move", str(round(x)), str(round(y)))
     ab("mouse", "down")
+
+
+def press_button():
+    button_down()
     ab("mouse", "up")
+
+
+def holding():
+    return js("document.querySelector('#hearth').hasAttribute('data-hold')")
+
+
+def hold_to_record():
+    """The button records only after a 3 s hold, and the ring shows while the hold runs."""
+    button_down()
+    time.sleep(1)
+    if not holding():
+        raise Fail("no hold ring while the button is held")
+    if state() != "clock":
+        raise Fail(f"state is {state()} after a 1 s hold, expected clock")
+    wait_state("recording", 4)
+    ab("mouse", "up")
+    time.sleep(0.5)
+    if state() != "recording":
+        raise Fail(f"letting go after the hold left recording: {state()}")
 
 
 def open_page(base, query):
@@ -195,8 +218,7 @@ def demo_path(base):
     wait_state("clock", 3)
     check_screen("clock")
 
-    press_key()
-    wait_state("recording", 3)
+    hold_to_record()
     check_screen("recording")
     time.sleep(2.2)
     counter = js("['c0','c1','c2','c3'].map((id) => document.getElementById(id).textContent).join('')")
@@ -232,19 +254,19 @@ def subtitles(base):
     no_page_errors()
 
 
-def replay(base):
-    """A double press while recording cancels it and replays the newest story."""
+def short_tap(base):
+    """A tap shorter than the 3 s hold does not record, and the ring goes away."""
     open_page(base, "demo=1&state=clock")
     wait_state("clock", 5)
-    # The second press must land inside 650 ms, so no state poll between the two (each call takes about 0.2 s).
-    press_key()
-    time.sleep(0.3)
-    press_key()
-    wait_state("playing", 3)
-    check_screen("playing", timeout=6)
+    button_down()
     time.sleep(1)
-    press_key()
-    wait_state("clock", 3)
+    ab("mouse", "up")
+    if holding():
+        raise Fail("the hold ring stays after a short tap")
+    time.sleep(2.5)
+    if state() != "clock":
+        raise Fail(f"a short tap changed the state to {state()}")
+    check_screen("clock")
     no_page_errors()
 
 
@@ -263,7 +285,7 @@ def short_press(base):
 
 
 def error_screen(base):
-    """The error screen shows, and a press starts a new recording."""
+    """The error screen shows, and a remote key press starts a new recording."""
     open_page(base, "demo=1&state=error")
     wait_state("error", 5)
     check_screen("error")
@@ -274,7 +296,16 @@ def error_screen(base):
     no_page_errors()
 
 
-SCENARIOS = [demo_path, replay, short_press, error_screen, subtitles]
+def error_tap(base):
+    """A short tap on the error screen goes back."""
+    open_page(base, "demo=1&state=error")
+    wait_state("error", 5)
+    press_button()
+    wait_state(["clock", "waiting"], 3)
+    no_page_errors()
+
+
+SCENARIOS = [demo_path, short_tap, short_press, error_screen, error_tap, subtitles]
 
 
 def free_port():

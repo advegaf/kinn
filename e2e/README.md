@@ -13,8 +13,9 @@ Needs Python 3 and agent-browser (`npm i -g agent-browser && agent-browser insta
 It serves hearth-web on a local port and opens it headless at 1340x800 with `?demo=1`.
 It presses the button with real key and pointer events and checks each state: clock, waiting,
 playing, recording, sending, saved, and error. It checks the new message banner and that a tap
-on it plays the message, and the English subtitles (`?subs=en`). It also checks the replay
-double press and a press that is too short to send. On each screen it checks that the right layer shows,
+on it plays the message, and the English subtitles (`?subs=en`). It checks that recording
+needs a 3 s hold on the button (the ring fills, a shorter tap does not record), and that a
+recording that is too short is not sent. On each screen it checks that the right layer shows,
 that its text is there, that no text runs off the screen or clips, and that the button zone is
 at least 44 px. About 40 s.
 
