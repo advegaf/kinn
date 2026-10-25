@@ -104,12 +104,9 @@ struct OnboardingFlow: View {
                     .padding(.top, 12)
 
                 Toggle(isOn: $demoMode) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Demo mode").font(.serif(19)).foregroundStyle(Color.ink)
-                        Text("Canned data, no network").font(.serif(15)).foregroundStyle(Color.sub)
-                    }
+                    Text("Demo mode").font(.serif(19)).foregroundStyle(Color.ink)
                 }
-                .tint(.ink)
+                .toggleStyle(TickToggleStyle())
                 .accessibilityIdentifier("onboarding.demoMode")
                 .padding(.top, 34)
 

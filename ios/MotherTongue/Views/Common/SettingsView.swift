@@ -14,10 +14,10 @@ struct SettingsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 back.accessibilityIdentifier("settings.done")
-                OnbHeadline(title: "Settings", note: "The back of the book")
+                OnbHeadline(title: "Settings")
                     .padding(.top, 22)
 
-                section("Profile") {
+                Disclosure(title: "Profile", id: "settings.profile") {
                     row("Name", session.profile?.name ?? "")
                     row("Role", role == .elder ? "Hearth" : "Family")
                     if let code = session.thread?.code {
@@ -26,6 +26,7 @@ struct SettingsView: View {
                     row("Voice", session.profile?.voiceId == nil ? "Not recorded" : "Cloned")
                     link("Record my voice again", action: recordVoice)
                 }
+                .padding(.top, 34)
 
                 if role == .elder {
                     section("Hearth") {
@@ -37,7 +38,6 @@ struct SettingsView: View {
                 section("Demo") {
                     toggle("Demo mode", isOn: $demoMode)
                         .accessibilityIdentifier("settings.demoMode")
-                    note("Canned sample stories with no network.")
                 }
 
                 Button("Start over") {
@@ -63,9 +63,7 @@ struct SettingsView: View {
 
     private func section<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text(title)
-                .font(.serif(26, relativeTo: .title3))
-                .foregroundStyle(Color.ink)
+            SectionTitle(text: title)
                 .padding(.bottom, 10)
                 .accessibilityAddTraits(.isHeader)
             Hairline()
@@ -93,8 +91,8 @@ struct SettingsView: View {
             Toggle(isOn: isOn) {
                 Text(label).font(.serif(19)).foregroundStyle(Color.ink)
             }
-            .tint(.ink)
-            .padding(.vertical, 10)
+            .toggleStyle(TickToggleStyle())
+            .padding(.vertical, 4)
             Hairline()
         }
     }

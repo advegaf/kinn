@@ -28,7 +28,7 @@ struct BackButton: View {
     }
 }
 
-private struct Chevron: Shape {
+struct Chevron: Shape {
     func path(in rect: CGRect) -> Path {
         Path { p in
             p.move(to: CGPoint(x: rect.maxX, y: rect.minY))

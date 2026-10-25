@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// 03 writing back: her line quoted when replying, three prompts in the margin, and a disc to tap or hold while you talk.
+/// 03 writing back: her line quoted when replying, three prompts in the margin, and a disc to tap or hold while you talk. A finished take shows a send disc next to it.
 struct WriteBackView: View {
     var message: Message?
     var back: () -> Void
@@ -12,6 +12,10 @@ struct WriteBackView: View {
     /// A short tap leaves the recording running until the next tap.
     @State private var latched = false
     @State private var note: String?
+    /// A finished take waits here until she sends it or records again. Nil for a simulated demo take.
+    @State private var takeURL: URL?
+    @State private var reviewing = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var recorder: AudioRecorder { session.recorder }
     private var prompts: [String] {
@@ -46,7 +50,10 @@ struct WriteBackView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .contentShape(.rect)
         .background { PaperCanvas() }
-        .onDisappear { recorder.cancel() }
+        .onDisappear {
+            recorder.cancel()
+            discardTake()
+        }
         #if DEBUG
         .task {
             if UserDefaults.standard.bool(forKey: "fakeRecording") {
@@ -103,10 +110,10 @@ struct WriteBackView: View {
     private var draft: some View {
         let prompt = prompts.indices.contains(selected) ? prompts[selected] : "Tell her something."
         let stop = prompt.last.map { ".?!".contains($0) } == true ? "" : "."
-        let tail = recorder.isRecording ? "" : "\(stop) Tap the disc and answer."
         return HStack(alignment: .lastTextBaseline, spacing: 3) {
-            (Text(prompt).foregroundColor(.ink) + Text(tail).foregroundColor(.later))
+            Text(prompt + stop)
                 .font(.serif(32, relativeTo: .title))
+                .foregroundStyle(Color.ink)
                 .tracking(-0.3)
                 .lineSpacing(6)
             if recorder.isRecording { Caret(height: 26).padding(.bottom, 4) }
@@ -123,35 +130,44 @@ struct WriteBackView: View {
                         .opacity(recorder.isRecording ? 1 : 0)
                         .accessibilityHidden(true)
                 }
-                Text(note ?? hint)
+                Text(note ?? " ")
                     .font(.serif(18))
                     .foregroundStyle(Color.soft)
+                    .accessibilityHidden(note == nil)
             }
             Spacer()
-            RecordDisc(live: recorder.isRecording)
-                .scaleEffect(pressStart != nil ? 0.97 : 1)
-                .animation(.press, value: pressStart != nil)
-                .gesture(press)
-                .accessibilityElement()
-                .accessibilityLabel(recorder.isRecording ? "Recording. Tap to send" : "Record")
-                .accessibilityAddTraits(.isButton)
-                .accessibilityIdentifier("writeBack.record")
-                .accessibilityAction {
-                    if recorder.isRecording {
-                        latched = false
-                        finish()
-                    } else {
-                        latched = true
-                        begin()
-                    }
+            HStack(spacing: 16) {
+                recordDisc
+                if reviewing {
+                    Button(action: send) { RecordDisc(mark: .send) }
+                        .buttonStyle(PressStyle())
+                        .accessibilityLabel("Send")
+                        .accessibilityIdentifier("writeBack.send")
+                        .transition(reduceMotion ? .fadeIn : .opacity.combined(with: .scale(scale: 0.95)))
                 }
-                .padding(.bottom, 6)
+            }
+            .padding(.bottom, 6)
         }
     }
 
-    private var hint: String {
-        if !recorder.isRecording { return "Tap to record, tap again to send" }
-        return latched ? "Tap again to send" : "Let go to send"
+    private var recordDisc: some View {
+        RecordDisc(mark: recorder.isRecording ? .stop : .record)
+            .scaleEffect(pressStart != nil ? 0.97 : 1)
+            .animation(.press, value: pressStart != nil)
+            .gesture(press)
+            .accessibilityElement()
+            .accessibilityLabel(recorder.isRecording ? "Stop recording" : reviewing ? "Record again" : "Record")
+            .accessibilityAddTraits(.isButton)
+            .accessibilityIdentifier("writeBack.record")
+            .accessibilityAction {
+                if recorder.isRecording {
+                    latched = false
+                    finish()
+                } else {
+                    latched = true
+                    begin()
+                }
+            }
     }
 
     private var counter: some View {
@@ -187,6 +203,8 @@ struct WriteBackView: View {
     }
 
     private func begin() {
+        discardTake()
+        withAnimation(reduceMotion ? nil : .pop) { reviewing = false }
         note = nil
         session.player.stop()
         Task {
@@ -210,7 +228,20 @@ struct WriteBackView: View {
             note = "Too short. Say a little more"
             return
         }
-        Task { await session.send(recording: result.url, replyTo: message?.id) }
+        takeURL = result.url
+        withAnimation(reduceMotion ? nil : .push) { reviewing = true }
+    }
+
+    private func send() {
+        Haptics.tap()
+        let url = takeURL
+        takeURL = nil
+        Task { await session.send(recording: url, replyTo: message?.id) }
         sent()
+    }
+
+    private func discardTake() {
+        if let takeURL { try? FileManager.default.removeItem(at: takeURL) }
+        takeURL = nil
     }
 }
